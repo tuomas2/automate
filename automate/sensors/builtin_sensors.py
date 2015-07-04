@@ -463,7 +463,7 @@ class ShellSensor(AbstractSensor):
     caller = CBool
     filter = Any
     """
-        must be a generator, such as for example:
+        Filter function, which must be a generator, such as for example:
 
         .. code-block:: python
 
