@@ -1,0 +1,15 @@
+@startuml
+Sensor1 --> Program1
+Sensor2 --> Program1
+Sensor1 --> Program2
+Program2 --> Actuator1
+Program1 --> Actuator1
+Program1: priority 1.0
+Program2: priority 2.0
+Actuator1: <b>Program2</b>
+Actuator1: Program1
+Program2 --> Actuator1
+Actuator2: <b>Program2</b>
+Program1 --> Actuator3
+Actuator3: <b>Program1</b>
+@enduml

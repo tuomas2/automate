@@ -1,0 +1,145 @@
+.. _automate-programs:
+
+Programs
+--------
+
+Program features are defined in :class:`~automate.program.ProgrammableSystemObject` class.
+:class:`~automate.program.Program`, :class:`~automate.program.DefaultProgram` and
+:class:`~automate.statusobject.StatusObject` classes are subclassed from :class:`~automate.program.ProgrammableSystemObject`.
+
+.. inheritance-diagram:: automate.program.Program
+                         automate.program.DefaultProgram
+                         automate.statusobject.StatusObject
+                         automate.statusobject.AbstractSensor
+                         automate.statusobject.AbstractActuator
+   :parts: 1
+
+Programs are used to define the logic on which system operates. Program behavior is determined by the conditions
+(:attr:`~automate.program.ProgrammableSystemObject.active_condition`,
+:attr:`~automate.program.ProgrammableSystemObject.update_condition`) and actions
+(:attr:`~automate.program.ProgrammableSystemObject.on_activate`,
+:attr:`~automate.program.ProgrammableSystemObject.on_update`, :attr:`~automate.program.ProgrammableSystemObject.on_deactivate`),
+that are of :class:`~automate.callable.AbstractCallable`
+type. Callables are special objects that are used to implement the actual programming of Automate program objects.
+There are many special Callable classes to perform different operations and it is also easy to develop
+your own Callables.
+
+All Sensors and Actuators that affect the return value of a condition callable,
+are *triggers* for a Callable. All actuators (and writeable sensors) that
+a callable may change, are *targets*. Whenever any of the triggers status change, programs
+conditions are automatically updated and actions are taken if appropriate condition evaluates
+as True.
+
+Actions and conditions are used as follows. Programs can be either active or inactive depending on
+active_condition attribute. When program actives (i.e. active_condition changes to True),
+on_activate action is called. When program deactivates, on_deactive action is called, correspondingly.
+When program is active, its targets can be continuously manipulated by on_update callable, which
+is called whenever update_condition evaluates as True.
+
+Actuator Status Manipulation
+----------------------------
+
+Program can control status
+of one or more actuators. Programs manipulate Actuator statuses the following way:
+
+* One or more programs can control state of the same Actuator. Programs have
+  priorities (floating point number), so that the actual status of Actuator is determined
+  by program with highest priority
+* If highest priority program deactivates, the control of Actuator status is moved
+  to the the second-highest priority active program.
+* If there are no other Program, each Actuator has also one DefaultProgram, which then
+  takes over Actuator control.
+
+The following example program illustrates the priorities::
+
+    from automate import *
+    class MySystem(System):
+        low_prio_prg = UserBoolSensor(priority=-5,
+                                      active_condition=Value('low_prio_prg'),
+                                      on_activate=SetStatus('actuator', 1.0),
+                                      default=True,
+                                      )
+        med_prio_prg = UserBoolSensor(priority=1,
+                                      active_condition=Value('med_prio_prg'),
+                                      on_activate=SetStatus('actuator', 2.0),
+                                      default=True,
+                                      )
+        high_prio_prg = UserBoolSensor(priority=5,
+                                      active_condition=Value('high_prio_prg'),
+                                      on_activate=SetStatus('actuator', 3.0),
+                                      default=True,
+                                      )
+        inactive_high_prio_prg = UserBoolSensor(priority=6,
+                                      active_condition=Value('inactive_high_prio_prg'),
+                                      on_activate=SetStatus('actuator', 4.0),
+                                      default=False,
+                                      )
+
+        actuator = FloatActuator()
+
+    ms = MySystem(services=[WebService()])
+
+.. uml::
+
+    @startuml
+    skinparam state {
+    BackGroundColor<<actuator>> #FFCCFF
+    BackGroundColor<<program>> #FFFFCC
+    BackGroundColor<<sensor>> #CCFFCC
+    }
+    state "high_prio_prg" as high_prio_prg <<sensor>>
+    high_prio_prg: UserBoolSensor
+    high_prio_prg: Status: True
+    high_prio_prg: Priority: 5.0
+    high_prio_prg -[#009933]-> high_prio_prg
+    high_prio_prg -[#FF0000]-> actuator
+    state "inactive_high_prio_prg" as inactive_high_prio_prg <<sensor>>
+    inactive_high_prio_prg: UserBoolSensor
+    inactive_high_prio_prg: Status: False
+    inactive_high_prio_prg: Priority: 6.0
+    inactive_high_prio_prg -[#009933]-> inactive_high_prio_prg
+    inactive_high_prio_prg -[#4C4C4C]-> actuator
+    state "low_prio_prg" as low_prio_prg <<sensor>>
+    low_prio_prg: UserBoolSensor
+    low_prio_prg: Status: True
+    low_prio_prg: Priority: -5.0
+    low_prio_prg -[#009933]-> low_prio_prg
+    low_prio_prg -[#0000FF]-> actuator
+    state "med_prio_prg" as med_prio_prg <<sensor>>
+    med_prio_prg: UserBoolSensor
+    med_prio_prg: Status: True
+    med_prio_prg: Priority: 1.0
+    med_prio_prg -[#009933]-> med_prio_prg
+    med_prio_prg -[#0000FF]-> actuator
+    state "actuator" as actuator <<actuator>>
+    actuator: FloatActuator
+    actuator: high_prio_prg :: 3.0
+    actuator: med_prio_prg :: 2.0
+    actuator: dp_actuator :: 0.0
+    actuator: low_prio_prg :: 1.0
+    @enduml
+
+In this program, four programs (three manually defined programs and default program dp_actuator) are active for actuator.
+The actual status of actuator (now: 3.0) is determined by highest priority program. If high_prio_prog goes inactive (i.e. if its
+status is changed to False)::
+
+    high_prio_prg.status = False
+
+the status is then determined by med_prio_prg (=> 2.0). And so on. All the active programs for actuator are visible in UML diagram.
+Red arrow shows the dominating program, blue arrows show the other non-dominating active programs and gray arrows
+show the inactive programs that have the actuator as a target (i.e. if they are activated, they will manipulate
+the status of the actuator). low_prio_prg can never manipulate actuator status as its priority is lower than
+default program dp_actuator priority.
+
+Program Features
+----------------
+
+Program features are defined in ``ProgrammableSystemObject`` class. Its definition is as follows:
+
+.. note::
+    Unfortunately, due to Sphinx autodoc limitation, all trait types are displayed in this documentation as ``None``.
+    For the real trait types, please see the source fode.
+
+.. autoclass:: automate.program.ProgrammableSystemObject
+   :members:
+

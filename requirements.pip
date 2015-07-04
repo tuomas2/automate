@@ -1,0 +1,7 @@
+traits==4.5.0
+croniter==0.3.3
+pyinotify==0.9.4
+ipython==2.3.0
+ansiconv
+colorlog
+plantuml

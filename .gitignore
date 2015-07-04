@@ -1,0 +1,7 @@
+/.idea/
+/automate.egg-info/
+*.pyc
+/norepo/
+*.swp
+*.sav
+/docs/build/
