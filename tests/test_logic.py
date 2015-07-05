@@ -252,6 +252,26 @@ def test_attrib(prog):
     prog.on_activate = c2 = Attrib(obj, 'a')
     assert c2.call(prog) == 1
 
+def test_attrib2(sysloader):
+    class mysys2(System):
+        class joku:
+            joku = 2.0
+        s = UserFloatSensor(default=3.0)
+        a = FloatActuator()
+        p = Program(active_condition=Attrib(joku, 'joku'))
+        p2 = Program(active_condition=Attrib(p, 'active'))
+        p3 = Program(active_condition=Value(True),
+                     on_activate=SetStatus(a, Attrib(s, 'status', no_eval=True)))
+
+
+    s = sysloader.new_system(mysys2)
+    assert s.p.active
+    assert s.p2.active
+    s.flush()
+    assert s.s in s.p3.actual_triggers
+    assert s.a.program == s.p3
+    assert s.a.status == 3.0
+
 
 def test_onlytriggers(mysys):
     mysys.prog.on_activate = c = OnlyTriggers(mysys.act, mysys.sens)

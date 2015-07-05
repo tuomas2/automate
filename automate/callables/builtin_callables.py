@@ -60,9 +60,14 @@ class Attrib(AbstractAction):
     """
         Give specified attribute of a object.
 
-        Usage::
+        :param no_eval bool: set to True to skip evaluation of object -- use this to access attributes of SystemObjects
+
+        Usage & example::
 
             Attrib(obj, 'attributename')
+            Attrib(sensor_name, 'status', no_eval=True)
+
+
     """
 
     @property
@@ -70,9 +75,15 @@ class Attrib(AbstractAction):
         return self._args[1]
 
     def call(self, caller, **kwargs):
+        no_eval = self._kwargs.get('no_eval', False)
         if not caller:
             return
-        return getattr(self.call_eval(self.obj, caller, **kwargs), self.call_eval(self.method, caller, **kwargs), None)
+        if no_eval:
+            obj = self.obj
+        else:
+            obj = self.call_eval(self.obj, caller, **kwargs)
+        attr = self.call_eval(self.method, caller, **kwargs)
+        return getattr(obj, attr, None)
 
 
 class Method(AbstractAction):

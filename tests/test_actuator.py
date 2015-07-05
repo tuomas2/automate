@@ -1,6 +1,7 @@
 from collections import deque
 
 import pytest
+import time
 
 from automate import *
 from automate import Group
