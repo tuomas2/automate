@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
 from setuptools import setup, find_packages
-#from pip.req import parse_requirements
-
 
 def get_version(filename):
     import re
