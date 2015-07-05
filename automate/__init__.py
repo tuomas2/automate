@@ -15,6 +15,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Automate.  If not, see <http://www.gnu.org/licenses/>.
+#
+# ------------------------------------------------------------------
+#
+# If you like Automate, please take a look at this page:
+# http://tuomasairaksinen.fi/automate/gospel/
 
 __author__ = "Tuomas Airaksinen"
 __copyright__ = "Copyright 2015, Tuomas Airaksinen"
