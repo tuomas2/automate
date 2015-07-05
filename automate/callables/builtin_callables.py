@@ -273,9 +273,9 @@ class Shell(AbstractAction):
 
         Usage examples::
 
-            Exec('/bin/echo test', output=True) # returns 'test'
-            Exec('mplayer something.mp3', no_wait=True) # returns PID of mplayer process that keeps running
-            Exec('/bin/cat', input='test', output=True) # returns 'test'.
+            Shell('/bin/echo test', output=True) # returns 'test'
+            Shell('mplayer something.mp3', no_wait=True) # returns PID of mplayer process that keeps running
+            Shell('/bin/cat', input='test', output=True) # returns 'test'.
     """
 
     def call(self, caller, **kwargs):

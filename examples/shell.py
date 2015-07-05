@@ -1,9 +1,10 @@
 from automate import *
-from automate.program import Program
 
-t = IntervalTimerSensor(interval=10)
-p = Program(
-    triggers=[t],
-    on_update=Log(Shell('ls'))
-)
-main()
+class demo(System):
+    t = IntervalTimerSensor(interval=3)
+    p = Program(
+        triggers=[t],
+        on_update=Log(Shell('/bin/ls', output=True))
+    )
+
+d = demo()

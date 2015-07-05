@@ -12,9 +12,8 @@ class mysys(System):
             mysensor = UserBoolSensor(tags='web')
         act2 = FloatActuator(priorities={'myactuator': -1})
     myactuator = FloatActuator(
-        #on_update = Run(Log('hep hep'), SetStatus(act2, 'myactuator'), Log('jep %s', ToStr('myactuator')))
         on_update=Run(Log('hep hep'), SetStatus(mygroup.act2), Log('jep %s', ToStr('myactuator')))
-    )  # "Actuator 1")
+    )
 
     # timers have cron syntax
     timer = CronTimerSensor(
@@ -30,23 +29,6 @@ class mysys(System):
     )
 
 
-s = mysys(services=[  # GuiService(),
-    # TextUiService(),
-    # RpcService(
-    #),
-    WebService(
-        # ssl_certificate="testi.crt",
-        # ssl_private_key="testi.key",
-        # http_port=4430,
-        #http_auth=('tuomas', 'mp2gra5'),
-
-
-    ),
-    #DjangoWebService(slave=True, http_port=8081),
-    # StatusSaverService(),
-],
-    #statusdata = {'mysensor': 1},
-    #print_level = logging.DEBUG,
-    print_level=logging.INFO,
+s = mysys(services=[ WebService() ],
+          print_level=logging.INFO,
 )
-# s.text_ui()

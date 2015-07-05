@@ -9,6 +9,4 @@ class mysys(System):
     pwm = RpioPWMActuator(port=18, dma_channel=0, frequency=50.)
 
 
-s = mysys(  # services=[WebService()],
-    print_level=logging.INFO,
-)
+s = mysys()

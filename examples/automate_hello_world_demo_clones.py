@@ -1,17 +1,17 @@
 #!/usr/bin/env python
 """
-Factory example
+Factory example.
+
+Two instances of system are running individually.
 """
 
 from automate import *
-from automate.program import Program
 
 
 def mysys(*args, **kwargs):
     class _mysys(System):
-        config = Config(logfile='helloworld.log')
-        mysensor = UserFloatSensor(allow_web=True)
-        myactuator = FloatActuator()  # "Actuator 1")
+        mysensor = UserFloatSensor()
+        myactuator = FloatActuator()
 
         # timers have cron syntax
         timer = CronTimerSensor("Timer 1",
@@ -22,18 +22,11 @@ def mysys(*args, **kwargs):
                        on_update=Run(
                            SetStatus(myactuator, 1),
                            Debug("Hello World!"),
-        )
-        )
+                       )
+                       )
+
     return _mysys(*args, **kwargs)
 
-s1 = mysys(services=[GuiService(autostart=False),
-                     TextUIService(),
-                     WebService(autostart=True),
-                     ])
-s2 = mysys(services=[GuiService(autostart=False),
-                     TextUIService(),
-                     WebService(autostart=True, http_port=8081),
-                     ])
 
-s1.namespace['s2'] = s2
-s1.text_ui()
+s1 = mysys(exclude_services=['TextUIService'], services=[WebService(http_port=8081)])
+s2 = mysys(services=[WebService(http_port=8082)])

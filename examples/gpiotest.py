@@ -1,5 +1,4 @@
 from automate import *
-from automate.program import Program
 
 
 class mysys(System):
@@ -8,12 +7,4 @@ class mysys(System):
     p = Program(active_condition=Value(s),
                 on_activate=SetStatus(a, True))
 
-s = mysys(services=[
-    # RpioService(),
-    # TextUiService(),
-],
-    #exclude_services = ['RpioService']
-    # exclude_services=['TextUiService']
-)
-# RpioService(), TextUiService()]
-# main()
+s = mysys()
