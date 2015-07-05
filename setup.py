@@ -1,22 +1,26 @@
 #!/usr/bin/env python
 
 from setuptools import setup, find_packages
-from pip.req import parse_requirements
-import re
+#from pip.req import parse_requirements
 
 
 def get_version(filename):
+    import re
     with open(filename) as fh:
         metadata = dict(re.findall("__([a-z]+)__ = '([^']+)'", fh.read()))
         return metadata['version']
 
-install_reqs = parse_requirements('requirements.pip')
 setupopts = dict(
     name="automate",
     version=get_version('automate/__init__.py'),
     packages=find_packages(),
-    install_requires=[str(ir.req) for ir in install_reqs],
-    package_data={},
+    install_requires=[
+        'traits==4.5.0',
+        'croniter==0.3.8',
+        'pyinotify==0.9.6',
+        'ipython==3.2',
+        'ansiconv==1.0',
+        'colorlog==2.6'],
     test_suite='py.test',
     test_require=['pytest', 'pytest-capturelog'],
     author="Tuomas Airaksinen",
