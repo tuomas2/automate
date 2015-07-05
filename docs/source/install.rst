@@ -12,7 +12,14 @@ automate involves some strict version requirements for the libraries it uses.
 
 Install from pypi::
 
-    pip install pythonautomate
+    pip install automate
+
+If you want to install some extensions too, you may also run::
+
+    pip install automate-webui
+    pip install automate-rpc
+    pip install automate-arduino
+    pip install automate-rpio
 
 Install from git repository::
 
