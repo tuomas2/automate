@@ -49,7 +49,8 @@ You can also create new ones.
 UML view
 ^^^^^^^^^
 
-In UML view you can see nice UML diagram of the whole system.
+In UML view you can see nice UML diagram of the whole system. To enable UML diagram, you need to set
+up :class:`~automate.services.builtin_services.PlantUMLService`.
 
 .. figure:: images/uml_view.png
 
@@ -67,42 +68,10 @@ Example application using Web UI
 This is extended example of the :ref:`hello-world`, that opens two web services, one for port 8085 and another
 in 8086. It will go to UML view by default and in "User defined" -view you will see only ``web_switch``.
 
-.. code-block:: python
-
-    from automate import *
-
-    class MySystem(System):
-        # HW swtich connected Raspberry Pi GPIO port 1
-        hardware_switch = RpioSensor(port=1)
-        # Switch that is controllable, for example, from WEB interface
-        web_switch = UserBoolSensor(tags=['user'])
-        # Lamp relay that switches lamp on/off, connected to GPIO port 2
-        lamp = RpioActuator(port=2)
-        # Program that controls the system behaviour
-        program = Program(
-            active_condition = Or('web_switch', 'hardware_switch'),
-            on_activate = SetStatus('lamp', True)
-        )
-
-    web_service = WebService(
-                        read_only=False,
-                        default_view='plantuml',
-                        http_port=8085,
-                        http_auth = ('myusername', 'mypassword'),
-                        user_tags = ['user'],
-                        )
-
-    slave = WebService(
-                       http_port=8086,
-                       slave=True,
-                       )
-
-    my_system = MySystem(
-        services=[web_service, slave]
-        )
+.. literalinclude:: webui_example.py
 
 .. tip::
-   Try the code in your IPython shell with ``cpaste`` command!
+   Try to run the code in your IPython shell by copying & pasting it with ``cpaste`` command!
 
 WebService class definition
 ---------------------------
