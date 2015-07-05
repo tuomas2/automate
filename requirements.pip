@@ -1,7 +1,7 @@
 traits==4.5.0
-croniter==0.3.3
-pyinotify==0.9.4
-ipython==2.3.0
-ansiconv==1.0.0
-colorlog==2.6.0
-plantuml==0.1.1
+croniter==0.3
+pyinotify==0.9
+ipython==3.2
+ansiconv==1.0
+colorlog==2.6
+plantuml==0.1
