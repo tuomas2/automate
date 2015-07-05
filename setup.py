@@ -15,16 +15,10 @@ setupopts = dict(
     name="automate",
     version=get_version('automate/__init__.py'),
     packages=find_packages(),
-
-    scripts=["automate_clean_app.py", 'generate_selfsigned_certificate.sh'],
     install_requires=[str(ir.req) for ir in install_reqs],
-
     package_data={},
-
     test_suite='py.test',
     test_require=['pytest', 'pytest-capturelog'],
-
-    # metadata for upload to PyPI
     author="Tuomas Airaksinen",
     author_email="tuomas.airaksinen@gmail.com",
     description="Python library and application (with GUI) for simple formulation of advanced automation solutions.",

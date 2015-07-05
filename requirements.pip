@@ -1,6 +1,6 @@
 traits==4.5.0
-croniter==0.3
-pyinotify==0.9
+croniter==0.3.8
+pyinotify==0.9.6
 ipython==3.2
 ansiconv==1.0
 colorlog==2.6
