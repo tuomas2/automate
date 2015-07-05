@@ -4,4 +4,3 @@ pyinotify==0.9
 ipython==3.2
 ansiconv==1.0
 colorlog==2.6
-plantuml==0.1
