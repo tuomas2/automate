@@ -32,25 +32,18 @@ setupopts = dict(
                      "electrical equipments with different sensors and actuators (/actuator/ is "
                      "any physical equipment or software function that does something with "
                      "some conditions).",
-    license="Free for non-commercial use",
-    keywords="automation, GPIO, Raspberry Pi, RPIO, enaml, traits",
+    license="GPL",
+    keywords="automation, GPIO, Raspberry Pi, RPIO, traits",
     url="http://github.com/tuomas2/automate",
-    #    entry_points={'automate.service_extension': ['builtin_services = automate.services'],
-    #                  'automate.sensor_extension': ['builtin_sensors = automate.sensors'],
-    #                  'automate.actuator_extension': ['builtin_actuators = automate.actuators'],
-    #                  'automate.logic_extension': ['builtin_logic = automate.logic']
-    #                  },
 
     classifiers=["Development Status :: 4 - Beta",
                  "Environment :: Console",
-                 "Environment :: X11 Applications :: Qt",
-                 "Environment :: Win32 (MS Windows)",
                  "Environment :: Web Environment",
                  "Intended Audience :: Education",
                  "Intended Audience :: End Users/Desktop",
                  "Intended Audience :: Developers",
                  "Intended Audience :: Information Technology",
-                 "License :: Free for non-commercial use",
+                 "License :: OSI Approved :: GNU General Public License (GPL)",
                  "Operating System :: Microsoft :: Windows",
                  "Operating System :: POSIX",
                  "Programming Language :: Python :: 2.7",
