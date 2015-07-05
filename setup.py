@@ -21,11 +21,13 @@ setupopts = dict(
     test_require=['pytest', 'pytest-capturelog'],
     author="Tuomas Airaksinen",
     author_email="tuomas.airaksinen@gmail.com",
-    description="Python library and application (with GUI) for simple formulation of advanced automation solutions.",
-    long_description="Automate can be used to easily formulate advanced rules for automatization of several different "
-                     "electrical equipments with different sensors and actuators (/actuator/ is "
-                     "any physical equipment or software function that does something with "
-                     "some conditions).",
+    description="Automate is a general purpose Python automatization library.",
+    long_description="Automate is a general purpose Python automatization library. Its objective is to offer "
+                     "convenient and robust object-oriented programming framework for complex state machine systems. "
+                     "Automate can be used to design complex automation systems, yet it is easy to learn and fun to use. "
+                     "It was originally developed with home robotics/automatization projects in mind, but is quite general "
+                     "in nature and could find applications from various fields. Automate can be embedded in other "
+                     "Python software as a component, which runs its operation in its own threads."
     license="GPL",
     keywords="automation, GPIO, Raspberry Pi, RPIO, traits",
     url="http://github.com/tuomas2/automate",
