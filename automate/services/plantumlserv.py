@@ -32,13 +32,11 @@ class PlantUMLService(AbstractUserService):
 
         PLantUMLService requires either PlantUML software (which is opensource software written in Java) to be
         installed locally (see http://plantuml.sourceforge.net/) or it is possible to use online service of plantuml.com
-        If local installation is used, you need to configure :attr:`.url` manually.
+        In addition you need python package :mod:`plantuml` (available via PYPI).
     """
 
-    autoload = True
-
-    #: URL of PlantUML Java Service
-    url = Str('http://www.plantuml.com/plantuml/svg/')
+    #: URL of PlantUML Java Service. To use PlantUML online service, set this to 'http://www.plantuml.com/plantuml/svg/'
+    url = Str()
 
     #: Arrow colors as HTML codes stored as a dictionary with keys:
     #: controlled_target, active_target, inactive_target, trigger
