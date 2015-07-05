@@ -4,6 +4,8 @@ Automate
 Automate is a general purpose Python automatization library.
 Read the documentation at http://tuomasairaksinen.fi/automate/docs/
 
+This is the first beta release of Automate. 
+
 Licence
 -------
 

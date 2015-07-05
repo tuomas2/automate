@@ -27,7 +27,7 @@ setupopts = dict(
                      "Automate can be used to design complex automation systems, yet it is easy to learn and fun to use. "
                      "It was originally developed with home robotics/automatization projects in mind, but is quite general "
                      "in nature and could find applications from various fields. Automate can be embedded in other "
-                     "Python software as a component, which runs its operation in its own threads."
+                     "Python software as a component, which runs its operation in its own threads.",
     license="GPL",
     keywords="automation, GPIO, Raspberry Pi, RPIO, traits",
     url="http://github.com/tuomas2/automate",
