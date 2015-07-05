@@ -1,1 +1,6 @@
 sphinxcontrib-plantuml==0.5
+automate-arduino
+automate-rpio
+automate-webui
+automate-wsgi
+automate-rpc
