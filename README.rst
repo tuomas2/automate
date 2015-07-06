@@ -73,6 +73,35 @@ This simple example has two sensors ``hardware_switch``, ``web_switch``, actuato
 contains logic what to do and when. Here, ``lamp`` is switched on if either ``web_switch`` or ``hardware_switch`` has
 status True.
 
+Installing Automate
+-------------------
+
+Automate can be installed like ordinary python package. I recommend installation
+in within virtual environment (see `virtualenv <https://virtualenv.pypa.io/en/latest/>`_).
+
+#. (optional): Create and start using virtualenv::
+
+    mkvirtualenv automate
+    workon automate
+
+
+#. Install from pypi::
+
+    pip install automate
+
+#. If you want to install some extensions too, you may also run::
+
+    pip install automate-webui
+    pip install automate-rpc
+    pip install automate-arduino
+    pip install automate-rpio
+
+Optionally, you could install also by cloning GIT repository and installing manually::
+
+    git clone https://github.com/tuomas2/automate.git
+    cd automate
+    ./setup.py install
+
 Licence
 -------
 
