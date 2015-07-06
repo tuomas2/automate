@@ -660,7 +660,7 @@ def test_while_actuator_condition(sysloader):
     s = sysloader.new_system(ms)
     s.f.status = 1
     # Flushing system is not sufficient because While is threaded activity.
-    time.sleep(0.1)
+    time.sleep(0.5)
     assert s.f.status == 0
     #assert s.s.program_status(s.f) == 3
     assert s.s.status == 0
@@ -718,7 +718,7 @@ def test_while_akvadimmer(sysloader):
     s = sysloader.new_system(ms)
     s.akvadimmer.status = 1
     # Flushing system is not sufficient because While is threaded activity.
-    time.sleep(0.1)
+    time.sleep(0.5)
     assert len(called) == 8
     assert s.dimmer[0].status == False
     assert s.akvadimmer.status == 0
@@ -739,7 +739,7 @@ def test_while_basic(sysloader):
     s = sysloader.new_system(ms)
     s.f.status = 1
     # Flushing system is not sufficient because While is threaded activity.
-    time.sleep(0.1)
+    time.sleep(0.5)
     assert s.s.status == 3
     assert len(called) == 3
 
@@ -763,7 +763,7 @@ def test_while_do_after(sysloader):
     s = sysloader.new_system(ms)
     s.f.status = 1
     # Flushing system is not sufficient because While is threaded activity.
-    time.sleep(0.1)
+    time.sleep(0.5)
     assert s.s.status == 3
     assert len(called) == 3
     assert do_after_called
@@ -790,7 +790,7 @@ def test_while_cancel(sysloader, caplog):
     s.f.status = 0  # : Deactivates program => cancels action
     s.flush()
     assert w.get_state(s.f).threads[0]._cancel_while
-    time.sleep(0.1)
+    time.sleep(0.5)
     assert not w.get_state(s.f)
     assert 'Canceling While' in caplog.text()
 
@@ -811,7 +811,7 @@ def test_while_nested(sysloader):
     s = sysloader.new_system(ms)
     s.f.status = 1
     s.flush()
-    time.sleep(0.1)
+    time.sleep(0.5)
     assert s.s.status == 3
     assert s.s2.status == 3
 
@@ -838,7 +838,7 @@ def test_while_nested_cancel(sysloader):
     w2 = w1[1]
     s.f.status = 1
     s.flush()
-    time.sleep(0.1)
+    time.sleep(0.5)
     assert len(w1.get_state(s.f).threads) == 1
     #assert len(w2.get_state(s.f).threads)==1
     assert not w1.get_state(s.f).threads[0]._cancel_while
@@ -850,7 +850,7 @@ def test_while_nested_cancel(sysloader):
     # There are many threads of second while, so this is not so easy to test
     # with w2._lock:
     #    assert (w2.get_state(s.f).cancel and w2.get_state(s.f).threads) or not w2.get_state(s.f)
-    time.sleep(0.1)
+    time.sleep(0.5)
     assert not w1.get_state(s.f)
     assert not w2.get_state(s.f)
     assert s.s.status > 0
@@ -1103,7 +1103,7 @@ def test_delay(caplog, mysys):
     mysys.namespace['c'] = c
     c.call(prog)
     assert 'Scheduling' in caplog.text()
-    time.sleep(0.1)
+    time.sleep(0.5)
     print '2', caplog.text()
     assert 'Time is up' in caplog.text()
 
@@ -1116,7 +1116,7 @@ def test_delay_cancel(caplog, prog):
     assert 'Scheduling' in caplog.text()
     assert c.get_state(prog).timers
     c.cancel(prog)
-    time.sleep(0.1)
+    time.sleep(0.5)
     # print caplog.text()
     assert not c.get_state(prog)
     assert 'Cancelling Delay' in caplog.text()
@@ -1144,7 +1144,7 @@ def test_delay_secondtry(caplog, mysys):
     assert 'Scheduling' in caplog.text()
     c.call(prog)
     assert len(c.get_state(prog).timers) == 2
-    time.sleep(0.1)
+    time.sleep(0.5)
     assert "Time is up" in caplog.text()
     assert len(c.get_state(prog).timers) == 0
 
@@ -1335,7 +1335,7 @@ def test_self_delay(self_sys):
     S.s.status = 1
     S.flush()
     assert S.s.status == 1
-    time.sleep(0.2)
+    time.sleep(0.5)
     S.flush()
     assert S.s.status == 0
 

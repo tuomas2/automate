@@ -9,8 +9,8 @@ from automate.program import Program
 
 logger = logging.getLogger('automate.tests')
 
-DELAYTIME = 0.5
-SLEEPTIME = 1.5 * DELAYTIME
+DELAYTIME = 1.0
+SLEEPTIME = 1.7 * DELAYTIME
 LOW = 1.0
 HIGH = 100.0
 AMOUNT = 20
