@@ -3,7 +3,7 @@ python:
   - "2.7"
 # command to install dependencies
 install: 
-    - "pip install pytest"
+    - "pip install -r .travis_requirements.txt"
     - "python setup.py install"
 # command to run tests
 script: py.test
