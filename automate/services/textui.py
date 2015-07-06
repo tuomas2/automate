@@ -55,7 +55,7 @@ class TextUIService(AbstractUserService):
 
     """
         Provides interactive Python shell frontend to the System.
-        Uses ipython if it is installed.
+        Uses IPython if it is installed.
         Provides couple of functions to the System namespace.
     """
     autoload = True

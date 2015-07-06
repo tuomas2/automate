@@ -32,6 +32,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
     'sphinxcontrib.plantuml',
+#    'sphinxcontrib.googleanalytics',
     'sphinx.ext.intersphinx',
     'sphinx.ext.graphviz',
     'sphinx.ext.inheritance_diagram',
@@ -74,6 +75,8 @@ extensions = [
 
 # inheritance_node_attrs = dict(fontsize=24, height=0.75,
 #                              )
+
+googleanalytics_id = 'UA-5516303-1'
 
 intersphinx_mapping = {'traits': ('http://traits.readthedocs.org/en/4.5.0/', None),
                        'python': ('http://docs.python.org/2', None),

@@ -64,7 +64,7 @@ class Attrib(AbstractAction):
     """
         Give specified attribute of a object.
 
-        :param no_eval bool: set to True to skip evaluation of object -- use this to access attributes of SystemObjects
+        :param no_eval bool: if True, evaluation of object is skipped -- use this to access attributes of SystemObjects
 
         Usage & example::
 

@@ -64,12 +64,12 @@ class ProgrammableSystemObject(SystemObject):
     #: An action Callable to be executed when Program deactivates.
     on_deactivate = Instance(AbstractCallable)
 
-    #: When program is active, this is the condition Callable that must equal to True in order to on_update action to
-    #: be executed. Whenever a trigger is changed, this condition is checked and if True, on_update is
-    #: executed.
+    #: When program is active, this is the condition Callable that must equal to ``True`` in order to
+    #: on_update action to be executed. Whenever a trigger is changed, this condition is checked and
+    #: if ``True``, on_update is executed.
     update_condition = Instance(AbstractCallable)
 
-    #: Action Callable to be executed if Program is active and update_condition is True.
+    #: Action Callable to be executed if Program is active and update_condition is ``True``.
     on_update = Instance(AbstractCallable)
 
     #: When programs sets Actuator status, the actual status of Actuator is determined by a program that has highest

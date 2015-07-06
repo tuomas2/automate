@@ -41,21 +41,20 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
         Baseclass for Sensors and Actuators
     """
 
-    #: Set to true if this object type meant to be user-editable in UIs. This is meant to be overwritten in
-    #: subclasses, if desired.
     editable = True
 
-    #: Safetydelay determines minimum time required for switching. State change is then delayed if necessary.
+    #: Determines minimum time required for switching. State change is then delayed if necessary.
     safety_delay = CFloat(0.)
 
-    #: Safetymode determines when safety_delay needs to be taken into account: when status is rising, falling or both.
+    #: Determines when :attr:`.safety_delay` needs to be taken into account: when status is
+    #: rising, falling or both.
     safety_mode = Enum("rising", "falling", "both")
 
-    #: Similar to safety_delay, but just delays change to make sure that events shorter
+    #: Similar to :attr:`.safety_delay`, but just delays change to make sure that events shorter
     #: than change_delay are not taken into account
     change_delay = CFloat(0.)
 
-    #: As safety_mode, but for change_delay
+    #: As :attr:`.safety_mode`, but for :attr:`.change_delay`
     change_mode = Enum("rising", "falling", "both")
 
     #: Do not emit actuator status changes into logs
@@ -90,11 +89,9 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
 
     logger = Instance(logging.Logger, transient=True)
 
-    #: The list of attributes that we want to show in UIs
     view = ["name", "status", "description", "safety_delay",
             "safety_mode", "change_delay", "change_mode"] + SystemObject.view
 
-    #: Short list of attributes shown in some UIs (define in class level)
     simple_view = []
 
     # used by Web UI, for templates
@@ -153,9 +150,9 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
 
     def set_status(self, new_status, origin=None):
         """
-            For sensors, this is synonymous to
+            For sensors, this is synonymous to::
 
-            sensor.status = new_status
+                sensor.status = new_status
 
             For (non-slave) actuators, origin argument (i.e. is the program that is
             changing the status) need to be given,
@@ -300,16 +297,16 @@ class AbstractSensor(StatusObject):
     """ Base class for all sensors """
 
     #: Is sensor user-editable in UIs. This variable is meant for per-instance tuning for Sensors,
-    #: whereas :attr:`automate.systemobject.SystemObject.editable` is for per-class adjustment.
+    #: whereas :attr:`.editable` is for per-class adjustment.
     user_editable = CBool(False)
 
-    #: Status type is defined as _status, but always use status property to set/get values.
+    #: Status type is defined as _status, but always use :attr:`.status` property to set/get values.
     _status = Any
 
     #: Default value for status
     default = Any
 
-    #: If non-zero, Sensor status will be reset to default after reset_delay seconds
+    #: If non-zero, Sensor status will be reset to default after defined time (in seconds).
     reset_delay = CFloat
 
     _reset_timer = Any(transient=True)
@@ -335,7 +332,8 @@ class AbstractSensor(StatusObject):
     def set_status(self, status, origin=None):
         """
             Compatibility to actuator class.
-            Also SetStatus callable can be used for sensors too, if so desired.
+            Also :class:`~automate.callables.builtin_callables.SetStatus`
+            callable can be used for sensors too, if so desired.
         """
 
         if status != self.default:
@@ -365,17 +363,19 @@ class AbstractActuator(StatusObject):
 
     """ Base class for all actuators."""
 
-    #: Default value for status. For actuators, this is set by automatically created DefaultProgram dp_actuatorname
+    #: Default value for status. For actuators, this is set by automatically created
+    #: :class:`~automate.program.DefaultProgram` dp_actuatorname
     default = Any(False, transient=True)
 
-    #: If True, actual status can be set by any program anytime without restrictions.
+    #: If ``True``, actual status can be set by any program anytime without restrictions.
     slave = CBool
 
     #: A property giving current program governing the status of this actuator (program that has the highest priority)
     program = Property(trait=Instance(ProgrammableSystemObject), transient=True, depends_on="program_stack[]")
 
     #: This dictionary can be used to override program priorities.
-    #: Note: keys here must be program names (not program instances).
+    #:
+    #: .. note::  Keys here must be program names, (not :class:`~automate.program.Program` instances).
     priorities = Dict(key_trait=Str, value_trait=CFloat)
 
     @cached_property
@@ -385,7 +385,7 @@ class AbstractActuator(StatusObject):
         except IndexError:
             return
 
-    #: Reference to actuators default program
+    #: Reference to actuators :class:`~automate.program.DefaultProgram`
     default_program = Instance(DefaultProgram)
 
     # Locks for thread-safety
@@ -408,8 +408,8 @@ class AbstractActuator(StatusObject):
 
     def set_status(self, status, program=None):
         """ For programs, to set current status of the actuator. Each
-            active program has its status in _program_stack dictionary and
-            the highest priority is realized in the actuator """
+            active program has its status in :attr:`.program_stack`
+            dictionary and the highest priority is realized in the actuator """
 
         if not self.slave and program not in self.program_stack:
             raise ValueError('Status cannot be changed directly')
@@ -461,14 +461,15 @@ class AbstractActuator(StatusObject):
 
     def update_program_stack(self):
         """
-            Update program_stack. Used by programs _priority_changed to reset ordering.
+            Update :attr:`.program_stack`. Used by programs
+            :attr:`~automate.program.ProgrammableSystemObject._priority_changed` attribute to reset ordering.
         """
         with self._program_lock:
             self._update_program_stack()
 
     def get_program_status(self, prog):
         """
-            Give status defined by given program prog
+            Give status defined by given program ``prog``
         """
         try:
             return self.program_status[prog]

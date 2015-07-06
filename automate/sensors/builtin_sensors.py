@@ -65,8 +65,8 @@ class UserEventSensor(UserBoolSensor):
     """
         Boolean-valued user-editable sensor suitable for using for singular events.
 
-        After status has been changed to True, it changes automatically its status
-        back to False.
+        After status has been changed to ``True``, it changes automatically its status
+        back to ``False``.
     """
 
     def __status_changed(self):
@@ -84,7 +84,7 @@ class AbstractNumericSensor(AbstractSensor):
         Abstract class for numeric sensor types, that allows limiting
         value within a specific range.
 
-        If limiting values (value_min, value_max) are used, value that exceeds
+        If limiting values (:attr:`.value_min`, :attr:`.value_max`) are used, value that exceeds
         these limits, is clipped to the range.
     """
 
@@ -159,11 +159,11 @@ class CronTimerSensor(AbstractSensor):
     _status = CBool(False)
 
     #: Semicolon separated lists of cron-compatible strings that indicate
-    #: when to switch status to True
+    #: when to switch status to ``True``
     timer_on = CronListStr
 
     #: Semicolon separated lists of cron-compatible strings that indicate
-    #: when to switch status to False
+    #: when to switch status to ``False``
     timer_off = CronListStr
 
     # Cronit objects
@@ -397,13 +397,15 @@ class SocketSensor(AbstractSensor):
         is dropped.
     """
 
-    #: Hostname/IP to listen. Use 0.0.0.0 to listen all interfaces.
+    #: Hostname/IP to listen. Use ``'0.0.0.0'``  to listen all interfaces.
     host = CStr('0.0.0.0')
 
     #: Port to listen
     port = CInt
 
+    #: set to ``True`` to tell SocketSensor to stop listening to port
     stop = CBool(transient=True)
+
     _socket = Instance(socket.socket, transient=True)
     _status = CInt
 

@@ -28,6 +28,10 @@ from automate.callable import AbstractCallable
 
 
 class Namespace(dict):
+    """
+        Namespace dictionary object for Automate System.
+        Contains all SystemObjects stored in System by their names.
+    """
 
     def __init__(self, system=None, *args, **kwargs):
         self.allow_overwrite = []

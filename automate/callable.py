@@ -160,7 +160,7 @@ class AbstractCallable(SystemObject, CompareMixin):
     def call_eval(self, value, caller, return_value=True, **kwargs):
         """
             Value might be either name registered in System namespace, or object, either
-            StatusObject or Callable. If Callable, evaluate call() method. If StatusObject,
+            StatusObject or Callable. If Callable, evaluate :meth:`.call` method. If StatusObject,
             return status.
         """
         value = self.name_to_system_object(value)
@@ -187,7 +187,7 @@ class AbstractCallable(SystemObject, CompareMixin):
             This function basically sets up :attr:`.system`, if it is not yet set up. After that,
             other Callable initialization actions are performed.
 
-            :param init: True is given when running this at the initialization phase. Then system
+            :param init: value ``True`` is given when running this at the initialization phase. Then system
                          attribute is set already, but callable needs to be initialized otherwise.
 
         """
@@ -214,6 +214,9 @@ class AbstractCallable(SystemObject, CompareMixin):
 
     @property
     def objects(self):
+        """
+            Shortcut to :attr:`._args`.
+        """
         return self._args
 
     @property
@@ -254,7 +257,7 @@ class AbstractCallable(SystemObject, CompareMixin):
         Define targets and triggers of this particular callable in :meth:`_give_triggers`
         and :meth:`_give_targets`.
 
-        :param str target: valid values: 'targets' and 'triggers'
+        :param str target: valid values: ``'targets'`` and ``'triggers'``
         """
         statusobjects = set()
         callables = set()
@@ -371,7 +374,7 @@ class AbstractCallable(SystemObject, CompareMixin):
     def give_str_indented(self, tags=False):
         """
             Give indented string representation of the callable.
-            This is used in WEB UI.
+            This is used in :ref:`automate-webui`.
         """
         args = self._args[:]
         kwargs = self._kwargs

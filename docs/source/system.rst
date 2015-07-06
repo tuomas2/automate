@@ -4,14 +4,8 @@ Automate System
 Introduction
 ------------
 
-System encapsulates the state machine parts into single object. It has already been
+:class:`automate.system.System` encapsulates the state machine parts into single object. It has already been
 explained how to use System. Here we will go further into some details.
-
-System Class Definition
------------------------
-
-.. autoclass:: automate.system.System
-   :members:
 
 
 .. _groups:
@@ -20,8 +14,8 @@ Groups
 ------
 
 
-In a Automate system, it is possible to group objects by putting them to Groups. Grouping helps organizing
-objects in code level as well as in GUIs (WEB UI etc.).
+In Automate system, it is possible to group objects by putting them to Groups. Grouping helps organizing
+objects in code level as well as in GUIs (:ref:`automate-webui` etc.).
 
 Here is an example::
 
@@ -35,16 +29,30 @@ Here is an example::
             sensor4 = UserBoolSensor()
 
 By adding SystemObject to a group, will assign it a tag corresponding to its groups class name. I.e. here,
-*sensor1* and *sensor2* will get tag *group:group1* and sensor3 and sensor4 will get tag *group:group2*.
+``sensor1`` and ``sensor2`` will get tag *group:group1* and ``sensor3`` and ``sensor4`` will get tag *group:group2*.
 
-System namespace
-----------------
+System has single namespace dictionary that contains names of all objects. That implies
+that objects in different groups may not have same name.
 
-System has single namespace that contains names of all objects. That implies
-that objects in different groups_ may not have same name.
+.. _state-saving:
 
-.. autoclass:: automate.namespace.Namespace
-   :members:
+System State Saving and Restoring via Serialization
+---------------------------------------------------
+
+If System state is desired to be loaded later from periodically auto-saved state dumps,
+system can be instantiated via :meth:`~automate.system.System.load_or_create` as follows::
+
+    my_system_instance = MySystem.load_or_create('my_statedump.dmp')
+
+Then system state will be saved periodically (by default, once per 30 minutes) by
+:class:`~automate.services.statussaver.StatusSaverService`, which is automatically loaded
+service (see :ref:`services`). If you desire to change
+interval, you need to explicitly define
+:attr:`~automate.services.statussaver.StatusSaverService.dump_interval`
+as follows::
+
+    status_saver = StatusSaverService(dump_interval=10) # interval in seconds
+    my_system_instance = MySystem.load_or_create('my_statedump.dmp', services=[status_saver])
 
 
 SystemObject
@@ -53,7 +61,8 @@ SystemObject
 .. inheritance-diagram:: automate.system.SystemObject
    :parts: 1
 
-SystemObject is baseclass for all objects that may be used within System (most importantly,
+:class:`~automate.systemobject.SystemObject` is baseclass for all objects that may be used within
+:class:`~automate.system.System` (most importantly,
 Sensors, Actuators and Programs).
 
 Due to multiple inheritance, many SystemObjects,
@@ -71,11 +80,16 @@ Sensors and Programs do not have Actuator properties (i.e. per-program statuses)
 Sensor status can still be set/written by a Program, similarly to actuators with
 :attr:`~automate.statusobject.AbstractActuator.slave` attribute set to True.
 
+System Class Definition
+-----------------------
+
+.. autoclass:: automate.system.System
+   :members:
+
+
 SystemObjects Class Definition
 ------------------------------
 
 .. autoclass:: automate.systemobject.SystemObject
    :members:
-
-
 

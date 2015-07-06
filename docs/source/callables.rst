@@ -1,3 +1,5 @@
+.. _callables:
+
 Callables
 =========
 
@@ -5,25 +7,26 @@ Introduction
 ------------
 
 Callables are used like a small *programming language* to define the programming logic within the
-Automate system. All ProgrammableSystemObjects have five attributes that accept Callable type
-objects:
+Automate system. All classes derived from :class:`~automate.program.ProgrammableSystemObject` have five
+attributes that accept Callable type objects:
 
  * Conditions
 
-   * active_condition
-   * update_condition
+   * :attr:`~automate.program.ProgrammableSystemObject.active_condition`
+   * :attr:`~automate.program.ProgrammableSystemObject.update_condition`
 
  * Actions
 
-   * on_activate
-   * on_update
-   * on_deactivate
+   * :attr:`~automate.program.ProgrammableSystemObject.on_activate`
+   * :attr:`~automate.program.ProgrammableSystemObject.on_update`
+   * :attr:`~automate.program.ProgrammableSystemObject.on_deactivate`
 
 Conditions determine *when* and actions, correspondingly, *what* to do.
 
 Actions are triggered by *triggers* that are Sensors and Actuators. Triggers are collected
 from Callables (conditions and actions) automatically, and their status changes are subscribed and followed
-automatically by a ProgrammableSystemObject. Thus, condition statuses are evaluated automatically, and
+automatically by a
+:class:`~automate.program.ProgrammableSystemObject`. Thus, condition statuses are evaluated automatically, and
 actions are executed based on condition statuses.
 
 Let us take a look at a small example that uses conditions and actions:
@@ -76,18 +79,19 @@ Let us take a look at a small example that uses conditions and actions:
 
    s = CounterClock(services=[WebService(read_only=False)])
 
-When user has switched *active_switch* sensor to True, this simple program will start adding +1 to target_actuator value every
-second. Because *periodical* is not used as a trigger in any action/condition, we need to explicitly define it as a
-trigger with triggers attribute. Correspondingly, *target_actuator* is automatically collected as prog's trigger (because
-it is the second argument of SetStatus), so we need to explicitly exclude it with *exclude_triggers* attribute.
+When user has switched ``active_switch`` sensor to ``True``, this simple program will start adding +1 to target_actuator value every
+second. Because ``periodical`` is not used as a trigger in any action/condition, we need to explicitly define it as a
+trigger with triggers attribute. Correspondingly, ``target_actuator`` is automatically collected as prog's trigger (because
+it is the second argument of SetStatus), so we need to explicitly exclude it with ``exclude_triggers`` attribute.
 
 .. tip::
 
-    Try the code yourself! Just cpaste the code into your ipython shell and go to http://localhost:8080 in your browser!
+    Try the code yourself! Just cpaste the code into your IPython shell and go to http://localhost:8080 in your browser!
     Screenshot:
 
-.. image:: images/counter_app.png
+    .. image:: images/counter_app.png
 
+.. _deriving-callables:
 
 Deriving Custom Callables
 -------------------------
@@ -130,7 +134,10 @@ are considered as targets, by defining
 :meth:`~automate.callable.AbstractCallable._give_targets`, correspondingly.
 
 As a general rule, Callable should not consider criteria conditions as triggers
-(for example the conditions of If, Switch etc).
+(for example the conditions of
+:class:`~automate.callables.builtin_callables.If`,
+:class:`~automate.callables.builtin_callables.Switch`
+etc).
 
 Referring to Other Objects in Callables
 ---------------------------------------

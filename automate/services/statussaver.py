@@ -37,7 +37,8 @@ class StatusSaverService(AbstractUserService):
     """
 
     autoload = True
-    # Dump saving interval, in seconds. Default 30 minutes.
+
+    #: Dump saving interval, in seconds. Default 30 minutes.
     dump_interval = CFloat(30 * 60)
 
     _exit = CBool(False)
