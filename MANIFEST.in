@@ -1,0 +1,3 @@
+include LICENCE.txt
+include examples/*.py
+include tests/*.py
