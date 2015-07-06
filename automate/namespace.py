@@ -41,7 +41,7 @@ class Namespace(dict):
         self['__name__'] = self.system.name + '_namespace'
         super(Namespace, self).__init__(*args, **kwargs)
 
-    def give_automatesystemobjects(self, system, tags=None):
+    def give_systemobjects(self, system, tags=None):
         objs = []
         if not tags:
             tags = set()
@@ -53,14 +53,14 @@ class Namespace(dict):
                 add_tags = tags.copy()
                 if hasattr(obj, 'tags'):
                     add_tags = add_tags | set(obj.tags.split(','))
-                objs.extend(self.give_automatesystemobjects(obj, add_tags | {'group:%s' % name}))
+                objs.extend(self.give_systemobjects(obj, add_tags | {'group:%s' % name}))
         return objs
 
     def set_system(self, loadstate=None):
         if loadstate:
             objs = [(i._passed_arguments[1]['name'], i, []) for i in loadstate]
         else:
-            objs = self.give_automatesystemobjects(self.system)
+            objs = self.give_systemobjects(self.system)
 
         def order(x):
             if isinstance(x[1], AbstractCallable):
