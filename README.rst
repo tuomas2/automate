@@ -1,12 +1,13 @@
+.. image:: https://travis-ci.org/tuomas2/automate.svg?branch=master
+    :target: https://travis-ci.org/tuomas2/automate
+
+.. image:: https://coveralls.io/repos/tuomas2/automate/badge.svg?branch=master
+    :target: https://coveralls.io/r/tuomas2/automate?branch=master
+
+
 Automate
 ========
 
-.. image:: https://travis-ci.org/tuomas2/automate.svg?branch=master
-    :target: https://travis-ci.org/tuomas2/automate
-    
-.. image:: https://coveralls.io/repos/tuomas2/automate/badge.svg 
-    :target: https://coveralls.io/r/tuomas2/automate
-    
 Automate is a general purpose Python automatization library.
 Read the documentation at http://tuomasairaksinen.fi/automate/docs/
 

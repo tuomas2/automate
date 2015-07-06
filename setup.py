@@ -20,7 +20,7 @@ setupopts = dict(
         'ansiconv==1.0',
         'colorlog==2.6'],
     test_suite='py.test',
-    test_require=['pytest', 'pytest-capturelog'],
+    tests_require=['pytest', 'pytest-capturelog'],
     author="Tuomas Airaksinen",
     author_email="tuomas.airaksinen@gmail.com",
     description="Automate is a general purpose Python automatization library.",
