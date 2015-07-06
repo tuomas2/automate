@@ -20,8 +20,8 @@ Highlights:
 
 * Supported hardware:
 
-  * Raspberry Pi GPIO input/output ports (via `RPIO <http://pythonhosted.org/RPIO/>`_ library)
-  * Arduino analog and digital input/output ports (via `pyFirmata <https://github.com/tino/pyFirmata>`_ library)
+  * Raspberry Pi GPIO input/output ports (:ref:`automate-rpio` via `RPIO <http://pythonhosted.org/RPIO/>`_ library)
+  * Arduino analog and digital input/output ports (:ref:`automate-arduino` via `pyFirmata <https://github.com/tino/pyFirmata>`_ library)
   * Easy to write ;ref:`extensions` to support other hardware
 
 * :ref:`state-saving`

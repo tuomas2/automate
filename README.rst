@@ -24,8 +24,8 @@ Highlights:
 
 * Supported hardware:
 
-  * Raspberry Pi GPIO input/output ports (via `RPIO <http://pythonhosted.org/RPIO/>`_ library)
-  * Arduino analog and digital input/output ports (via `pyFirmata <https://github.com/tino/pyFirmata>`_ library)
+  * Raspberry Pi GPIO input/output ports (``automate-rpio`` extension via `RPIO <http://pythonhosted.org/RPIO/>`_ library)
+  * Arduino analog and digital input/output ports (``automate-arduino`` extension via `pyFirmata <https://github.com/tino/pyFirmata>`_ library)
   * Easy to write extensions to support other hardware
 
 * System state saving and restoring via serialization
@@ -39,7 +39,7 @@ Highlights:
 
 * RPC and Websocket interfaces (provided by `automate-rpc` and `automate-webui`) to connect
   between other applications or other Automate systems.
-* Comprehensive and customizable Web User Interface via `automate-webui`
+* Comprehensive and customizable Web User Interface via `automate-webui` extension.
 * UML graphs can be drawn automaticlaly of the system (as can be seen in the examples of this documentation)
 
 .. _hello-world:
