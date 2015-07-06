@@ -71,7 +71,7 @@ Let's take a look at a small Automate program as an example, which uses also ``a
 
 This simple example has two sensors ``hardware_switch``, ``web_switch``, actuator (``lamp``) and a ``program`` that
 contains logic what to do and when. Here, ``lamp`` is switched on if either ``web_switch`` or ``hardware_switch`` has
-status True.
+status ``True``.
 
 Installing Automate
 -------------------
