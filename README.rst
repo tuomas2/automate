@@ -46,7 +46,8 @@ Highlights:
 
 Example
 -------
-Let us consider following short Automate program as a first example:
+
+Let's take a look at a small Automate program as an example, which uses also ``automate-rpio`` extension.
 
 .. code-block:: python
 
@@ -66,12 +67,10 @@ Let us consider following short Automate program as a first example:
         )
 
 
-    my_system = MySystem(
-        services=[WebService()]
-    )
+    my_system = MySystem()
 
 This simple example has two sensors ``hardware_switch``, ``web_switch``, actuator (``lamp``) and a ``program`` that
-contains logic what to do and when. Here, ``lamp`` is switched on if either web_switch or ``hardware_switch`` has
+contains logic what to do and when. Here, ``lamp`` is switched on if either ``web_switch`` or ``hardware_switch`` has
 status True.
 
 Licence
