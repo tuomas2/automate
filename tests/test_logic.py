@@ -773,6 +773,7 @@ def test_while_cancel(sysloader, caplog):
     called = []
 
     def myfunc():
+        time.sleep(0.1)
         called.append(1)
 
     class ms(System):
