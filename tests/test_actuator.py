@@ -234,7 +234,7 @@ def test_back_and_forth_on_activate(mysys):
 
 
 def test_back_and_forth_on_activate_w_safety_delay(mysys):
-    mysys.act.safety_delay = DELAYTIME
+    mysys.act.safety_delay = 5*DELAYTIME
     mysys.act.debug = True
     assert mysys.act.status == LOW
     mysys.sens.set_status(True)
