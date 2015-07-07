@@ -511,10 +511,14 @@ class Delay(AbstractRunner):
     def _run(self, caller, timer, **kwargs):
         self.logger.info("Time is up, running %s", self)
         for i in self.objects:
+            if not caller in self.state:
+                # cancelled
+                return
             self.call_eval(i, caller, **kwargs)
 
         with self._lock:
-            self.get_state(caller).timers.remove(timer)
+            if caller in self.state: # if not cancelled
+                self.get_state(caller).timers.remove(timer)
         return True
 
 
