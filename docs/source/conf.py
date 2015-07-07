@@ -78,7 +78,7 @@ extensions = [
 # inheritance_node_attrs = dict(fontsize=24, height=0.75,
 #                              )
 
-googleanalytics_id = 'UA-5516303-1'
+#googleanalytics_id = 'UA-5516303-1'
 
 intersphinx_mapping = {'traits': ('http://traits.readthedocs.org/en/4.5.0/', None),
                        'python': ('http://docs.python.org/2', None),
@@ -87,10 +87,10 @@ intersphinx_mapping = {'traits': ('http://traits.readthedocs.org/en/4.5.0/', Non
 
 autodoc_member_order = 'bysource'
 
-plantuml = 'java -jar /home/tairaksinen/.PyCharm40/config/plugins/plantuml4idea/lib/plantuml.jar'
+#plantuml = 'java -jar /home/tairaksinen/.PyCharm40/config/plugins/plantuml4idea/lib/plantuml.jar'
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+#templates_path = ['_templates']
 
 # The suffix of source filenames.
 source_suffix = '.rst'
