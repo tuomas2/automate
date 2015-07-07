@@ -31,11 +31,11 @@ import os
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
-    'sphinxcontrib.plantuml',
-#    'sphinxcontrib.googleanalytics',
     'sphinx.ext.intersphinx',
     'sphinx.ext.graphviz',
     'sphinx.ext.inheritance_diagram',
+    #    'sphinxcontrib.plantuml',
+    #    'sphinxcontrib.googleanalytics',
     #    'sphinxcontrib.srclinks'
     #    'numpydoc.traitsdoc',
 ]
