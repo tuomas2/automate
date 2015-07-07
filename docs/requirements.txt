@@ -1,5 +1,5 @@
--e https://github.com/tuomas2/automate-arduino.git
--e https://github.com/tuomas2/automate-rpio.git
--e https://github.com/tuomas2/automate-wsgi.git
--e https://github.com/tuomas2/automate-webui.git
--e https://github.com/tuomas2/automate-rpc.git
+-e git://github.com/tuomas2/automate-arduino.git@master#egg=automate-arduino
+-e git://github.com/tuomas2/automate-rpio.git@master#egg=automate-rpio
+-e git://github.com/tuomas2/automate-wsgi.git@master#egg=automate-wsgi
+-e git://github.com/tuomas2/automate-webui.git@master#egg=automate-webui
+-e git://github.com/tuomas2/automate-rpc.git@master#egg=automate-rpc
