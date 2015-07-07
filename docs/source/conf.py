@@ -18,13 +18,13 @@ import os
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 # Get the project root dir, which is the parent dir of this
-cwd = os.getcwd()
-project_root = os.path.dirname(cwd)
+#cwd = os.getcwd()
+#project_root = os.path.dirname(cwd)
 
 # Insert the project root dir as the first element in the PYTHONPATH.
 # This lets us ensure that the source package is imported, and that its
 # version is used.
-sys.path.insert(0, project_root)
+#sys.path.insert(0, project_root)
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -173,7 +173,6 @@ if on_rtd:
     html_theme = 'default'
 else:
     html_theme = 'sphinx_rtd_theme'
-    #html_theme = 'nature'
 
 #html_theme = 'sphinxdoc'
 
