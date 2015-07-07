@@ -45,7 +45,7 @@ Highlights:
 
 * RPC and Websocket interfaces (provided by `automate-rpc` and `automate-webui`) to connect
   between other applications or other Automate systems.
-* Comprehensive and customizable Web User Interface via `automate-webui` extension.
+* Comprehensive and customizable Web User Interface via `automate-webui <http://github.com/tuomas2/automate-webui>`_ extension.
 * UML graphs can be drawn automaticlaly of the system (as can be seen in the examples of this documentation)
 
 .. _hello-world:
