@@ -1,8 +1,8 @@
 .. image:: https://travis-ci.org/tuomas2/automate.svg?branch=master
    :target: https://travis-ci.org/tuomas2/automate
 
-.. image:: https://coveralls.io/repos/tuomas2/automate/badge.svg?branch=master
-   :target: https://coveralls.io/r/tuomas2/automate?branch=master
+.. image:: https://coveralls.io/repos/github/tuomas2/automate/badge.svg?branch=master
+   :target: https://coveralls.io/github/tuomas2/automate?branch=master
 
 Automate BETA
 =============

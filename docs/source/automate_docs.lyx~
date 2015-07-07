@@ -83,24 +83,6 @@ Introduction
 What is Automate?
 \end_layout
 
-\begin_deeper
-\begin_layout Itemize
-Easily extensible
-\end_layout
-
-\begin_layout Itemize
-Modular
-\end_layout
-
-\begin_layout Itemize
-Robust
-\end_layout
-
-\begin_layout Itemize
-Uses traits
-\end_layout
-
-\end_deeper
 \begin_layout Itemize
 Automate 
 \begin_inset Quotes eld
@@ -113,52 +95,15 @@ Hello world
 
 \end_layout
 
-\begin_deeper
-\begin_layout Itemize
-Example use cases
-\end_layout
-
-\end_deeper
-\end_deeper
-\begin_layout Itemize
-Features
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-State saving 
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-StatusSaverService
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-Integrated IPython console
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-namespace
-\end_layout
-
-\end_deeper
-\begin_layout Itemize
-
-\end_layout
-
 \end_deeper
 \begin_layout Itemize
 Making Automate extensions
 \end_layout
 
-\begin_layout Itemize
+\begin_layout Section
 Automate program structure
 \end_layout
 
-\begin_deeper
 \begin_layout Itemize
 System
 \end_layout
@@ -230,29 +175,6 @@ automate-arduino
 
 \begin_layout Itemize
 automate-rpio
-\end_layout
-
-\end_deeper
-\end_deeper
-\begin_layout Itemize
-Automate Api
-\end_layout
-
-\begin_deeper
-\begin_layout Itemize
-Sensors
-\end_layout
-
-\begin_layout Itemize
-Actuators
-\end_layout
-
-\begin_layout Itemize
-Callables
-\end_layout
-
-\begin_layout Itemize
-Services
 \end_layout
 
 \end_deeper

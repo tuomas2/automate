@@ -15,8 +15,8 @@ fields that could take advantage of Automate. Automate can be embedded
 in other Python software as a component, which runs its operation in
 its own threads.
 
-Highlights:
-^^^^^^^^^^^
+Highlights
+----------
 
 * Supported hardware:
 
@@ -53,30 +53,7 @@ monitor system and set
 status of ``web_switch``. The following figure (generated via :class:`~automate_webui.webui.WebService` interface)
 illustrates the system in UML graph:
 
-.. uml::
-    @startuml
-    skinparam state {
-    BackGroundColor<<actuator>> #FFCCFF
-    BackGroundColor<<program>> #FFFFCC
-    BackGroundColor<<sensor>> #CCFFCC
-    }
-    state "program" as program <<program>>
-    program: Program
-    program: Status: False
-    program: Priority: 1
-    hardware_switch -[#009933]-> program
-    web_switch -[#009933]-> program
-    program -[#4C4C4C]-> lamp
-    state "web_switch" as web_switch <<sensor>>
-    web_switch: UserBoolSensor
-    web_switch: Status: False
-    state "lamp" as lamp <<actuator>>
-    lamp: RpioActuator
-    lamp: dp_lamp :: False
-    state "hardware_switch" as hardware_switch <<sensor>>
-    hardware_switch: RpioSensor
-    hardware_switch: Status: False
-    @enduml
+.. image:: images/hello_world.svg
 
 Original application
 --------------------

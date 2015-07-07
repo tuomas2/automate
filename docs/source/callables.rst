@@ -31,33 +31,6 @@ actions are executed based on condition statuses.
 
 Let us take a look at a small example that uses conditions and actions:
 
-
-.. uml::
-    @startuml
-    skinparam state {
-    BackGroundColor<<actuator>> #FFCCFF
-    BackGroundColor<<program>> #FFFFCC
-    BackGroundColor<<sensor>> #CCFFCC
-    }
-    state "prog" as prog <<program>>
-    prog: Program
-    prog: Status: True
-    prog: Priority: 1
-    periodical -[#009933]-> prog
-    active_switch -[#009933]-> prog
-    prog -[#FF0000]-> target_actuator
-    state "target_actuator" as target_actuator <<actuator>>
-    target_actuator: IntActuator
-    target_actuator: prog :: 7.0
-    target_actuator: dp_target_actuator :: 0
-    state "periodical" as periodical <<sensor>>
-    periodical: IntervalTimerSensor
-    periodical: Status: 1.0
-    state "active_switch" as active_switch <<sensor>>
-    active_switch: UserBoolSensor
-    active_switch: Status: True
-    @enduml
-
 .. code-block:: python
 
    from automate import *
@@ -78,6 +51,8 @@ Let us take a look at a small example that uses conditions and actions:
                  )
 
    s = CounterClock(services=[WebService(read_only=False)])
+
+.. image:: images/callables.svg
 
 When user has switched ``active_switch`` sensor to ``True``, this simple program will start adding +1 to target_actuator value every
 second. Because ``periodical`` is not used as a trigger in any action/condition, we need to explicitly define it as a
