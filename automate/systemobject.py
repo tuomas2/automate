@@ -63,8 +63,7 @@ class SystemObject(HasStrictTraits):
     def _get_name(self):
         try:
             return self.system.reverse[self]
-        except (KeyError, AttributeError) as e:
-            self.logger.error('Tried to get name but system is not yet initialized. Error: %s', e)
+        except (KeyError, AttributeError):
             return 'System not initialized!'
 
     def _set_name(self, new_name):
