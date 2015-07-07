@@ -11,21 +11,20 @@ Introduction
 Automate Web UI extension provides easy to use approach to monitoring and modifying
 Automate system and its components. Features:
 
- - Displayed data updated in real time via Websocket
- - Responsive design (using `Bootstrap <http://getbootstrap.com/>`_ CSS & JS library), suitable for
-   mobile and desktop use.
- - Optional authentication
- - Read-only and read-write modes.
+- Displayed data updated in real time via Websocket
+- Responsive design (using `Bootstrap <http://getbootstrap.com/>`_ CSS & JS library), suitable for
+  mobile and desktop use.
+- Optional authentication
+- Read-only and read-write modes.
 
-    - Read-only mode allows only monitoring (default)
-    - Read-write mode allows modifying the System by:
+  - Read-only mode allows only monitoring (default)
+  - Read-write mode allows modifying the System by:
 
-      - adding new Actuators / Sensors / Programs
-      - modifying existing Actuators / Sensors / Programs
-      - Quick editing of user-editable sensors from main views
+    - adding new Actuators / Sensors / Programs
+    - modifying existing Actuators / Sensors / Programs
+    - Quick editing of user-editable sensors from main views
 
- - HTTP and secured HTTPS servers supported (powered by built in `Tornado Web Server <www.tornadoweb.org/>`_)
-
+- HTTP and secured HTTPS servers supported (powered by built in `Tornado Web Server <www.tornadoweb.org/>`_)
 
 Main features are illustrated with a few screenshots:
 
