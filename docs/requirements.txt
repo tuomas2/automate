@@ -1,5 +1,3 @@
-docutils==0.12
-sphinx
 -e git://github.com/tuomas2/automate-arduino.git@master#egg=automate-arduino
 -e git://github.com/tuomas2/automate-rpio.git@master#egg=automate-rpio
 -e git://github.com/tuomas2/automate-wsgi.git@master#egg=automate-wsgi
