@@ -1,9 +1,9 @@
-.. image:: https://travis-ci.org/tuomas2/automate.svg?branch=master
+.. image:: https://travis-ci.org/tuomas2/automate.svg?branch=develop
    :target: https://travis-ci.org/tuomas2/automate
    :alt: Travis CI Status
 
-.. image:: https://coveralls.io/repos/github/tuomas2/automate/badge.svg?branch=master
-   :target: https://coveralls.io/github/tuomas2/automate?branch=master
+.. image:: https://coveralls.io/repos/github/tuomas2/automate/badge.svg?branch=develop
+   :target: https://coveralls.io/github/tuomas2/automate?branch=develop
    :alt: Coverage Status
 
 .. image:: https://readthedocs.org/projects/python-automate/badge/?version=develop
