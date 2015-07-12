@@ -34,6 +34,8 @@ import pyinotify
 import threading
 import Queue
 
+from datetime import datetime
+
 from croniter import croniter
 from traits.api import Any, CInt, CFloat, Unicode, CUnicode, List, CBool, Instance, CStr, Int
 
@@ -190,34 +192,47 @@ class CronTimerSensor(AbstractSensor):
                 return
             from copy import deepcopy
 
-            onprev = sorted(deepcopy(self._cronit_on), key=lambda x: x.get_prev())[-1].get_current()
-            offprev = sorted(deepcopy(self._cronit_off), key=lambda x: x.get_prev())[-1].get_current()
-            self.status = onprev > offprev
+            onprev = deepcopy(self._cronit_on)
+            offprev = deepcopy(self._cronit_off)
+
+            for i in onprev:
+                i.get_prev(datetime)
+            for i in offprev:
+                i.get_prev(datetime)
+
+            onprev.sort(key=lambda x: x.get_current(datetime))
+            offprev.sort(key=lambda x: x.get_current(datetime))
+            self.status = onprev[-1].get_current(datetime) > offprev[-1].get_current(datetime)
 
     def _switch_on(self):
         self.status = 1
         with self._timerlock:
-            self._cronit_on[0].get_next()
+            self._cronit_on[0].get_next(datetime)
         self._setup_timer_on()
 
     def _switch_off(self):
         self.status = 0
         with self._timerlock:
-            self._cronit_off[0].get_next()
+            self._cronit_off[0].get_next(datetime)
         self._setup_timer_off()
+
+    @staticmethod
+    def _now():
+        return datetime.now()
+        #time.time()
 
     def _timer_on_changed(self, name, new):
         with self._timerlock:
-            self._cronit_on = [croniter(i, time.time()) for i in new.split(";")]
+            self._cronit_on = [croniter(i, self._now()) for i in new.split(";")]
             for i in self._cronit_on:
-                i.get_next()
+                i.get_next(datetime)
         self._setup_timer_on()
         self.update_status()
 
     def _timer_off_changed(self, name, new):
-        self._cronit_off = [croniter(i, time.time()) for i in new.split(";")]
+        self._cronit_off = [croniter(i, self._now()) for i in new.split(";")]
         for i in self._cronit_off:
-            i.get_next()
+            i.get_next(datetime)
         self._setup_timer_off()
         self.update_status()
 
@@ -228,11 +243,11 @@ class CronTimerSensor(AbstractSensor):
             if not self._cronit_on:
                 return
 
-            self._cronit_on.sort(key=lambda x: x.get_current())
-            delay = self._cronit_on[0].get_current() - time.time()
-            self._timer_on = threading.Timer(delay, threaded(self._switch_on,))
-            self._timer_on.name = "Timer for TimerSensor:on " + self.name.encode(
-                "utf-8") + " at %s" % time.strftime("%a %T %D", time.localtime(time.time() + delay))
+            self._cronit_on.sort(key=lambda x: x.get_current(datetime))
+            delay = self._cronit_on[0].get_current(datetime) - self._now()
+            self._timer_on = threading.Timer(delay.seconds, threaded(self._switch_on,))
+            self._timer_on.name = ("Timer for TimerSensor:on " + self.name.encode("utf-8") +
+                                   " at %s" % (self._now() + delay))
             self._timer_on.start()
 
     def _setup_timer_off(self):
@@ -241,11 +256,11 @@ class CronTimerSensor(AbstractSensor):
                 self._timer_off.cancel()
             if not self._cronit_on:
                 return
-            self._cronit_off.sort(key=lambda x: x.get_current())
-            delay = self._cronit_off[0].get_current() - time.time()
-            self._timer_off = threading.Timer(delay, threaded(self._switch_off))
-            self._timer_off.name = "Timer for TimerSensor:off " + self.name.encode(
-                "utf-8") + " at %s" % time.strftime("%a %T %D", time.localtime(time.time() + delay))
+            self._cronit_off.sort(key=lambda x: x.get_current(datetime))
+            delay = self._cronit_off[0].get_current(datetime) - self._now()
+            self._timer_off = threading.Timer(delay.seconds, threaded(self._switch_off))
+            self._timer_off.name = ("Timer for TimerSensor:off " + self.name.encode("utf-8") +
+                                    " at %s" % (self._now() + delay))
             self._timer_off.start()
 
     def cleanup(self):
