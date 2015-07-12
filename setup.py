@@ -10,8 +10,8 @@ def get_version(filename):
 
 setupopts = dict(
     name="automate",
-    version=get_version('automate/__init__.py'),
-    packages=find_packages(),
+    version=get_version('src/automate/__init__.py'),
+    packages=find_packages('src'),
     install_requires=[
         'traits==4.5.0',
         'croniter==0.3.8',
