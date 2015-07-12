@@ -1,5 +1,5 @@
 /.idea/
-/automate.egg-info/
+/src/automate.egg-info/
 *.pyc
 /norepo/
 *.swp
