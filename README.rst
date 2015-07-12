@@ -22,7 +22,7 @@ complex automation systems, yet it is easy to learn and fun to use. It was
 originally developed with home robotics/automatization projects in mind,
 but is quite general in nature and one could find applications from various
 fields that could take advantage of Automate. Automate can be embedded
-in other Python software as a component, which runs its operation in
+in other Python software as a component, which runs its operations in
 its own threads.
 
 Highlights:
