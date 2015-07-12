@@ -6,8 +6,8 @@
    :target: https://coveralls.io/github/tuomas2/automate?branch=master
    :alt: Coverage Status
 
-.. image:: https://readthedocs.org/projects/python-automate/badge/?version=latest
-   :target: https://readthedocs.org/projects/python-automate/?badge=latest
+.. image:: https://readthedocs.org/projects/python-automate/badge/?version=master
+   :target: https://readthedocs.org/projects/python-automate/?badge=master
    :alt: Documentation Status
 
 Automate BETA
