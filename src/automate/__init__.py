@@ -39,4 +39,4 @@ from .actuators import *
 from .sensors import *
 from .services import *
 from .tools import *
-
+from .statusobject import *

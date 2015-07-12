@@ -1,7 +1,8 @@
-.. _automate-programs:
 
-Programming with Automate objects
-=================================
+Programming Automate Objects
+============================
+
+.. _automate-programs:
 
 Programs
 --------
