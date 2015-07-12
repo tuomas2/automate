@@ -19,7 +19,7 @@
 # ------------------------------------------------------------------
 #
 # If you like Automate, please take a look at this page:
-# http://tuomasairaksinen.fi/automate/gospel/
+# http://python-automate.org/gospel/
 
 import re
 from traits.api import cached_property, on_trait_change, CList, Dict, Instance, Set, Event, Property

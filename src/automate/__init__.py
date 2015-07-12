@@ -19,7 +19,7 @@
 # ------------------------------------------------------------------
 #
 # If you like Automate, please take a look at this page:
-# http://tuomasairaksinen.fi/automate/gospel/
+# http://python-automate.org/gospel/
 
 __author__ = "Tuomas Airaksinen"
 __copyright__ = "Copyright 2015, Tuomas Airaksinen"

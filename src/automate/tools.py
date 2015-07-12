@@ -19,7 +19,7 @@
 # ------------------------------------------------------------------
 #
 # If you like Automate, please take a look at this page:
-# http://tuomasairaksinen.fi/automate/gospel/
+# http://python-automate.org/gospel/
 
 from traits.api import CUnicode, Unicode
 from automate.common import threaded

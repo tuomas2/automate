@@ -19,7 +19,7 @@
 # ------------------------------------------------------------------
 #
 # If you like Automate, please take a look at this page:
-# http://tuomasairaksinen.fi/automate/gospel/
+# http://python-automate.org/gospel/
 
 """
 Apply two fixeds to traits 4.5.0 that are necessary in order to Automate to function.
