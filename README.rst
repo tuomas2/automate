@@ -1,19 +1,20 @@
-.. image:: https://travis-ci.org/tuomas2/automate.svg?branch=master
+.. image:: https://travis-ci.org/tuomas2/automate.svg?branch=develop
    :target: https://travis-ci.org/tuomas2/automate
    :alt: Travis CI Status
 
-.. image:: https://coveralls.io/repos/github/tuomas2/automate/badge.svg?branch=master
-   :target: https://coveralls.io/github/tuomas2/automate?branch=master
+.. image:: https://coveralls.io/repos/github/tuomas2/automate/badge.svg?branch=develop
+   :target: https://coveralls.io/github/tuomas2/automate?branch=develop
    :alt: Coverage Status
 
-.. image:: https://readthedocs.org/projects/python-automate/badge/?version=master
-   :target: https://readthedocs.org/projects/python-automate/?badge=master
+.. image:: https://readthedocs.org/projects/python-automate/badge/?version=develop
+   :target: https://readthedocs.org/projects/python-automate/?badge=develop
    :alt: Documentation Status
 
 Automate BETA
 =============
 
-Read full documentation at http://python-automate.readthedocs.org/
+- Github URL: http://github.com/tuomas2/automate
+- Read full documentation at http://python-automate.readthedocs.org/
 
 Automate is a general purpose automatization library for Python.
 Its objective is to offer convenient and robust object-oriented programming
