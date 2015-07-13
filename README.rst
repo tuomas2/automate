@@ -1,13 +1,13 @@
-.. image:: https://travis-ci.org/tuomas2/automate.svg?branch=develop
+.. image:: https://travis-ci.org/tuomas2/automate.svg?branch=master
    :target: https://travis-ci.org/tuomas2/automate
    :alt: Travis CI Status
 
-.. image:: https://coveralls.io/repos/github/tuomas2/automate/badge.svg?branch=develop
-   :target: https://coveralls.io/github/tuomas2/automate?branch=develop
+.. image:: https://coveralls.io/repos/github/tuomas2/automate/badge.svg?branch=master
+   :target: https://coveralls.io/github/tuomas2/automate?branch=master
    :alt: Coverage Status
 
-.. image:: https://readthedocs.org/projects/python-automate/badge/?version=develop
-   :target: https://readthedocs.org/projects/python-automate/?badge=develop
+.. image:: https://readthedocs.org/projects/python-automate/badge/?version=master
+   :target: https://readthedocs.org/projects/python-automate/?badge=master
    :alt: Documentation Status
 
 Automate BETA
