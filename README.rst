@@ -13,7 +13,8 @@
 Automate BETA
 =============
 
-Read full documentation at http://python-automate.readthedocs.org/
+- Github URL: http://github.com/tuomas2/automate
+- Read full documentation at http://python-automate.readthedocs.org/
 
 Automate is a general purpose automatization library for Python.
 Its objective is to offer convenient and robust object-oriented programming
