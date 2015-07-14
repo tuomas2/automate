@@ -278,7 +278,8 @@ class Shell(AbstractAction):
         Usage examples::
 
             Shell('/bin/echo test', output=True) # returns 'test'
-            Shell('mplayer something.mp3', no_wait=True) # returns PID of mplayer process that keeps running
+            Shell('mplayer something.mp3', no_wait=True) # returns PID of mplayer
+                                                         # process that keeps running
             Shell('/bin/cat', input='test', output=True) # returns 'test'.
     """
 
@@ -318,7 +319,8 @@ class SetStatus(AbstractAction):
             SetStatus(target, source)
             # sets status of target to the status of source.
             SetStatus([actuator1, actuator2], [sensor1, sensor2])
-            # sets status of actuator 1 to status of sensor1 and status of actuator2 to status of sensor2.
+            # sets status of actuator 1 to status of sensor1 and
+            # status of actuator2 to status of sensor2.
     """
 
     def call(self, caller=None, trigger=None, **kwargs):
@@ -573,7 +575,8 @@ class IfElse(AbstractCallable):
 
     Usage::
 
-        IfElse(x, y, z) # if x, then run y, else run z, where x, y, and z are Callables or StatusObjects
+        IfElse(x, y, z) # if x, then run y, else run z, where x, y,
+                        # and z are Callables or StatusObjects
         IfElse(x, y)
     """
 
@@ -605,8 +608,9 @@ class Switch(AbstractCallable):
 
     Usage::
 
-        Switch(criterion, choice1, choice2...) # where criteria is integer-valued (Callable or StatusObject etc.)
-                                              # and choice1, 2... are Callables.
+        Switch(criterion, choice1, choice2...) # where criteria is integer-valued
+                                               # (Callable or StatusObject etc.)
+                                               # and choice1, 2... are Callables.
 
         Switch(criterion, {'value1': callable1, 'value2': 'callable2'})
     """
@@ -655,7 +659,8 @@ class Min(AbstractMathematical):
     Usage::
 
         Min(x, y, z...)
-        # where x,y,z are anything that can be evaluated as number (Callables, Statusobjects etc).
+        # where x,y,z are anything that can be
+        # evaluated as number (Callables, Statusobjects etc).
      """
 
     def call(self, caller=None, **kwargs):
@@ -672,7 +677,8 @@ class Max(AbstractMathematical):
     Usage::
 
         Max(x, y, z...)
-        # where x,y,z are anything that can be evaluated as number (Callables, Statusobjects etc).
+        # where x,y,z are anything that can be
+        # evaluated as number (Callables, Statusobjects etc).
     """
 
     def call(self, caller=None, **kwargs):
@@ -689,7 +695,8 @@ class Sum(AbstractMathematical):
     Usage::
 
         Sum(x, y, z...)
-        # where x,y,z are anything that can be evaluated as number (Callables, Statusobjects etc).
+        # where x,y,z are anything that can be
+        # evaluated as number (Callables, Statusobjects etc).
     """
 
     def call(self, caller=None, **kwargs):
@@ -706,7 +713,8 @@ class Product(AbstractMathematical):
     Usage::
 
         Product(x, y, z...)
-        # where x,y,z are anything that can be evaluated as number (Callables, Statusobjects etc).
+        # where x,y,z are anything that can be
+        # evaluated as number (Callables, Statusobjects etc).
 
     """
 
@@ -863,9 +871,9 @@ class Value(AbstractLogical):
 
     Usage::
 
-        Value(x) # returns value of x. Used to convert StatusObject into Callable, for example,
-                 # if StatusObject status needs to be used directly as a condition of
-                 # Program condition attributes.
+        Value(x) # returns value of x. Used to convert StatusObject into Callable,
+                 # for example, if StatusObject status needs to be used directly
+                 # as a condition of Program condition attributes.
 
     """
     _args = CList

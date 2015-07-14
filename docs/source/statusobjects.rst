@@ -38,8 +38,8 @@ As an example, we will define one of each:
 .. code-block:: python
 
    # imports from your own library that you are using to define your sensor & actuator
-   from mylibrary import (setup_data_changed_callback, fetch_data_from_my_datasource, initialize_my_actuator_device,
-                          change_status_in_my_actuator_device)
+   from mylibrary import (setup_data_changed_callback, fetch_data_from_my_datasource,
+                          initialize_my_actuator_device, change_status_in_my_actuator_device)
 
    class MySensor(AbstractSensor):
        """
