@@ -547,7 +547,7 @@ class ShellSensor(AbstractSensor):
                 if not line:
                     self.logger.debug('Process exiting (status_loop)')
                     break
-                self.status = list(filter(line, *args))
+                self.status = filter(line, *args)
 
         else:
             filter = self.filter or default_filter
