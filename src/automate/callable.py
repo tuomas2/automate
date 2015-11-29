@@ -1,3 +1,4 @@
+from builtins import str
 # -*- coding: utf-8 -*-
 # (c) 2015 Tuomas Airaksinen
 #
@@ -173,11 +174,11 @@ class AbstractCallable(SystemObject, CompareMixin):
 
     def _fix_list(self, lst):
         if isinstance(lst, dict):
-            lst2 = lst.iteritems()
+            lst2 = lst.items()
         elif isinstance(lst, list):
             lst2 = enumerate(lst)
         for idx, obj in lst2:
-            if isinstance(obj, (str, unicode)):
+            if isinstance(obj, str):
                 lst[idx] = self.name_to_system_object(obj)
             if isinstance(obj, list):
                 self._fix_list(obj)
@@ -246,7 +247,7 @@ class AbstractCallable(SystemObject, CompareMixin):
         if not self.system:
             raise SystemNotReady
 
-        if isinstance(value, (str, unicode, Object)):
+        if isinstance(value, (str, Object)):
             rv = self.system.name_to_system_object(value)
             return rv if rv else value
         else:
@@ -290,7 +291,7 @@ class AbstractCallable(SystemObject, CompareMixin):
         """
             A property giving a generator that goes through all the children of this Callable (not recursive)
         """
-        return deep_iterate(self._args + self._kwargs.values())
+        return deep_iterate(self._args + list(self._kwargs.values())) #TODO: chain?
 
     def _give_triggers(self):
         """Give all triggers of this object (non-recursive)"""
@@ -317,10 +318,10 @@ class AbstractCallable(SystemObject, CompareMixin):
     def _give_str(self, args, kwargs):
         if self in self.system.namespace.reverse:
             return repr(self.name)
-        kwstr = u', '.join(k + u'=' + repr(v) for k, v in kwargs.iteritems())
+        kwstr = u', '.join(k + u'=' + repr(v) for k, v in kwargs.items())
         if kwstr and args:
             kwstr = ', ' + kwstr
-        return unicode(self.__class__.__name__) + u"(" + u", ".join([repr(i) for i in args]) + kwstr + u")"
+        return str(self.__class__.__name__) + u"(" + u", ".join([repr(i) for i in args]) + kwstr + u")"
 
     def give_str(self):
         """
@@ -348,7 +349,7 @@ class AbstractCallable(SystemObject, CompareMixin):
             if hasattr(obj, 'give_str_indented') and not obj in self.system.namespace.reverse:
                 rv = obj.give_str_indented(tags)
             else:
-                rv = unicode(obj if no_repr else repr(obj))
+                rv = str(obj if no_repr else repr(obj))
                 if not no_color:
                     rv = ('__ACT__' if getattr(obj, 'status', obj) else '__INACT__') + rv
             return indent(rv)
@@ -359,14 +360,14 @@ class AbstractCallable(SystemObject, CompareMixin):
                 rv = ('__ACT__' if getattr(obj, 'status', obj) else '__INACT__') + rv
             return rv
 
-        kwstrs = [k + u'=' + in_one_line(v) for k, v in kwargs.iteritems()]
+        kwstrs = [k + u'=' + in_one_line(v) for k, v in kwargs.items()]
 
         argstr = u"(\n" + indent(u", \n".join([indented_str(i) for i in args] +
                                               [indented_str(i, no_repr=True, no_color=True) for i in kwstrs]) + u"\n)")
         if len(self.strip_color_tags(argstr)) < 35:
             argstr = u"(" + u", ".join([in_one_line(i) for i in args] + kwstrs) + u")"
 
-        rv = unicode(self.__class__.__name__) + argstr
+        rv = str(self.__class__.__name__) + argstr
         if tags:
             rv = ('__ACT__' if self.status else '__INACT__') + rv
         return rv

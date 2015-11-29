@@ -22,6 +22,7 @@
 # http://python-automate.org/gospel/
 
 from __future__ import absolute_import
+from builtins import object
 from copy import copy
 import logging
 import re
@@ -52,7 +53,7 @@ class SystemBase(HasStrictTraits):
     pass
 
 
-class Group:
+class Group(object):
     pass
 
 
@@ -86,7 +87,7 @@ class NameOrSensorActuatorBaseTrait(TraitType):
         v = value
         if isinstance(v, StatusObject):
             return v
-        if isinstance(v, (str, unicode)):
+        if isinstance(v, str):
             return object.system.name_to_system_object(v)
         self.error(object, name, value)
         return value
@@ -216,13 +217,13 @@ class CompareMixin(object):
 class TagSet(CSet):
 
     def validate(self, object, name, value):
-        if isinstance(value, (str, unicode)):
+        if isinstance(value, str):
             return set((i.strip() for i in value.split(',')))
         return super(TagSet, self).validate(object, name, value)
 
 
 def is_iterable(y):
-    if isinstance(y, (str, unicode)):
+    if isinstance(y, str):
         return False
     return isinstance(y, Iterable)
 
@@ -251,7 +252,7 @@ def deep_iterate(l):
             l_list = l.values()
         for i in l_list:
             if is_iterable(i):
-                for j in deep_iterate(i):
+                for j in deep_iterate(i): #TODO: yield from
                     yield j
             else:
                 yield i
@@ -261,8 +262,8 @@ def deep_iterate(l):
 
 def get_modules_all(base_class, _locals):
     r_types = {}
-    for k, v in copy(_locals).iteritems():
+    for k, v in copy(_locals).items():
         if has_baseclass(v, base_class) and v is not base_class:
             r_types[k] = v
 
-    return r_types.keys()
+    return list(r_types.keys())

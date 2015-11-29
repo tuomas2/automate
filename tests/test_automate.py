@@ -1,3 +1,4 @@
+from builtins import object
 # -*- coding: utf-8 -*-
 # (c) 2015 Tuomas Airaksinen
 #
@@ -116,7 +117,7 @@ def test_register_function(mysys):
     assert mysys.namespace['func']()
     assert mysys.func()
 
-    class tst:
+    class tst(object):
 
         def hep(self):
             return self.status

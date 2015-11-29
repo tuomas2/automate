@@ -131,7 +131,7 @@ class Namespace(dict):
         super(Namespace, self).__delitem__(key)
 
     def update(self, d):
-        for key, value in d.iteritems():
+        for key, value in d.items():
             self[key] = value
 
     def __setitem__(self, name, value):

@@ -1,3 +1,4 @@
+from builtins import object
 # -*- coding: utf-8 -*-
 # (c) 2015 Tuomas Airaksinen
 #
@@ -158,7 +159,7 @@ def test_freeze_act(freezesys_act):
     assert freezesys.s1.status == True
 
 
-class TestProgramFeatures:
+class TestProgramFeatures(object):
 
     def test_triggerlist_targetlist_change(self, mysys):
         p = mysys.p

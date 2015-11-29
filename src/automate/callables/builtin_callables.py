@@ -1,3 +1,7 @@
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
 # -*- coding: utf-8 -*-
 # (c) 2015 Tuomas Airaksinen
 #
@@ -23,7 +27,7 @@
 
 import re
 import threading
-import xmlrpclib
+import xmlrpc.client
 import socket
 import subprocess
 
@@ -142,7 +146,7 @@ class Func(AbstractAction):
     def call(self, caller, **kwargs):
         if not caller:
             return
-        _kwargs = {k: self.call_eval(v, caller, **kwargs) for k, v in self._kwargs.iteritems()}
+        _kwargs = {k: self.call_eval(v, caller, **kwargs) for k, v in self._kwargs.items()}
         return_value = _kwargs.pop('return_value', True)
         args = [self.call_eval(i, caller, return_value=return_value, **kwargs) for i in self.args]
         if _kwargs.pop('add_caller', False):
@@ -378,13 +382,13 @@ class SetAttr(AbstractAction):
         if not caller:
             return
         obj = self.obj
-        for attr, val in self._kwargs.iteritems():
+        for attr, val in self._kwargs.items():
             val = self.call_eval(val, caller, **kwargs)
             setattr(obj, attr, val)
         return True
 
     def _give_triggers(self):
-        return self._kwargs.values()
+        return list(self._kwargs.values())
 
     def _give_targets(self):
         return self.obj
@@ -493,7 +497,7 @@ class Delay(AbstractRunner):
             delay = self.call_eval(self.delay, caller, **kwargs)
             timer = threading.Timer(delay, None)
             timer.function = threaded(self._run, caller, timer, **kwargs)
-            timer.name = "Timer for " + unicode(self).encode("utf-8") + " %d sek" % delay
+            timer.name = "Timer for " + str(self).encode("utf-8") + " %d sek" % delay
             timer.start()
             timers.append(timer)
 
@@ -890,7 +894,7 @@ class AbstractQuery(AbstractCallable):
     """
 
 
-class ReprObject:
+class ReprObject(object):
 
     def __init__(self, name):
         self.name = name
@@ -1044,19 +1048,19 @@ class RemoteFunc(AbstractCallable):
         try:
             if self._cached_server is None:
                 host = self.call_eval(self.obj, caller, **kwargs)
-                self._cached_server = server = xmlrpclib.ServerProxy(host)
+                self._cached_server = server = xmlrpc.client.ServerProxy(host)
             else:
                 server = self._cached_server
 
             funcname = self.call_eval(self.value, caller, **kwargs)
             args = [self.call_eval(o, caller, **kwargs) for o in self.objects[2:]]
-            _kwargs = {k: self.call_eval(v, caller, **kwargs) for k, v in self._kwargs.iteritems()}
+            _kwargs = {k: self.call_eval(v, caller, **kwargs) for k, v in self._kwargs.items()}
             try:
                 return getattr(server, funcname)(*args, **_kwargs)
-            except xmlrpclib.Fault as e:
+            except xmlrpc.client.Fault as e:
                 self.logger.error(
                     'Could call remote function (%s,%s)(*%s, **%s), error: %s', server, funcname, args, _kwargs, e)
-        except (socket.gaierror, IOError, xmlrpclib.Fault) as e:
+        except (socket.gaierror, IOError, xmlrpc.client.Fault) as e:
             self.logger.error('Could call remote function, error: %s', e)
 
 

@@ -24,6 +24,9 @@
 """
     Module for various Sensor classes.
 """
+from future import standard_library
+standard_library.install_aliases()
+from builtins import filter
 
 import time
 import socket
@@ -32,7 +35,7 @@ import subprocess
 import types
 import pyinotify
 import threading
-import Queue
+import queue
 
 from datetime import datetime
 
@@ -554,7 +557,7 @@ class ShellSensor(AbstractSensor):
                 self.status = s
 
     def setup(self):
-        self._queue = Queue.Queue()
+        self._queue = queue.Queue()
         t1 = threading.Thread(target=self.cmd_loop, name='ShellSensor.cmd_loop %s' % self.name)
         t1.start()
         t2 = threading.Thread(target=self.status_loop, name='ShellSensor.status_loop %s' % self.name)

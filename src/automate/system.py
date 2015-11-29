@@ -23,12 +23,16 @@
 
 from __future__ import print_function
 from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import input
 import threading
 import operator
 import sys
 import os
 import logging
-import cPickle
+import pickle
 import pkg_resources
 
 from traits.api import (CStr, Instance, CBool, CList, Property, CInt, CUnicode, Event, CSet, Str, cached_property,
@@ -198,8 +202,8 @@ class System(SystemBase):
 
         def load():
             print('Loading %s' % filename)
-            file = open(filename, 'r')
-            state = cPickle.load(file)
+            file = open(filename, 'rb')
+            state = pickle.load(file)
             file.close()
             system = System(loadstate=state, filename=filename, **kwargs)
             return system
@@ -213,7 +217,7 @@ class System(SystemBase):
                 return load()
             else:
                 while True:
-                    answer = raw_input('Program file more recent. Do you want to load it? (y/n) ')
+                    answer = input('Program file more recent. Do you want to load it? (y/n) ')
                     if answer == 'y':
                         return create()
                     elif answer == 'n':
@@ -229,8 +233,8 @@ class System(SystemBase):
             self.logger.error('Filename not specified. Could not save state')
             return
         self.logger.info('Saving system state to %s', self.filename)
-        with open(self.filename, 'w') as file, self.worker_thread.queue.mutex:
-            cPickle.dump((list(self.objects)), file, 2)
+        with open(self.filename, 'wb') as file, self.worker_thread.queue.mutex:
+            pickle.dump((list(self.objects)), file, 2)
 
     @property
     def cmd_namespace(self):
@@ -238,7 +242,7 @@ class System(SystemBase):
             A read-only property that gives the namespace of the system for evaluating commands.
         """
         import automate
-        ns = dict(automate.__dict__.items() + self.namespace.items())
+        ns = dict(list(automate.__dict__.items()) + list(self.namespace.items()))
         return ns
 
     def __getattr__(self, item):
@@ -302,7 +306,7 @@ class System(SystemBase):
         """
             Give SystemObject instance corresponding to the name
         """
-        if isinstance(name, (str, unicode)):
+        if isinstance(name, str):
             if self.allow_name_referencing:
                 name = name
             else:
@@ -412,7 +416,7 @@ class System(SystemBase):
             except Exception as e:
                 self.logger.info("Failed to exec cmd %s: %s.", cmd, e)
                 rval = False
-            for key, value in ns.iteritems():
+            for key, value in ns.items():
                 if key not in nscopy or not value is nscopy[key]:
                     if key in self.namespace:
                         del self.namespace[key]
@@ -486,7 +490,7 @@ class System(SystemBase):
         self.namespace.set_system(loadstate)
 
         self.logger.info('Setup loggers per object')
-        for k, v in self.namespace.iteritems():
+        for k, v in self.namespace.items():
             if isinstance(v, SystemObject):
                 ctype = v.__class__.__name__
                 v.logger = self.logger.getChild('%s.%s' % (ctype, k))

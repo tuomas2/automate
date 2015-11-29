@@ -1,3 +1,6 @@
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 # -*- coding: utf-8 -*-
 # (c) 2015 Tuomas Airaksinen
 #
@@ -21,7 +24,7 @@
 # If you like Automate, please take a look at this page:
 # http://python-automate.org/gospel/
 
-import Queue
+import queue
 import logging
 import threading
 
@@ -77,7 +80,7 @@ class StatusWorkerThread(threading.Thread):
         self.logger.debug('Stop set')
 
     def __init__(self, *args, **kwargs):
-        self.queue = Queue.Queue()
+        self.queue = queue.Queue()
         self._stop = False
         self.logger = logging.getLogger('automate.StatusWorkerThread')
         super(StatusWorkerThread, self).__init__(*args, **kwargs)

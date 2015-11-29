@@ -24,6 +24,7 @@
 """
     Module for builtin Actuator classes
 """
+from __future__ import division
 
 from threading import Thread
 import time
@@ -46,8 +47,6 @@ class IntActuator(AbstractActuator):
     """ Integer valued actuator"""
     _status = CInt(transient=True)
     default = CInt
-
-0
 
 
 class FloatActuator(AbstractActuator):

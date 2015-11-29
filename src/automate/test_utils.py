@@ -1,3 +1,5 @@
+from builtins import str
+from builtins import object
 # -*- coding: utf-8 -*-
 # (c) 2015 Tuomas Airaksinen
 #

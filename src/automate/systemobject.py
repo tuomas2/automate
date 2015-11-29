@@ -22,6 +22,7 @@
 # http://python-automate.org/gospel/
 
 from __future__ import absolute_import
+from builtins import str
 import logging
 from traits.has_traits import HasStrictTraits, cached_property
 from traits.trait_types import Instance, CUnicode, Tuple, Dict, Event, Unicode, Int, CBool
@@ -191,7 +192,7 @@ class SystemObject(HasStrictTraits):
             Setup Callable attributes that belong to this object.
         """
         defaults = self.get_default_callables()
-        for key, value in defaults.iteritems():
+        for key, value in defaults.items():
             self._postponed_callables.setdefault(key, value)
         for key in self.callables:
             value = self._postponed_callables.pop(key)

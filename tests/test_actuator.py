@@ -1,3 +1,4 @@
+from builtins import range
 # -*- coding: utf-8 -*-
 # (c) 2015 Tuomas Airaksinen
 #
@@ -248,7 +249,7 @@ def test_back_and_forth_on_activate(mysys):
     mysys.flush()
     assert mysys.act.status == LOW
     logger.debug('STARTING')
-    for i in xrange(AMOUNT):
+    for i in range(AMOUNT):
         mysys.sens.set_status(True)
         mysys.sens.set_status(False)
     mysys.flush()
@@ -266,7 +267,7 @@ def test_back_and_forth_on_activate_w_safety_delay(mysys):
     mysys.flush()
     assert mysys.act.status == LOW
     mysys.act._last_changed = time.time()
-    for i in xrange(AMOUNT):
+    for i in range(AMOUNT):
         mysys.sens.set_status(True)
         mysys.sens.set_status(False)
     mysys.sens.set_status(True)
