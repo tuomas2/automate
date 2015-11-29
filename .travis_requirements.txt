@@ -2,6 +2,5 @@ pytest
 pytest-capturelog
 coveralls
 pytest-cov
-future
 mock
 -e git+https://github.com/enthought/traits.git@ac5d0296def6a389f932add5fbcab2eef6e7334e#egg=Traits
