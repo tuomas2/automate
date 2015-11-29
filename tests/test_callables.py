@@ -202,7 +202,8 @@ class TestAbstractLogicCallable(object):
         s = sysloader.new_system(syst)
 
         c2 = s.c1.on_deactivate[1]
-
+        if sys.version_info < (3, 0):
+            strver = re.sub(r"([= \(])(['\"])", lambda m: m.group(1) + 'u' + m.group(2), strver)
         assert c2.give_str() == strver
         assert repr(c2) == strver
         assert str(c2) == strver
