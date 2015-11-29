@@ -14,10 +14,9 @@ setupopts = dict(
     packages=find_packages('src'),
     package_dir={'': 'src'},
     install_requires=[
-        'traits==4.5.0',
         'croniter==0.3.8',
         'pyinotify==0.9.6',
-        'ipython==3.2',
+        'ipython==4.0',
         'ansiconv==1.0',
         'colorlog==2.6'],
     test_suite='py.test',
