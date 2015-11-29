@@ -21,6 +21,7 @@
 # If you like Automate, please take a look at this page:
 # http://python-automate.org/gospel/
 
+from __future__ import unicode_literals
 from builtins import str
 import re
 from traits.api import cached_property, on_trait_change, CList, Dict, Instance, Set, Event, Property
@@ -118,7 +119,7 @@ class AbstractCallable(SystemObject, CompareMixin):
     def kwargs_changed(self, name, old, new):
         if not self.system:
             return
-        for o in new.added.values():
+        for o in list(new.added.values()):
             if isinstance(o, AbstractCallable):
                 o.setup_callable_system(self.system)
 
@@ -174,7 +175,7 @@ class AbstractCallable(SystemObject, CompareMixin):
 
     def _fix_list(self, lst):
         if isinstance(lst, dict):
-            lst2 = lst.items()
+            lst2 = list(lst.items())
         elif isinstance(lst, list):
             lst2 = enumerate(lst)
         for idx, obj in lst2:
@@ -318,7 +319,7 @@ class AbstractCallable(SystemObject, CompareMixin):
     def _give_str(self, args, kwargs):
         if self in self.system.namespace.reverse:
             return repr(self.name)
-        kwstr = u', '.join(k + u'=' + repr(v) for k, v in kwargs.items())
+        kwstr = u', '.join(k + u'=' + repr(v) for k, v in list(kwargs.items()))
         if kwstr and args:
             kwstr = ', ' + kwstr
         return str(self.__class__.__name__) + u"(" + u", ".join([repr(i) for i in args]) + kwstr + u")"
@@ -360,7 +361,7 @@ class AbstractCallable(SystemObject, CompareMixin):
                 rv = ('__ACT__' if getattr(obj, 'status', obj) else '__INACT__') + rv
             return rv
 
-        kwstrs = [k + u'=' + in_one_line(v) for k, v in kwargs.items()]
+        kwstrs = [k + u'=' + in_one_line(v) for k, v in list(kwargs.items())]
 
         argstr = u"(\n" + indent(u", \n".join([indented_str(i) for i in args] +
                                               [indented_str(i, no_repr=True, no_color=True) for i in kwstrs]) + u"\n)")

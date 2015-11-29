@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from future import standard_library
 standard_library.install_aliases()
 # -*- coding: utf-8 -*-
@@ -72,7 +73,7 @@ class PlantUMLService(AbstractUserService):
             s = io.StringIO()
         s.write('@startuml\n')
         s.write('skinparam state {\n')
-        for k, v in self.background_colors.items():
+        for k, v in list(self.background_colors.items()):
             s.write('BackGroundColor<<%s>> %s\n' % (k, v))
         s.write('}\n')
 

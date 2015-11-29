@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+from builtins import bytes
 from future import standard_library
 standard_library.install_aliases()
 from builtins import str
@@ -146,7 +148,7 @@ class Func(AbstractAction):
     def call(self, caller, **kwargs):
         if not caller:
             return
-        _kwargs = {k: self.call_eval(v, caller, **kwargs) for k, v in self._kwargs.items()}
+        _kwargs = {k: self.call_eval(v, caller, **kwargs) for k, v in list(self._kwargs.items())}
         return_value = _kwargs.pop('return_value', True)
         args = [self.call_eval(i, caller, return_value=return_value, **kwargs) for i in self.args]
         if _kwargs.pop('add_caller', False):
@@ -382,7 +384,7 @@ class SetAttr(AbstractAction):
         if not caller:
             return
         obj = self.obj
-        for attr, val in self._kwargs.items():
+        for attr, val in list(self._kwargs.items()):
             val = self.call_eval(val, caller, **kwargs)
             setattr(obj, attr, val)
         return True
@@ -1054,7 +1056,7 @@ class RemoteFunc(AbstractCallable):
 
             funcname = self.call_eval(self.value, caller, **kwargs)
             args = [self.call_eval(o, caller, **kwargs) for o in self.objects[2:]]
-            _kwargs = {k: self.call_eval(v, caller, **kwargs) for k, v in self._kwargs.items()}
+            _kwargs = {k: self.call_eval(v, caller, **kwargs) for k, v in list(self._kwargs.items())}
             try:
                 return getattr(server, funcname)(*args, **_kwargs)
             except xmlrpc.client.Fault as e:

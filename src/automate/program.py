@@ -22,6 +22,7 @@
 # http://python-automate.org/gospel/
 
 from __future__ import absolute_import
+from __future__ import unicode_literals
 from builtins import str
 import logging
 
@@ -273,7 +274,7 @@ class ProgrammableSystemObject(SystemObject):
         c.pop('update_condition')  # nor do we want to run on_update
         self.active_condition = Value(False)
         self.update_condition = Value(False)
-        for key, value in c.items():
+        for key, value in list(c.items()):
             setattr(self, key, value)
 
         super(ProgrammableSystemObject, self).setup_system(system, *args, **kwargs)

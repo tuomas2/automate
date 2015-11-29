@@ -22,6 +22,7 @@
 # http://python-automate.org/gospel/
 
 from __future__ import absolute_import
+from __future__ import unicode_literals
 __author__ = "Tuomas Airaksinen"
 __copyright__ = "Copyright 2015, Tuomas Airaksinen"
 __credits__ = []

@@ -22,6 +22,7 @@
 # http://python-automate.org/gospel/
 
 from __future__ import absolute_import
+from __future__ import unicode_literals
 from builtins import object, str
 from copy import copy
 import logging
@@ -249,7 +250,7 @@ def deep_iterate(l):
     if is_iterable(l):
         l_list = l
         if isinstance(l, dict):
-            l_list = l.values()
+            l_list = list(l.values())
         for i in l_list:
             if is_iterable(i):
                 for j in deep_iterate(i): #TODO: yield from
@@ -262,7 +263,7 @@ def deep_iterate(l):
 
 def get_modules_all(base_class, _locals):
     r_types = {}
-    for k, v in copy(_locals).items():
+    for k, v in list(copy(_locals).items()):
         if has_baseclass(v, base_class) and v is not base_class:
             r_types[k] = v
 

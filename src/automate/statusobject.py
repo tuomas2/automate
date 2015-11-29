@@ -22,6 +22,8 @@
 # http://python-automate.org/gospel/
 
 from __future__ import absolute_import
+from __future__ import unicode_literals
+from builtins import str
 import logging
 import operator
 import threading

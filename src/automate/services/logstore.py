@@ -21,6 +21,7 @@
 # If you like Automate, please take a look at this page:
 # http://python-automate.org/gospel/
 
+from __future__ import unicode_literals
 import logging
 import logging.handlers
 

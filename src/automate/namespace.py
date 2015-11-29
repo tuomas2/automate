@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+from builtins import str
 # -*- coding: utf-8 -*-
 # (c) 2015 Tuomas Airaksinen
 #
@@ -131,7 +133,7 @@ class Namespace(dict):
         super(Namespace, self).__delitem__(key)
 
     def update(self, d):
-        for key, value in d.items():
+        for key, value in list(d.items()):
             self[key] = value
 
     def __setitem__(self, name, value):

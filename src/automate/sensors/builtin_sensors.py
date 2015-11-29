@@ -24,6 +24,7 @@
 """
     Module for various Sensor classes.
 """
+from __future__ import unicode_literals
 from future import standard_library
 standard_library.install_aliases()
 from builtins import filter
@@ -546,7 +547,7 @@ class ShellSensor(AbstractSensor):
                 if not line:
                     self.logger.debug('Process exiting (status_loop)')
                     break
-                self.status = filter(line, *args)
+                self.status = list(filter(line, *args))
 
         else:
             filter = self.filter or default_filter

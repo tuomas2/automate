@@ -23,6 +23,7 @@
 
 from __future__ import print_function
 from __future__ import absolute_import
+from __future__ import unicode_literals
 from future import standard_library
 standard_library.install_aliases()
 from builtins import str
@@ -55,7 +56,7 @@ else:
 
 def get_autoload_services():
     import automate.services
-    return (i for i in automate.services.__dict__.values() if has_baseclass(i, AbstractService) and i.autoload)
+    return (i for i in list(automate.services.__dict__.values()) if has_baseclass(i, AbstractService) and i.autoload)
 
 
 def get_service_by_name(name):
@@ -223,7 +224,7 @@ class System(SystemBase):
                 return load()
             else:
                 while True:
-                    answer = input('Program file more recent. Do you want to load it? (y/n) ')
+                    answer = eval(input('Program file more recent. Do you want to load it? (y/n) '))
                     if answer == 'y':
                         return create()
                     elif answer == 'n':
@@ -422,7 +423,7 @@ class System(SystemBase):
             except Exception as e:
                 self.logger.info("Failed to exec cmd %s: %s.", cmd, e)
                 rval = False
-            for key, value in ns.items():
+            for key, value in list(ns.items()):
                 if key not in nscopy or not value is nscopy[key]:
                     if key in self.namespace:
                         del self.namespace[key]
@@ -496,7 +497,7 @@ class System(SystemBase):
         self.namespace.set_system(loadstate)
 
         self.logger.info('Setup loggers per object')
-        for k, v in self.namespace.items():
+        for k, v in list(self.namespace.items()):
             if isinstance(v, SystemObject):
                 ctype = v.__class__.__name__
                 v.logger = self.logger.getChild('%s.%s' % (ctype, k))
