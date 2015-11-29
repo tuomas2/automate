@@ -252,11 +252,11 @@ class Eval(AbstractAction):
         pre_exec = _kwargs.pop('pre_exec', '')
 
         if pre_exec:
-            exec pre_exec.format(**self._kwargs) in namespace
+            exec(pre_exec.format(**self._kwargs), namespace)
         try:
             return eval(self.obj.format(**self._kwargs), namespace)
         except SyntaxError:
-            exec self.obj.format(**self._kwargs) in namespace
+            exec(self.obj.format(**self._kwargs), namespace)
             return True
 
 

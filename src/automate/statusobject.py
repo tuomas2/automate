@@ -21,6 +21,7 @@
 # If you like Automate, please take a look at this page:
 # http://python-automate.org/gospel/
 
+from __future__ import absolute_import
 import logging
 import operator
 import threading
@@ -504,7 +505,7 @@ class AbstractActuator(StatusObject):
             actevent = Empty()
             self.status = self.default
 
-        from program import DefaultProgram
+        from .program import DefaultProgram
 
         if not self.default_program:
             self.default_program = DefaultProgram(

@@ -21,6 +21,8 @@
 # If you like Automate, please take a look at this page:
 # http://python-automate.org/gospel/
 
+from __future__ import print_function
+from __future__ import absolute_import
 import threading
 import operator
 import sys
@@ -156,7 +158,7 @@ class System(SystemBase):
 
     @cached_property
     def _get_ordinary_programs(self):
-        import program
+        from . import program
         return {i for i in self.programs if isinstance(i, program.Program)}
 
     #: Start worker thread automatically after system is initialized
@@ -195,7 +197,7 @@ class System(SystemBase):
             return time_savefile > time_program
 
         def load():
-            print 'Loading %s' % filename
+            print('Loading %s' % filename)
             file = open(filename, 'r')
             state = cPickle.load(file)
             file.close()
@@ -203,7 +205,7 @@ class System(SystemBase):
             return system
 
         def create():
-            print 'Creating new system'
+            print('Creating new system')
             return cls(filename=filename, **kwargs)
 
         if filename and os.path.isfile(filename):
@@ -407,7 +409,7 @@ class System(SystemBase):
                 self.logger.info("Exec: %s", cmd)
             except ExitException:
                 raise
-            except Exception, e:
+            except Exception as e:
                 self.logger.info("Failed to exec cmd %s: %s.", cmd, e)
                 rval = False
             for key, value in ns.iteritems():
@@ -419,7 +421,7 @@ class System(SystemBase):
             self.logger.info("Set items in namespace: %s", r)
         except ExitException:
             raise
-        except Exception, e:
+        except Exception as e:
             self.logger.info("Failed to eval cmd %s: %s", cmd, e)
             return False
 
@@ -509,12 +511,12 @@ class System(SystemBase):
 # Load extensions
 
 from . import services, sensors, actuators, callables
-print 'Loading extensions'
+print('Loading extensions')
 for entry_point in pkg_resources.iter_entry_points('automate.extension'):
-    print 'Loading extension %s' % entry_point
+    print('Loading extension %s' % entry_point)
     ext_classes = entry_point.load(require=False)
     for ext_class in ext_classes:
-        print '... %s' % ext_class.__name__
+        print('... %s' % ext_class.__name__)
         if issubclass(ext_class, AbstractService):
             setattr(services, ext_class.__name__, ext_class)
         elif issubclass(ext_class, AbstractSensor):

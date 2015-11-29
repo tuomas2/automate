@@ -21,6 +21,7 @@
 # If you like Automate, please take a look at this page:
 # http://python-automate.org/gospel/
 
+from __future__ import absolute_import
 import logging
 from traits.has_traits import HasStrictTraits, cached_property
 from traits.trait_types import Instance, CUnicode, Tuple, Dict, Event, Unicode, Int, CBool
@@ -112,8 +113,8 @@ class SystemObject(HasStrictTraits):
             Used by WEB interface templates.
         """
 
-        from statusobject import AbstractSensor, AbstractActuator
-        from program import Program
+        from .statusobject import AbstractSensor, AbstractActuator
+        from .program import Program
         if isinstance(self, AbstractSensor):
             return 'sensor'
         elif isinstance(self, AbstractActuator):

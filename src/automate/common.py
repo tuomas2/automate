@@ -21,6 +21,7 @@
 # If you like Automate, please take a look at this page:
 # http://python-automate.org/gospel/
 
+from __future__ import absolute_import
 from copy import copy
 import logging
 import re
@@ -81,7 +82,7 @@ class LogicStr(Unicode):
 class NameOrSensorActuatorBaseTrait(TraitType):
 
     def validate(self, object, name, value):
-        from statusobject import StatusObject
+        from .statusobject import StatusObject
         v = value
         if isinstance(v, StatusObject):
             return v
@@ -183,32 +184,32 @@ class CompareMixin(object):
        """
 
     def __mul__(self, obj):
-        import callables
+        from . import callables
 
         return callables.Product(self, obj)
 
     def __add__(self, obj):
-        import callables
+        from . import callables
 
         return callables.Sum(self, obj)
 
     def __sub__(self, obj):
-        import callables
+        from . import callables
 
         return callables.Sum(self, -obj)
 
     def __neg__(self):
-        import callables
+        from . import callables
 
         return callables.Neg(self)
 
     def __lt__(self, obj):
-        import callables
+        from . import callables
 
         return callables.Less(self, obj)
 
     def __gt__(self, obj):
-        import callables
+        from . import callables
         return callables.More(self, obj)
 
 

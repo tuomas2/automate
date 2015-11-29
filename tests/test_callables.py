@@ -21,6 +21,7 @@
 # If you like Automate, please take a look at this page:
 # http://python-automate.org/gospel/
 
+from __future__ import print_function
 import pytest
 import mock
 
@@ -885,7 +886,7 @@ def test_while_nested_cancel(sysloader):
 
 def get_musicserver():
     def func(arg1, arg2=None):
-        print arg1, arg2  # getattr(arg2, 'name', None)
+        print(arg1, arg2)  # getattr(arg2, 'name', None)
 
     class MusicServer_Tests(System):
         normal_volume = UserIntSensor(
@@ -1130,7 +1131,7 @@ def test_delay(caplog, mysys):
     c.call(prog)
     assert 'Scheduling' in caplog.text()
     time.sleep(0.5)
-    print '2', caplog.text()
+    print('2', caplog.text())
     assert 'Time is up' in caplog.text()
 
 

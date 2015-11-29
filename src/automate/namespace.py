@@ -79,7 +79,7 @@ class Namespace(dict):
         for name, obj, groups in objs:
             obj.system = self.system
             if name in self:
-                raise NameError, '%s already in namespace!' % name
+                raise NameError('%s already in namespace!' % name)
             self[name] = obj
 
         self.logger.info('Set up system and groups into object tags')
