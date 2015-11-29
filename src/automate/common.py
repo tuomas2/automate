@@ -22,7 +22,7 @@
 # http://python-automate.org/gospel/
 
 from __future__ import absolute_import
-from builtins import object
+from builtins import object, str
 from copy import copy
 import logging
 import re

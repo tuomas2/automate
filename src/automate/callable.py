@@ -1,4 +1,3 @@
-from builtins import str
 # -*- coding: utf-8 -*-
 # (c) 2015 Tuomas Airaksinen
 #
@@ -22,6 +21,7 @@ from builtins import str
 # If you like Automate, please take a look at this page:
 # http://python-automate.org/gospel/
 
+from builtins import str
 import re
 from traits.api import cached_property, on_trait_change, CList, Dict, Instance, Set, Event, Property
 from automate.common import CompareMixin, Lock, deep_iterate, Object, is_iterable, AbstractStatusObject, DictObject, SystemNotReady

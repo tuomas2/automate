@@ -350,12 +350,12 @@ class SetStatus(AbstractAction):
             self.system.logger.debug('SetStatus(%s, %s) by %s', obj, value, caller)
             try:
                 obj.set_status(value, caller)
-            except ValueError:
+            except ValueError as e:
                 self.system.logger.error(
-                    'Trying to set invalid status %s of type %s (by %s)', value, type(value), caller)
-            except AttributeError:
+                    'Trying to set invalid status %s of type %s (by %s). Error: %s', value, type(value), caller, e)
+            except AttributeError as e:
                 self.system.logger.error(
-                    'Trying to set status of invalid object %s of type %s, by %s', obj, type(obj), caller)
+                    'Trying to set status of invalid object %s of type %s, by %s. Error: %s', obj, type(obj), caller, e)
         return True
 
     def _give_triggers(self):

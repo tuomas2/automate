@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from builtins import range
 # -*- coding: utf-8 -*-
 # (c) 2015 Tuomas Airaksinen
