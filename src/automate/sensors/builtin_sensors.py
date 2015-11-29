@@ -249,7 +249,7 @@ class CronTimerSensor(AbstractSensor):
             self._cronit_on.sort(key=lambda x: x.get_current(datetime))
             delay = self._cronit_on[0].get_current(datetime) - self._now()
             self._timer_on = threading.Timer(delay.seconds, threaded(self._switch_on,))
-            self._timer_on.name = ("Timer for TimerSensor:on " + self.name.encode("utf-8") +
+            self._timer_on.name = ("Timer for TimerSensor:on " + self.name +
                                    " at %s" % (self._now() + delay))
             self._timer_on.start()
 
@@ -262,7 +262,7 @@ class CronTimerSensor(AbstractSensor):
             self._cronit_off.sort(key=lambda x: x.get_current(datetime))
             delay = self._cronit_off[0].get_current(datetime) - self._now()
             self._timer_off = threading.Timer(delay.seconds, threaded(self._switch_off))
-            self._timer_off.name = ("Timer for TimerSensor:off " + self.name.encode("utf-8") +
+            self._timer_off.name = ("Timer for TimerSensor:off " + self.name +
                                     " at %s" % (self._now() + delay))
             self._timer_off.start()
 
@@ -349,7 +349,7 @@ class AbstractPollingSensor(AbstractSensor):
         if self.poll_active:
             self.update_status()
             self._pollthread = threading.Timer(self.interval, threaded(self._restart))
-            self._pollthread.name = "PollingSensor: " + self.name.encode("utf-8") + " %.2f sek" % self.interval
+            self._pollthread.name = "PollingSensor: " + self.name + " %.2f sek" % self.interval
             self._pollthread.start()
 
     def update_status(self):
@@ -513,7 +513,7 @@ class ShellSensor(AbstractSensor):
     def cmd_loop(self):
         p = self._process = subprocess.Popen(self.cmd, shell=True, executable='bash', stdout=subprocess.PIPE)
         while True:
-            line = p.stdout.readline()
+            line = p.stdout.readline().decode('utf-8')
             self._queue.put(line)
             if not line:
                 self.logger.debug('Process exiting (cmd_loop)')

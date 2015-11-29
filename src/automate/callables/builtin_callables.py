@@ -291,7 +291,7 @@ class Shell(AbstractAction):
         cmd = self.call_eval(self.obj, caller, **kwargs)
         input = self._kwargs.get('input', None)
         if input:
-            input = str(self.call_eval(input, caller, **kwargs))
+            input = bytes(self.call_eval(input, caller, **kwargs), 'utf-8')
         if not caller:
             return
         try:
@@ -305,7 +305,7 @@ class Shell(AbstractAction):
                 out, err = process.communicate(input)
                 retcode = process.poll()
                 if self._kwargs.get('output', False):
-                    return out
+                    return out.decode('utf-8')
                 else:
                     return retcode
         except Exception as e:
@@ -497,7 +497,7 @@ class Delay(AbstractRunner):
             delay = self.call_eval(self.delay, caller, **kwargs)
             timer = threading.Timer(delay, None)
             timer.function = threaded(self._run, caller, timer, **kwargs)
-            timer.name = "Timer for " + str(self).encode("utf-8") + " %d sek" % delay
+            timer.name = "Timer for " + str(self) + " %d sek" % delay
             timer.start()
             timers.append(timer)
 

@@ -388,3 +388,6 @@ class AbstractCallable(SystemObject, CompareMixin):
         if isinstance(other, self.__class__):
             return self.objects == other.objects
         return False
+
+    def __hash__(self):
+        return id(self)

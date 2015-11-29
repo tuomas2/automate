@@ -96,10 +96,11 @@ class StatusWorkerThread(threading.Thread):
 
     def process_job(self):
         job = self.queue.get()
-        try:
-            job.run()
-        except Exception as e:
-            self.logger.error('Error occurred when executing job %s: %s', job, e)
+        job.run()
+        #try:
+        #    job.run()
+        #except Exception as e:
+        #    self.logger.error('Error occurred when executing job %s: %s', job, e)
         self.queue.task_done()
 
     def run(self):

@@ -75,7 +75,7 @@ class AbstractInterpolatingActuator(FloatActuator):
         if self._changethread and self._changethread.is_alive():
             return
         self._changethread = Thread(target=threaded(self.statuschanger),
-                                    name="Changethread for " + self.name.encode("utf-8"))
+                                    name="Changethread for " + self.name)
         self._changethread.start()
 
 
@@ -119,7 +119,7 @@ class ConstantTimeActuator(ConstantSpeedActuator):
         if self._changethread and self._changethread.is_alive():
             return
         self._changethread = Thread(target=threaded(self.statuschanger),
-                                    name="Changethread for " + self.name.encode("utf-8"))
+                                    name="Changethread for " + self.name)
         self._changethread.start()
 
 

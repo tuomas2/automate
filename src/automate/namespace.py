@@ -49,7 +49,7 @@ class Namespace(dict):
         for name, obj in inspect.getmembers(system):
             if isinstance(obj, SystemObject):
                 objs.append((name, obj, tags))
-            if isinstance(obj, type(Group)):
+            if isinstance(obj, type) and issubclass(obj, Group):
                 add_tags = tags.copy()
                 if hasattr(obj, 'tags'):
                     add_tags = add_tags | set(obj.tags.split(','))
@@ -123,7 +123,7 @@ class Namespace(dict):
             if o in self.reverse:
                 del self.reverse[o]
         except TypeError as e:
-            if not e.message.startswith("unhashable type"):
+            if not str(e).startswith("unhashable type"):
                 raise
 
         if isinstance(o, SystemObject) and o in self.system.objects:
@@ -145,7 +145,7 @@ class Namespace(dict):
             if value in self.get('reverse', []):
                 is_alias = True
         except TypeError as e:
-            if not e.message.startswith("unhashable type"):
+            if not str(e).startswith("unhashable type"):
                 raise
 
         super(Namespace, self).__setitem__(name, value)

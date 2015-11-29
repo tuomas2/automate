@@ -46,6 +46,12 @@ from automate.systemobject import SystemObject
 from automate.worker import StatusWorkerThread
 from automate.callable import AbstractCallable
 
+import sys
+
+if sys.version_info >= (3, 0):
+    TimerClass = threading.Timer
+else:
+    TimerClass = threading._Timer
 
 def get_autoload_services():
     import automate.services
@@ -365,7 +371,7 @@ class System(SystemBase):
 
         self.logger.info("Shutting down %s, please wait a moment.", self.name)
         for t in threading.enumerate():
-            if isinstance(t, threading._Timer):
+            if isinstance(t, TimerClass):
                 t.cancel()
         self.logger.debug('Timers cancelled')
 

@@ -269,8 +269,8 @@ def test_logicstr(mysys):
         mysys.p2.active_condition_str = 'asfdjk'
     assert mysys.p2.active_condition_str == 'Value(False)'
 
-    assert mysys.p3.targets_str == 'TraitSetObject([])'
+    assert mysys.p3.targets_str == 'TraitSetObject()'
     assert mysys.p3.targets == set([])
     mysys.p3.targets_str = '{a1}'
-    assert mysys.p3.targets_str == "TraitSetObject(['a1'])"
+    assert mysys.p3.targets_str == "TraitSetObject({'a1'})"
     assert mysys.p3.targets == {mysys.a1}

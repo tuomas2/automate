@@ -69,7 +69,7 @@ class LogStoreService(AbstractUserService):
 
             def emit(self, record):
                 super(MyBufferingHandler, self).emit(record)
-                service.most_recent_line = ansiconv.to_html(html_formatter.format(record).encode('utf-8')) + '\n'
+                service.most_recent_line = ansiconv.to_html(html_formatter.format(record)) + '\n'
 
         service._loghandler = loghandler = MyBufferingHandler(service.log_length)
         loghandler.setLevel(service.log_level)
@@ -83,9 +83,8 @@ class LogStoreService(AbstractUserService):
         else:
             formatter = ColoredFormatter(self.html_format if html else self.format, datefmt=self.time_format)
 
-        logentries = u'\n'.join([formatter.format(i) for i in handler.buffer[-lines:]])
+        rv = u'\n'.join([formatter.format(i) for i in handler.buffer[-lines:]])
 
-        rv = logentries.encode('utf-8')
         if html:
             rv = ansiconv.to_html(rv)
         else:

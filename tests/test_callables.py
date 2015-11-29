@@ -348,7 +348,7 @@ def test_eval():
     assert c.call(prog) == 2
     c = Eval('a+1+{b}', pre_exec='a=1', b=1)
     assert c.call(prog) == 3
-    assert Eval('print "hep"').call(prog) == True
+    assert Eval('class hep:\n    pass').call(prog) == True
 
 
 @pytest.mark.parametrize('x, r', [
