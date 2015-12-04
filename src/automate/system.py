@@ -224,7 +224,7 @@ class System(SystemBase):
                 return load()
             else:
                 while True:
-                    answer = eval(input('Program file more recent. Do you want to load it? (y/n) '))
+                    answer = input('Program file more recent. Do you want to load it? (y/n) ')
                     if answer == 'y':
                         return create()
                     elif answer == 'n':
