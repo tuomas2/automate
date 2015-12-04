@@ -6,3 +6,4 @@
 *.sav
 /docs/build/
 /dist/
+/.cache/
