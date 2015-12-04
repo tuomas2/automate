@@ -189,8 +189,8 @@ class TestAbstractLogicCallable(object):
                                      "Method([1], 'pop')"
                                  ),
                                  (
-                                     Method([1], 'pop', arg1='hep', arg2='hop'),
-                                     "Method([1], 'pop', arg1='hep', arg2='hop')",
+                                     Method([1], 'pop', arg1='hep'),
+                                     "Method([1], 'pop', arg1='hep')",
                                  ),
                                  (
                                      SetStatus(1, 2),
