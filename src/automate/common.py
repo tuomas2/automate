@@ -30,6 +30,7 @@ import re
 import keyword
 import threading
 from collections import Iterable
+from functools import wraps
 
 from traits.api import CSet, HasStrictTraits, Unicode, TraitType
 
@@ -96,6 +97,7 @@ class NameOrSensorActuatorBaseTrait(TraitType):
 
 def threaded(func, *args, **kwargs):
     """ uses thread_init as a decorator-style """
+    @wraps(func)
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -253,7 +255,7 @@ def deep_iterate(l):
             l_list = list(l.values())
         for i in l_list:
             if is_iterable(i):
-                for j in deep_iterate(i): #TODO: yield from
+                for j in deep_iterate(i): #TODO: could use yield from (python 3.3)
                     yield j
             else:
                 yield i
