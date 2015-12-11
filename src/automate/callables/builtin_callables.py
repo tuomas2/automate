@@ -1,9 +1,3 @@
-from __future__ import unicode_literals
-from builtins import bytes
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-from builtins import object
 # -*- coding: utf-8 -*-
 # (c) 2015 Tuomas Airaksinen
 #
@@ -26,6 +20,13 @@ from builtins import object
 #
 # If you like Automate, please take a look at this page:
 # http://python-automate.org/gospel/
+
+from __future__ import unicode_literals
+from builtins import bytes
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
 
 import re
 import threading
@@ -269,6 +270,34 @@ class Eval(AbstractAction):
 class Exec(Eval):
 
     """Synonym to :class:`.Eval`"""
+
+
+class GetService(AbstractAction):
+    """
+    Get service by name and number.
+
+    Usage::
+
+        GetService(name, number=0)
+
+    Usage examples::
+
+        GetService('WebService')
+        GetService('WebService', 1)
+
+    """
+    def call(self, caller, **kwargs):
+        name = self._args[0]
+        try:
+            num = self._args[1]
+        except IndexError:
+            num = 0
+
+        services = self.system.services_by_name[name]
+        if isinstance(services, list):
+            return services[num]
+        else:
+            return services
 
 
 class Shell(AbstractAction):
