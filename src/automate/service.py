@@ -69,6 +69,7 @@ class AbstractService(HasStrictTraits):
     def reload(self):
         self.cleanup()
         self.setup()
+        self.logger.info('Reloading %s ready!', self)
 
     def __repr__(self):
         return '<' + self.__class__.__name__ + ' instance%s>' % ('' if self.system else ' not initialized')
