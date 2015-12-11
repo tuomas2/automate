@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 # -*- coding: utf-8 -*-
 # (c) 2015 Tuomas Airaksinen
 #
@@ -21,6 +22,10 @@
 # If you like Automate, please take a look at this page:
 # http://python-automate.org/gospel/
 
+from __future__ import print_function
+from builtins import str
+from builtins import range
+from builtins import object
 import pytest
 import mock
 
@@ -129,7 +134,7 @@ def test_call_eval(mysys):
     assert call_eval(1, mysys.prog) == 1
 
 
-class TestAbstractLogicCallable:
+class TestAbstractLogicCallable(object):
 
     #    @mock.patch.object(Attrib, '_give_triggers')
     #    @mock.patch.object(Empty, '_give_triggers')
@@ -184,8 +189,8 @@ class TestAbstractLogicCallable:
                                      "Method([1], 'pop')"
                                  ),
                                  (
-                                     Method([1], 'pop', arg1='hep', arg2='hop'),
-                                     "Method([1], 'pop', arg1='hep', arg2='hop')",
+                                     Method([1], 'pop', arg1='hep'),
+                                     "Method([1], 'pop', arg1='hep')",
                                  ),
                                  (
                                      SetStatus(1, 2),
@@ -197,7 +202,8 @@ class TestAbstractLogicCallable:
         s = sysloader.new_system(syst)
 
         c2 = s.c1.on_deactivate[1]
-
+        if sys.version_info < (3, 0):
+            strver = re.sub(r"([= \(])(['\"])", lambda m: m.group(1) + 'u' + m.group(2), strver)
         assert c2.give_str() == strver
         assert repr(c2) == strver
         assert str(c2) == strver
@@ -237,7 +243,7 @@ def test_call(prog):
     with pytest.raises(IndexError):
         c.call(prog)
 
-    class mycls:
+    class mycls(object):
 
         def fun(self, *args, **kwargs):
             return args, kwargs
@@ -269,7 +275,7 @@ def test_attrib(prog):
     prog.on_activate = c = Attrib(l, "pop")
     assert c.call(prog)() == 3
 
-    class mycls:
+    class mycls(object):
         a = 1
     obj = mycls()
     prog.on_activate = c2 = Attrib(obj, 'a')
@@ -277,7 +283,7 @@ def test_attrib(prog):
 
 def test_attrib2(sysloader):
     class mysys2(System):
-        class joku:
+        class joku(object):
             joku = 2.0
         s = UserFloatSensor(default=3.0)
         a = FloatActuator()
@@ -344,7 +350,7 @@ def test_eval():
     assert c.call(prog) == 2
     c = Eval('a+1+{b}', pre_exec='a=1', b=1)
     assert c.call(prog) == 3
-    assert Eval('print "hep"').call(prog) == True
+    assert Eval('class hep:\n    pass').call(prog) == True
 
 
 @pytest.mark.parametrize('x, r', [
@@ -885,7 +891,7 @@ def test_while_nested_cancel(sysloader):
 
 def get_musicserver():
     def func(arg1, arg2=None):
-        print arg1, arg2  # getattr(arg2, 'name', None)
+        print(arg1, arg2)  # getattr(arg2, 'name', None)
 
     class MusicServer_Tests(System):
         normal_volume = UserIntSensor(
@@ -1064,7 +1070,7 @@ def test_musicserver_radiodei(sysloader):
 
 
 def test_setattr(mysys):
-    class mycls:
+    class mycls(object):
         a = 1
     a = mycls()
     mysys.prog.on_deactivate = c = SetAttr(a, b=2, c=3, d=mysys.sens)
@@ -1130,7 +1136,7 @@ def test_delay(caplog, mysys):
     c.call(prog)
     assert 'Scheduling' in caplog.text()
     time.sleep(0.5)
-    print '2', caplog.text()
+    print('2', caplog.text())
     assert 'Time is up' in caplog.text()
 
 
@@ -1176,7 +1182,7 @@ def test_delay_secondtry(caplog, mysys):
 
 
 def test_ifelse(mysys):
-    class mycls:
+    class mycls(object):
         r = 0
     itm1 = mycls()
     itm2 = mycls()
@@ -1212,7 +1218,7 @@ def test_ifelse(mysys):
     assert _if.collect_targets() == {mysys.act, mysys.a2}
 
 
-@pytest.mark.parametrize('var', range(3))
+@pytest.mark.parametrize('var', list(range(3)))
 def test_switch(var, mysys):
     i = mysys.namespace['i'] = Switch(var, 1, 2, 3)
     i.call(prog) == var + 1

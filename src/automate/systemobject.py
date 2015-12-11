@@ -21,6 +21,9 @@
 # If you like Automate, please take a look at this page:
 # http://python-automate.org/gospel/
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from builtins import str
 import logging
 from traits.has_traits import HasStrictTraits, cached_property
 from traits.trait_types import Instance, CUnicode, Tuple, Dict, Event, Unicode, Int, CBool
@@ -70,7 +73,7 @@ class SystemObject(HasStrictTraits):
         if not is_valid_variable_name(new_name):
             raise NameError('Illegal name %s' % new_name)
         try:
-            if self in self.system.namespace.values():
+            if self in list(self.system.namespace.values()):
                 del self.system.namespace[self.name]
         except NameError:
 
@@ -112,8 +115,8 @@ class SystemObject(HasStrictTraits):
             Used by WEB interface templates.
         """
 
-        from statusobject import AbstractSensor, AbstractActuator
-        from program import Program
+        from .statusobject import AbstractSensor, AbstractActuator
+        from .program import Program
         if isinstance(self, AbstractSensor):
             return 'sensor'
         elif isinstance(self, AbstractActuator):
@@ -190,7 +193,7 @@ class SystemObject(HasStrictTraits):
             Setup Callable attributes that belong to this object.
         """
         defaults = self.get_default_callables()
-        for key, value in defaults.iteritems():
+        for key, value in list(defaults.items()):
             self._postponed_callables.setdefault(key, value)
         for key in self.callables:
             value = self._postponed_callables.pop(key)

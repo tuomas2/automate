@@ -21,12 +21,19 @@
 # If you like Automate, please take a look at this page:
 # http://python-automate.org/gospel/
 
+from __future__ import print_function
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import input
 import threading
 import operator
 import sys
 import os
 import logging
-import cPickle
+import pickle
 import pkg_resources
 
 from traits.api import (CStr, Instance, CBool, CList, Property, CInt, CUnicode, Event, CSet, Str, cached_property,
@@ -40,10 +47,16 @@ from automate.systemobject import SystemObject
 from automate.worker import StatusWorkerThread
 from automate.callable import AbstractCallable
 
+import sys
+
+if sys.version_info >= (3, 0):
+    TimerClass = threading.Timer
+else:
+    TimerClass = threading._Timer
 
 def get_autoload_services():
     import automate.services
-    return (i for i in automate.services.__dict__.values() if has_baseclass(i, AbstractService) and i.autoload)
+    return (i for i in list(automate.services.__dict__.values()) if has_baseclass(i, AbstractService) and i.autoload)
 
 
 def get_service_by_name(name):
@@ -156,7 +169,7 @@ class System(SystemBase):
 
     @cached_property
     def _get_ordinary_programs(self):
-        import program
+        from . import program
         return {i for i in self.programs if isinstance(i, program.Program)}
 
     #: Start worker thread automatically after system is initialized
@@ -195,15 +208,15 @@ class System(SystemBase):
             return time_savefile > time_program
 
         def load():
-            print 'Loading %s' % filename
-            file = open(filename, 'r')
-            state = cPickle.load(file)
+            print('Loading %s' % filename)
+            file = open(filename, 'rb')
+            state = pickle.load(file)
             file.close()
             system = System(loadstate=state, filename=filename, **kwargs)
             return system
 
         def create():
-            print 'Creating new system'
+            print('Creating new system')
             return cls(filename=filename, **kwargs)
 
         if filename and os.path.isfile(filename):
@@ -211,7 +224,7 @@ class System(SystemBase):
                 return load()
             else:
                 while True:
-                    answer = raw_input('Program file more recent. Do you want to load it? (y/n) ')
+                    answer = input('Program file more recent. Do you want to load it? (y/n) ')
                     if answer == 'y':
                         return create()
                     elif answer == 'n':
@@ -227,8 +240,8 @@ class System(SystemBase):
             self.logger.error('Filename not specified. Could not save state')
             return
         self.logger.info('Saving system state to %s', self.filename)
-        with open(self.filename, 'w') as file, self.worker_thread.queue.mutex:
-            cPickle.dump((list(self.objects)), file, 2)
+        with open(self.filename, 'wb') as file, self.worker_thread.queue.mutex:
+            pickle.dump((list(self.objects)), file, 2)
 
     @property
     def cmd_namespace(self):
@@ -236,7 +249,7 @@ class System(SystemBase):
             A read-only property that gives the namespace of the system for evaluating commands.
         """
         import automate
-        ns = dict(automate.__dict__.items() + self.namespace.items())
+        ns = dict(list(automate.__dict__.items()) + list(self.namespace.items()))
         return ns
 
     def __getattr__(self, item):
@@ -300,7 +313,7 @@ class System(SystemBase):
         """
             Give SystemObject instance corresponding to the name
         """
-        if isinstance(name, (str, unicode)):
+        if isinstance(name, str):
             if self.allow_name_referencing:
                 name = name
             else:
@@ -359,7 +372,7 @@ class System(SystemBase):
 
         self.logger.info("Shutting down %s, please wait a moment.", self.name)
         for t in threading.enumerate():
-            if isinstance(t, threading._Timer):
+            if isinstance(t, TimerClass):
                 t.cancel()
         self.logger.debug('Timers cancelled')
 
@@ -407,10 +420,10 @@ class System(SystemBase):
                 self.logger.info("Exec: %s", cmd)
             except ExitException:
                 raise
-            except Exception, e:
+            except Exception as e:
                 self.logger.info("Failed to exec cmd %s: %s.", cmd, e)
                 rval = False
-            for key, value in ns.iteritems():
+            for key, value in list(ns.items()):
                 if key not in nscopy or not value is nscopy[key]:
                     if key in self.namespace:
                         del self.namespace[key]
@@ -419,7 +432,7 @@ class System(SystemBase):
             self.logger.info("Set items in namespace: %s", r)
         except ExitException:
             raise
-        except Exception, e:
+        except Exception as e:
             self.logger.info("Failed to eval cmd %s: %s", cmd, e)
             return False
 
@@ -484,7 +497,7 @@ class System(SystemBase):
         self.namespace.set_system(loadstate)
 
         self.logger.info('Setup loggers per object')
-        for k, v in self.namespace.iteritems():
+        for k, v in list(self.namespace.items()):
             if isinstance(v, SystemObject):
                 ctype = v.__class__.__name__
                 v.logger = self.logger.getChild('%s.%s' % (ctype, k))
@@ -509,12 +522,12 @@ class System(SystemBase):
 # Load extensions
 
 from . import services, sensors, actuators, callables
-print 'Loading extensions'
+print('Loading extensions')
 for entry_point in pkg_resources.iter_entry_points('automate.extension'):
-    print 'Loading extension %s' % entry_point
+    print('Loading extension %s' % entry_point)
     ext_classes = entry_point.load(require=False)
     for ext_class in ext_classes:
-        print '... %s' % ext_class.__name__
+        print('... %s' % ext_class.__name__)
         if issubclass(ext_class, AbstractService):
             setattr(services, ext_class.__name__, ext_class)
         elif issubclass(ext_class, AbstractSensor):

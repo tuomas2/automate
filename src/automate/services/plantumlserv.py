@@ -1,3 +1,6 @@
+from __future__ import unicode_literals
+from future import standard_library
+standard_library.install_aliases()
 # -*- coding: utf-8 -*-
 # (c) 2015 Tuomas Airaksinen
 #
@@ -21,7 +24,7 @@
 # If you like Automate, please take a look at this page:
 # http://python-automate.org/gospel/
 
-import cStringIO
+import io
 
 from traits.api import Str, Dict
 
@@ -67,10 +70,10 @@ class PlantUMLService(AbstractUserService):
         if filename:
             s = open(filename, 'w')
         else:
-            s = cStringIO.StringIO()
+            s = io.StringIO()
         s.write('@startuml\n')
         s.write('skinparam state {\n')
-        for k, v in self.background_colors.iteritems():
+        for k, v in list(self.background_colors.items()):
             s.write('BackGroundColor<<%s>> %s\n' % (k, v))
         s.write('}\n')
 

@@ -21,6 +21,8 @@
 # If you like Automate, please take a look at this page:
 # http://python-automate.org/gospel/
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 __author__ = "Tuomas Airaksinen"
 __copyright__ = "Copyright 2015, Tuomas Airaksinen"
 __credits__ = []
@@ -30,7 +32,7 @@ __maintainer__ = "Tuomas Airaksinen"
 __email__ = "tuomas.airaksinen@gmail.com"
 __status__ = "Beta"
 
-import traits_fixes
+from . import traits_fixes
 from .common import *
 from .program import *
 from .system import *

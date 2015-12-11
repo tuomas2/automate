@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+from builtins import object
 # -*- coding: utf-8 -*-
 # (c) 2015 Tuomas Airaksinen
 #
@@ -158,7 +160,7 @@ def test_freeze_act(freezesys_act):
     assert freezesys.s1.status == True
 
 
-class TestProgramFeatures:
+class TestProgramFeatures(object):
 
     def test_triggerlist_targetlist_change(self, mysys):
         p = mysys.p
@@ -268,8 +270,8 @@ def test_logicstr(mysys):
         mysys.p2.active_condition_str = 'asfdjk'
     assert mysys.p2.active_condition_str == 'Value(False)'
 
-    assert mysys.p3.targets_str == 'TraitSetObject([])'
+    assert mysys.p3.targets_str in ['TraitSetObject()', 'TraitSetObject([])']
     assert mysys.p3.targets == set([])
     mysys.p3.targets_str = '{a1}'
-    assert mysys.p3.targets_str == "TraitSetObject(['a1'])"
+    assert mysys.p3.targets_str in ["TraitSetObject(['a1'])", "TraitSetObject({'a1'})"]
     assert mysys.p3.targets == {mysys.a1}

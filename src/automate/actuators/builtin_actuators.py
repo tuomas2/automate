@@ -24,6 +24,8 @@
 """
     Module for builtin Actuator classes
 """
+from __future__ import division
+from __future__ import unicode_literals
 
 from threading import Thread
 import time
@@ -46,8 +48,6 @@ class IntActuator(AbstractActuator):
     """ Integer valued actuator"""
     _status = CInt(transient=True)
     default = CInt
-
-0
 
 
 class FloatActuator(AbstractActuator):
@@ -76,7 +76,7 @@ class AbstractInterpolatingActuator(FloatActuator):
         if self._changethread and self._changethread.is_alive():
             return
         self._changethread = Thread(target=threaded(self.statuschanger),
-                                    name="Changethread for " + self.name.encode("utf-8"))
+                                    name="Changethread for " + self.name)
         self._changethread.start()
 
 
@@ -120,7 +120,7 @@ class ConstantTimeActuator(ConstantSpeedActuator):
         if self._changethread and self._changethread.is_alive():
             return
         self._changethread = Thread(target=threaded(self.statuschanger),
-                                    name="Changethread for " + self.name.encode("utf-8"))
+                                    name="Changethread for " + self.name)
         self._changethread.start()
 
 

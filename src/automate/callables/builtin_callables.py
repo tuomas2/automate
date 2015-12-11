@@ -21,9 +21,16 @@
 # If you like Automate, please take a look at this page:
 # http://python-automate.org/gospel/
 
+from __future__ import unicode_literals
+from builtins import bytes
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
+
 import re
 import threading
-import xmlrpclib
+import xmlrpc.client
 import socket
 import subprocess
 
@@ -142,7 +149,7 @@ class Func(AbstractAction):
     def call(self, caller, **kwargs):
         if not caller:
             return
-        _kwargs = {k: self.call_eval(v, caller, **kwargs) for k, v in self._kwargs.iteritems()}
+        _kwargs = {k: self.call_eval(v, caller, **kwargs) for k, v in list(self._kwargs.items())}
         return_value = _kwargs.pop('return_value', True)
         args = [self.call_eval(i, caller, return_value=return_value, **kwargs) for i in self.args]
         if _kwargs.pop('add_caller', False):
@@ -252,17 +259,45 @@ class Eval(AbstractAction):
         pre_exec = _kwargs.pop('pre_exec', '')
 
         if pre_exec:
-            exec pre_exec.format(**self._kwargs) in namespace
+            exec(pre_exec.format(**self._kwargs), namespace)
         try:
             return eval(self.obj.format(**self._kwargs), namespace)
         except SyntaxError:
-            exec self.obj.format(**self._kwargs) in namespace
+            exec(self.obj.format(**self._kwargs), namespace)
             return True
 
 
 class Exec(Eval):
 
     """Synonym to :class:`.Eval`"""
+
+
+class GetService(AbstractAction):
+    """
+    Get service by name and number.
+
+    Usage::
+
+        GetService(name, number=0)
+
+    Usage examples::
+
+        GetService('WebService')
+        GetService('WebService', 1)
+
+    """
+    def call(self, caller, **kwargs):
+        name = self._args[0]
+        try:
+            num = self._args[1]
+        except IndexError:
+            num = 0
+
+        services = self.system.services_by_name[name]
+        if isinstance(services, list):
+            return services[num]
+        else:
+            return services
 
 
 class Shell(AbstractAction):
@@ -287,7 +322,7 @@ class Shell(AbstractAction):
         cmd = self.call_eval(self.obj, caller, **kwargs)
         input = self._kwargs.get('input', None)
         if input:
-            input = str(self.call_eval(input, caller, **kwargs))
+            input = bytes(self.call_eval(input, caller, **kwargs), 'utf-8')
         if not caller:
             return
         try:
@@ -301,7 +336,7 @@ class Shell(AbstractAction):
                 out, err = process.communicate(input)
                 retcode = process.poll()
                 if self._kwargs.get('output', False):
-                    return out
+                    return out.decode('utf-8')
                 else:
                     return retcode
         except Exception as e:
@@ -346,12 +381,12 @@ class SetStatus(AbstractAction):
             self.system.logger.debug('SetStatus(%s, %s) by %s', obj, value, caller)
             try:
                 obj.set_status(value, caller)
-            except ValueError:
+            except ValueError as e:
                 self.system.logger.error(
-                    'Trying to set invalid status %s of type %s (by %s)', value, type(value), caller)
-            except AttributeError:
+                    'Trying to set invalid status %s of type %s (by %s). Error: %s', value, type(value), caller, e)
+            except AttributeError as e:
                 self.system.logger.error(
-                    'Trying to set status of invalid object %s of type %s, by %s', obj, type(obj), caller)
+                    'Trying to set status of invalid object %s of type %s, by %s. Error: %s', obj, type(obj), caller, e)
         return True
 
     def _give_triggers(self):
@@ -378,13 +413,13 @@ class SetAttr(AbstractAction):
         if not caller:
             return
         obj = self.obj
-        for attr, val in self._kwargs.iteritems():
+        for attr, val in list(self._kwargs.items()):
             val = self.call_eval(val, caller, **kwargs)
             setattr(obj, attr, val)
         return True
 
     def _give_triggers(self):
-        return self._kwargs.values()
+        return list(self._kwargs.values())
 
     def _give_targets(self):
         return self.obj
@@ -493,7 +528,7 @@ class Delay(AbstractRunner):
             delay = self.call_eval(self.delay, caller, **kwargs)
             timer = threading.Timer(delay, None)
             timer.function = threaded(self._run, caller, timer, **kwargs)
-            timer.name = "Timer for " + unicode(self).encode("utf-8") + " %d sek" % delay
+            timer.name = "Timer for " + str(self) + " %d sek" % delay
             timer.start()
             timers.append(timer)
 
@@ -890,7 +925,7 @@ class AbstractQuery(AbstractCallable):
     """
 
 
-class ReprObject:
+class ReprObject(object):
 
     def __init__(self, name):
         self.name = name
@@ -1044,19 +1079,19 @@ class RemoteFunc(AbstractCallable):
         try:
             if self._cached_server is None:
                 host = self.call_eval(self.obj, caller, **kwargs)
-                self._cached_server = server = xmlrpclib.ServerProxy(host)
+                self._cached_server = server = xmlrpc.client.ServerProxy(host)
             else:
                 server = self._cached_server
 
             funcname = self.call_eval(self.value, caller, **kwargs)
             args = [self.call_eval(o, caller, **kwargs) for o in self.objects[2:]]
-            _kwargs = {k: self.call_eval(v, caller, **kwargs) for k, v in self._kwargs.iteritems()}
+            _kwargs = {k: self.call_eval(v, caller, **kwargs) for k, v in list(self._kwargs.items())}
             try:
                 return getattr(server, funcname)(*args, **_kwargs)
-            except xmlrpclib.Fault as e:
+            except xmlrpc.client.Fault as e:
                 self.logger.error(
                     'Could call remote function (%s,%s)(*%s, **%s), error: %s', server, funcname, args, _kwargs, e)
-        except (socket.gaierror, IOError, xmlrpclib.Fault) as e:
+        except (socket.gaierror, IOError, xmlrpc.client.Fault) as e:
             self.logger.error('Could call remote function, error: %s', e)
 
 

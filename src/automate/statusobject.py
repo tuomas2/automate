@@ -21,18 +21,28 @@
 # If you like Automate, please take a look at this page:
 # http://python-automate.org/gospel/
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from builtins import str
 import logging
 import operator
 import threading
 import time
+import sys
 
 from traits.api import (cached_property, Any, CBool, Instance, Dict, Str, CFloat,
                         List, Enum, Bool, Property)
+from traits.trait_errors import TraitError
 
 from automate.common import Lock, AbstractStatusObject, CompareMixin, nomutex
 from automate.worker import StatusWorkerTask, DummyStatusWorkerTask
 from automate.program import ProgrammableSystemObject, DefaultProgram
 from automate.systemobject import SystemObject
+
+if sys.version_info >= (3, 0):
+    TimerClass = threading.Timer
+else:
+    TimerClass = threading._Timer
 
 
 class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin):
@@ -73,7 +83,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
         return False
 
     # Thread of currently running action
-    _timed_action = Instance(threading._Timer, transient=True)
+    _timed_action = Instance(TimerClass, transient=True)
 
     # Reference of status change job that is in the worker queue is saved here
     _queued_job = Instance(StatusWorkerTask, transient=True)
@@ -203,7 +213,10 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
         self._change_start = 0.
         self._last_changed = time.time()
 
-        self._status = status
+        try:
+            self._status = status
+        except TraitError as e:
+            self.logger.warning('Wrong type of status %s was passed to %s. Error: %s', status, self, e)
 
     def _add_statuschange_to_queue(self, status, prog, with_statuslock=False):
         # This function is used for delayed actions
@@ -216,7 +229,13 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
             self.system.worker_thread.put(DummyStatusWorkerTask(self._set_real_status, status, prog))
 
     def _are_delays_active(self, new_status):
-        mode = "rising" if new_status > self._status else "falling"
+        try:
+            mode = "rising" if new_status > self._status else "falling"
+        except TypeError as e:
+            if 'unorderable types' in str(e): # if it cannot be determined whether value is rising or falling, we'll assume it's rising
+                mode = 'rising'
+            else:
+                raise e
         safety_active = False
         change_active = False
         if self.safety_delay > 0. and self.safety_mode in [mode, "both"]:
@@ -282,12 +301,11 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
             else:
                 timesince = time.time() - self._last_changed
                 delaytime = max(0, self.safety_delay - timesince, changedelay)
-                #self.logger.debug("Scheduling safety/change_delay timer for %s for %f", self, delaytime)
                 logger("Scheduling safety/change_delay timer for %f sek. Now %s. Going to change to %s.",
                        delaytime, self._status, status)
                 self._timed_action = threading.Timer(delaytime, timer_func,
                                                      args=(self._add_statuschange_to_queue, status, getattr(self, "program", None), True))
-                self._timed_action.name = "Safety/change_delay for " + self.name.encode("utf-8") + " %f sek" % delaytime
+                self._timed_action.name = "Safety/change_delay for " + self.name + " %f sek" % delaytime
                 self._timed_action.start()
                 return False
 
@@ -504,7 +522,7 @@ class AbstractActuator(StatusObject):
             actevent = Empty()
             self.status = self.default
 
-        from program import DefaultProgram
+        from .program import DefaultProgram
 
         if not self.default_program:
             self.default_program = DefaultProgram(
