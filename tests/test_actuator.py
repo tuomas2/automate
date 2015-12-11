@@ -281,6 +281,8 @@ def test_back_and_forth_on_activate_w_safety_delay(mysys):
 def test_back_and_forth_on_update(mysys):
     assert mysys.act.status == LOW
     mysys.prog.active_condition = Value(True)
+    mysys.flush()
+    assert mysys.act.status == HIGH
     mysys.prog.update_condition = Value(True)
     mysys.prog.on_update = SetStatus(mysys.act, mysys.sens)
     mysys.flush()
