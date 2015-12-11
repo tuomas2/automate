@@ -14,7 +14,7 @@ setupopts = dict(
     packages=find_packages('src'),
     package_dir={'': 'src'},
     install_requires=[
-        'traits>=4.6.0.dev354,<4.7.0',
+        'traits>=4.5.0,<4.7.0',
         'croniter==0.3.8',
         'pyinotify==0.9.6',
         'ipython==4.0',
