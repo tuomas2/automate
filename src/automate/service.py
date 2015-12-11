@@ -60,8 +60,15 @@ class AbstractService(HasStrictTraits):
 
     def cleanup(self):
         """
-            Cleanup actions must be performed here. Define in subclasses.
+            Cleanup actions must be performed here. This must be blocking until service is
+            fully cleaned up.
+
+            Define in subclasses.
         """
+
+    def reload(self):
+        self.cleanup()
+        self.setup()
 
     def __repr__(self):
         return '<' + self.__class__.__name__ + ' instance%s>' % ('' if self.system else ' not initialized')
