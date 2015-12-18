@@ -278,7 +278,8 @@ class GetService(AbstractAction):
 
     Usage::
 
-        GetService(name, number=0)
+        GetService(name)
+        GetService(name, number)
 
     Usage examples::
 
@@ -288,16 +289,29 @@ class GetService(AbstractAction):
     """
     def call(self, caller, **kwargs):
         name = self._args[0]
-        try:
-            num = self._args[1]
-        except IndexError:
-            num = 0
+        num = self._args[1] if len(self._args) > 1 else 0
+        return self.system.services_by_name[name][num]
 
-        services = self.system.services_by_name[name]
-        if isinstance(services, list):
-            return services[num]
-        else:
-            return services
+
+class ReloadService(AbstractAction):
+    """
+    Reload given service.
+
+    Usage::
+
+        ReloadService(name, number)
+        ReloadService(name)
+
+    Usage examples::
+
+        ReloadService('WebService', 0)
+        ReloadService('ArduinoService')
+
+    """
+    def call(self, caller, **kwargs):
+        name = self._args[0]
+        num = self._args[1] if len(self._args) > 1 else 0
+        return self.system.services_by_name[name][num].reload()
 
 
 class Shell(AbstractAction):
