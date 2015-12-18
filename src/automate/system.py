@@ -24,6 +24,9 @@
 from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import unicode_literals
+
+from collections import defaultdict
+
 from future import standard_library
 standard_library.install_aliases()
 from builtins import str
@@ -284,17 +287,10 @@ class System(SystemBase):
         """
             A property that gives a dictionary that contains services as values and their names as keys.
         """
-        rv = {}
+        srvs = defaultdict(list)
         for i in self.services:
-            name = i.__class__.__name__
-            if name in rv:
-                if not isinstance(rv[name], list):
-                    obj = rv[name]
-                    rv[name] = [obj]
-                rv[name].append(i)
-            else:
-                rv[name] = i
-        return rv
+            srvs[i.__class__.__name__].append(i)
+        return srvs
 
     @property
     def service_names(self):
@@ -352,12 +348,11 @@ class System(SystemBase):
             Used by Sensors/Actuators/other services that need to use other services for their
             operations.
         """
-        ser = self.services_by_name.get(type)
-        if not ser:
+        srvs = self.services_by_name.get(type)
+        if not srvs:
             return
 
-        if isinstance(ser, list):
-            ser = ser[id]
+        ser = srvs[id]
 
         if not ser.system:
             ser.setup_system(self)
