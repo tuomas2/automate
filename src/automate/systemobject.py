@@ -157,7 +157,7 @@ class SystemObject(HasStrictTraits):
         """
         return dict(type=self.__class__.__name__, tags=list(self.tags))
 
-    def setup(self):
+    def setup(self, *args, **kwargs):
         """
             Initialize necessary services etc. here. Define this in subclasses.
         """
