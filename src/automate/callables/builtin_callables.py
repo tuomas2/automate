@@ -25,8 +25,6 @@ from __future__ import unicode_literals
 from builtins import bytes
 from future import standard_library
 standard_library.install_aliases()
-from builtins import str
-from builtins import object
 
 import re
 import threading

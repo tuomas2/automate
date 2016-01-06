@@ -24,12 +24,11 @@
 from __future__ import print_function
 from __future__ import absolute_import
 from __future__ import unicode_literals
-
+from past.builtins import basestring
 from collections import defaultdict
 
 from future import standard_library
 standard_library.install_aliases()
-from builtins import str
 from builtins import input
 import threading
 import operator
@@ -309,7 +308,7 @@ class System(SystemBase):
         """
             Give SystemObject instance corresponding to the name
         """
-        if isinstance(name, str):
+        if isinstance(name, basestring):
             if self.allow_name_referencing:
                 name = name
             else:

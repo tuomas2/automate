@@ -22,7 +22,7 @@
 # http://python-automate.org/gospel/
 
 from __future__ import unicode_literals
-from builtins import str
+from past.builtins import basestring
 import re
 from traits.api import cached_property, on_trait_change, CList, Dict, Instance, Set, Event, Property
 from automate.common import CompareMixin, Lock, deep_iterate, Object, is_iterable, AbstractStatusObject, DictObject, SystemNotReady
@@ -179,7 +179,7 @@ class AbstractCallable(SystemObject, CompareMixin):
         elif isinstance(lst, list):
             lst2 = enumerate(lst)
         for idx, obj in lst2:
-            if isinstance(obj, str):
+            if isinstance(obj, basestring):
                 lst[idx] = self.name_to_system_object(obj)
             if isinstance(obj, list):
                 self._fix_list(obj)
@@ -248,7 +248,7 @@ class AbstractCallable(SystemObject, CompareMixin):
         if not self.system:
             raise SystemNotReady
 
-        if isinstance(value, (str, Object)):
+        if isinstance(value, (basestring, Object)):
             rv = self.system.name_to_system_object(value)
             return rv if rv else value
         else:

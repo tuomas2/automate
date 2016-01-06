@@ -23,7 +23,7 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
-from builtins import object, str
+from past.builtins import basestring
 from copy import copy
 import logging
 import re
@@ -74,24 +74,24 @@ class Object(object):
 
 class LogicStr(Unicode):
 
-    def validate(self, object, name, value):
+    def validate(self, obj, name, value):
         v = value
-        f = object.system.eval_in_system_namespace(v)
+        f = obj.system.eval_in_system_namespace(v)
         if f is None:
-            self.error(object, name, value)
+            self.error(obj, name, value)
         return value
 
 
 class NameOrSensorActuatorBaseTrait(TraitType):
 
-    def validate(self, object, name, value):
+    def validate(self, obj, name, value):
         from .statusobject import StatusObject
         v = value
         if isinstance(v, StatusObject):
             return v
-        if isinstance(v, str):
-            return object.system.name_to_system_object(v)
-        self.error(object, name, value)
+        if isinstance(v, basestring):
+            return obj.system.name_to_system_object(v)
+        self.error(obj, name, value)
         return value
 
 
@@ -220,13 +220,13 @@ class CompareMixin(object):
 class TagSet(CSet):
 
     def validate(self, object, name, value):
-        if isinstance(value, str):
+        if isinstance(value, basestring):
             return set((i.strip() for i in value.split(',')))
         return super(TagSet, self).validate(object, name, value)
 
 
 def is_iterable(y):
-    if isinstance(y, str):
+    if isinstance(y, basestring):
         return False
     return isinstance(y, Iterable)
 

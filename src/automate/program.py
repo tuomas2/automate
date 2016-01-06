@@ -23,7 +23,6 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
-from builtins import str
 import logging
 
 from traits.api import cached_property, on_trait_change, CFloat, Instance, CBool, CSet, Property

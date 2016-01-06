@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 # -*- coding: utf-8 -*-
 # (c) 2015 Tuomas Airaksinen
 #
@@ -22,8 +21,8 @@ from __future__ import unicode_literals
 # If you like Automate, please take a look at this page:
 # http://python-automate.org/gospel/
 
+from __future__ import unicode_literals
 from __future__ import print_function
-from builtins import str
 from builtins import range
 from builtins import object
 import pytest

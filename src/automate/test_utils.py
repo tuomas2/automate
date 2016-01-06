@@ -1,6 +1,3 @@
-from __future__ import unicode_literals
-from builtins import str
-from builtins import object
 # -*- coding: utf-8 -*-
 # (c) 2015 Tuomas Airaksinen
 #
@@ -24,6 +21,7 @@ from builtins import object
 # If you like Automate, please take a look at this page:
 # http://python-automate.org/gospel/
 
+from __future__ import unicode_literals
 import logging
 logger = logging.getLogger('automate')
 import pytest
