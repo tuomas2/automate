@@ -1035,9 +1035,9 @@ class RegexSearch(AbstractCallable):
     """
 
     def call(self, caller=None, **kwargs):
-        matchstring = str(self.call_eval(self.obj, caller, **kwargs))
-        pattern = str(self.call_eval(self.value, caller, **kwargs))
-        match = re.search(matchstring, pattern, re.MULTILINE)
+        pattern = str(self.call_eval(self.obj, caller, **kwargs))
+        searchstring = str(self.call_eval(self.value, caller, **kwargs))
+        match = re.search(pattern, searchstring, re.MULTILINE)
         if match:
             return match.group(self._kwargs.get('group', 1))
         else:
@@ -1067,9 +1067,9 @@ class RegexMatch(AbstractCallable):
     """
 
     def call(self, caller=None, **kwargs):
-        matchstring = self.call_eval(self.obj, caller, **kwargs)
-        pattern = self.call_eval(self.value, caller, **kwargs)
-        match = re.match(matchstring, pattern, re.MULTILINE)
+        pattern = self.call_eval(self.obj, caller, **kwargs)
+        searchstring = self.call_eval(self.value, caller, **kwargs)
+        match = re.match(pattern, searchstring, re.MULTILINE)
         if match:
             return match.group(self._kwargs.get('group', 0))
         else:
