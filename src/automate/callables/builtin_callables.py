@@ -365,6 +365,8 @@ class SetStatus(AbstractAction):
 
             SetStatus(target, source)
             # sets status of target to the status of source.
+            SetStatus(target, source, Force=True)
+            # sets status to hardware level even if it is not changed
             SetStatus([actuator1, actuator2], [sensor1, sensor2])
             # sets status of actuator 1 to status of sensor1 and
             # status of actuator2 to status of sensor2.
@@ -373,6 +375,7 @@ class SetStatus(AbstractAction):
     def call(self, caller=None, trigger=None, **kwargs):
         if not caller:
             return
+        force = self._kwargs.get('force', False)
         values = self.call_eval(self.value, caller, **kwargs)
         objs = self.name_to_system_object(self.obj)
         if isinstance(objs, AbstractCallable):
@@ -392,7 +395,7 @@ class SetStatus(AbstractAction):
             obj = self.call_eval(obj, caller, return_value=False, trigger=trigger, **kwargs)
             self.system.logger.debug('SetStatus(%s, %s) by %s', obj, value, caller)
             try:
-                obj.set_status(value, caller)
+                obj.set_status(value, origin=caller, force=force)
             except ValueError as e:
                 self.system.logger.error(
                     'Trying to set invalid status %s of type %s (by %s). Error: %s', value, type(value), caller, e)

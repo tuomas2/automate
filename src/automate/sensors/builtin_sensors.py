@@ -111,12 +111,12 @@ class AbstractNumericSensor(AbstractSensor):
         d.update(dict(value_min=self.value_min, value_max=self.value_max))
         return d
 
-    def set_status(self, status, origin=None):
+    def set_status(self, status, **kwargs):
         if status is None:
             clipped_status = None
         else:
             clipped_status = max(min(float(status), self.value_max), self.value_min)
-        super(AbstractNumericSensor, self).set_status(clipped_status, origin)
+        super(AbstractNumericSensor, self).set_status(clipped_status, **kwargs)
 
 
 class UserIntSensor(AbstractNumericSensor):

@@ -157,7 +157,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
         super(StatusObject, self).setup_system(*args, **kwargs)
         self.data_type = self._status.__class__.__name__
 
-    def set_status(self, new_status, origin=None):
+    def set_status(self, new_status, origin=None, force=False):
         """
             For sensors, this is synonymous to::
 
@@ -243,7 +243,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
             change_active = True
         return safety_active, change_active
 
-    def _do_change_status(self, status):
+    def _do_change_status(self, status, force=False):
         """
         This function is called by
            - set_status
@@ -255,9 +255,9 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
         This does not directly change status, but adds change request
         to queue.
         """
-        self.system.worker_thread.put(DummyStatusWorkerTask(self._request_status_change_in_queue, status))
+        self.system.worker_thread.put(DummyStatusWorkerTask(self._request_status_change_in_queue, status, force=force))
 
-    def _request_status_change_in_queue(self, status):
+    def _request_status_change_in_queue(self, status, force=False):
         def timer_func(func, *args):
             func(*args)
             self._timed_action = None
@@ -281,7 +281,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
             if not self._change_start:
                 self._change_start = timenow
 
-            if status == self._status:
+            if status == self._status and not force:
                 self._change_start = 0
                 logger('Status same %s, no need to change', status)
                 return
@@ -346,7 +346,7 @@ class AbstractSensor(StatusObject):
             self._reset_timer = threading.Timer(self.reset_delay, lambda: self.set_status(self.default))
             self._reset_timer.start()
 
-    def set_status(self, status, origin=None):
+    def set_status(self, status, origin=None, force=False):
         """
             Compatibility to actuator class.
             Also :class:`~automate.callables.builtin_callables.SetStatus`
@@ -355,7 +355,7 @@ class AbstractSensor(StatusObject):
 
         if status != self.default:
             self._setup_reset_delay()
-        return self._do_change_status(status)
+        return self._do_change_status(status, force)
 
     def update_status(self):
         """A method to read and update actual status. Implement it in subclasses, if necessary"""
@@ -423,29 +423,29 @@ class AbstractActuator(StatusObject):
         self._program_lock = Lock("programlock")
         return super(AbstractActuator, self).__setstate__(*args, **kwargs)
 
-    def set_status(self, status, program=None):
+    def set_status(self, status, origin=None, force=False):
         """ For programs, to set current status of the actuator. Each
             active program has its status in :attr:`.program_stack`
             dictionary and the highest priority is realized in the actuator """
 
-        if not self.slave and program not in self.program_stack:
+        if not self.slave and origin not in self.program_stack:
             raise ValueError('Status cannot be changed directly')
 
         with self._actuator_status_lock:
-            self.logger.debug("set_status got through, program: %s", program)
+            self.logger.debug("set_status got through, program: %s", origin)
             if self.debug:
-                self.logger.info("Set_status %s %s %s", self.name, program, status)
+                self.logger.info("Set_status %s %s %s", self.name, origin, status)
 
             if self.slave:
-                return self._do_change_status(status)
+                return self._do_change_status(status, force)
 
-            self.logger.debug("Sets status %s for %s", status, program.name)
+            self.logger.debug("Sets status %s for %s", status, origin.name)
 
             with self._program_lock:
-                self.program_status[program] = status
+                self.program_status[origin] = status
 
-                if self.program == program:
-                    return self._do_change_status(status)
+                if self.program == origin:
+                    return self._do_change_status(status, force)
 
     def activate_program(self, program):
         """
