@@ -30,7 +30,7 @@ import time
 import sys
 
 from traits.api import (cached_property, Any, CBool, Instance, Dict, Str, CFloat,
-                        List, Enum, Bool, Property)
+                        List, Enum, Bool, Property, Event)
 from traits.trait_errors import TraitError
 
 from automate.common import Lock, AbstractStatusObject, CompareMixin, nomutex
@@ -125,7 +125,10 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
                     and isinstance(self.on_update, Empty))
 
     #: Status of the object.
-    status = Property(depends_on="_status", transient=True)
+    status = Property(depends_on="_status, _status_trigger", transient=True)
+
+    #: To force trigger status change events even if status itself does not change
+    _status_trigger = Event
 
     def get_status_display(self, **kwargs):
         """
@@ -213,7 +216,10 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
         self._last_changed = time.time()
 
         try:
-            self._status = status
+            if self._status == status:
+                self._status_trigger = True
+            else:
+                self._status = status
         except TraitError as e:
             self.logger.warning('Wrong type of status %s was passed to %s. Error: %s', status, self, e)
 
