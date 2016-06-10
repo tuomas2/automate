@@ -19,7 +19,7 @@
 # ------------------------------------------------------------------
 #
 # If you like Automate, please take a look at this page:
-# http://python-automate.org/gospel/
+# http://evankelista.net/automate/
 
 from __future__ import print_function
 from __future__ import absolute_import
