@@ -37,6 +37,7 @@ import types
 import pyinotify
 import threading
 import queue
+from copy import deepcopy
 
 from datetime import datetime
 
@@ -141,6 +142,14 @@ class UserStrSensor(AbstractSensor):
     _status = CUnicode
 
 
+class CroniterOn(croniter):
+    pass
+
+
+class CroniterOff(croniter):
+    pass
+
+
 class CronTimerSensor(AbstractSensor):
 
     """
@@ -166,113 +175,66 @@ class CronTimerSensor(AbstractSensor):
 
     #: Semicolon separated lists of cron-compatible strings that indicate
     #: when to switch status to ``True``
-    timer_on = CronListStr
+    timer_on = CronListStr("0 0 0 0 0")
 
     #: Semicolon separated lists of cron-compatible strings that indicate
     #: when to switch status to ``False``
-    timer_off = CronListStr
+    timer_off = CronListStr("0 0 0 0 0")
 
-    # Cronit objects
-    _cronit_on = List(transient=True)
-    _cronit_off = List(transient=True)
-
-    _timer_on = Any(transient=True)
-    _timer_off = Any(transient=True)
-
-    _timerlock = Any(transient=True)
+    _update_timer = Any(transient=True)  # Timer object
+    _timerlock = Any(transient=True)  # Lock object
 
     view = UserBoolSensor.view + ["timer_on", "timer_off"]
 
     def setup_system(self, *args, **traits):
         self._timerlock = Lock()
         super(CronTimerSensor, self).setup_system(*args, **traits)
-        self._setup_timer_on()
-        self._setup_timer_off()
         self.update_status()
+
+    def _now(self):
+        return datetime.now()
 
     def update_status(self):
         with self._timerlock:
-            if not (self._cronit_on and self._cronit_off):
-                return
-            from copy import deepcopy
+            now = self._now()
+            next_iters = [CroniterOn(i, now) for i in self.timer_on.split(";")] + \
+                         [CroniterOff(i, now) for i in self.timer_off.split(";")]
 
-            onprev = deepcopy(self._cronit_on)
-            offprev = deepcopy(self._cronit_off)
+            for i in next_iters:
+                i.get_next(datetime)
 
-            for i in onprev:
+            next_iters.sort(key=lambda x: x.get_current(datetime))
+
+            prev_iters = deepcopy(next_iters)
+
+            for i in prev_iters:
                 i.get_prev(datetime)
-            for i in offprev:
-                i.get_prev(datetime)
+            prev_iters.sort(key=lambda x: x.get_current(datetime))
 
-            onprev.sort(key=lambda x: x.get_current(datetime))
-            offprev.sort(key=lambda x: x.get_current(datetime))
-            self.status = onprev[-1].get_current(datetime) > offprev[-1].get_current(datetime)
+            self.status = isinstance(prev_iters[-1], CroniterOn)
 
-    def _switch_on(self):
-        self.status = 1
-        with self._timerlock:
-            self._cronit_on[0].get_next(datetime)
-        self._setup_timer_on()
-
-    def _switch_off(self):
-        self.status = 0
-        with self._timerlock:
-            self._cronit_off[0].get_next(datetime)
-        self._setup_timer_off()
-
-    @staticmethod
-    def _now():
-        return datetime.now()
-        #time.time()
+            self._setup_next_update(next_iters[0].get_current(datetime))
 
     def _timer_on_changed(self, name, new):
-        with self._timerlock:
-            self._cronit_on = [croniter(i, self._now()) for i in new.split(";")]
-            for i in self._cronit_on:
-                i.get_next(datetime)
-        self._setup_timer_on()
         self.update_status()
 
     def _timer_off_changed(self, name, new):
-        self._cronit_off = [croniter(i, self._now()) for i in new.split(";")]
-        for i in self._cronit_off:
-            i.get_next(datetime)
-        self._setup_timer_off()
         self.update_status()
 
-    def _setup_timer_on(self):
-        with self._timerlock:
-            if self._timer_on and self._timer_on.is_alive():
-                self._timer_on.cancel()
-            if not self._cronit_on:
-                return
+    def _setup_next_update(self, next_update_time):
+        now = self._now()
+        if self._update_timer and self._update_timer.is_alive():
+            self._update_timer.cancel()
 
-            self._cronit_on.sort(key=lambda x: x.get_current(datetime))
-            delay = self._cronit_on[0].get_current(datetime) - self._now()
-            self._timer_on = threading.Timer(delay.seconds, threaded(self._switch_on,))
-            self._timer_on.name = ("Timer for TimerSensor:on " + self.name +
-                                   " at %s" % (self._now() + delay))
-            self._timer_on.start()
-
-    def _setup_timer_off(self):
-        with self._timerlock:
-            if self._timer_off and self._timer_off.is_alive():
-                self._timer_off.cancel()
-            if not self._cronit_on:
-                return
-            self._cronit_off.sort(key=lambda x: x.get_current(datetime))
-            delay = self._cronit_off[0].get_current(datetime) - self._now()
-            self._timer_off = threading.Timer(delay.seconds, threaded(self._switch_off))
-            self._timer_off.name = ("Timer for TimerSensor:off " + self.name +
-                                    " at %s" % (self._now() + delay))
-            self._timer_off.start()
+        delay = next_update_time - now
+        self._update_timer = threading.Timer(delay.seconds, threaded(self.update_status,))
+        self._update_timer.name = ("Timer for TimerSensor " + self.name + " at %s" % (now + delay))
+        self._update_timer.start()
 
     def cleanup(self):
         with self._timerlock:
-            if self._timer_off:
-                self._timer_off.cancel()
-            if self._timer_on:
-                self._timer_on.cancel()
+            if self._update_timer:
+                self._update_timer.cancel()
 
 
 class FileChangeSensor(AbstractSensor):
