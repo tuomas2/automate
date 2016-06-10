@@ -226,8 +226,8 @@ class CronTimerSensor(AbstractSensor):
         if self._update_timer and self._update_timer.is_alive():
             self._update_timer.cancel()
 
-        delay = next_update_time - now + timedelta(seconds=1)
-        self.logger.warning('SETTING TIMER %s to %s, %s seconds, at %s', self, delay, delay.seconds, now+delay)
+        delay = next_update_time - now + timedelta(seconds=5)
+        self.logger.debug('Setting timer to %s, %s seconds, at %s', delay, delay.seconds, now+delay)
         self._update_timer = threading.Timer(delay.seconds, threaded(self.update_status,))
         self._update_timer.name = ("Timer for TimerSensor " + self.name + " at %s" % (now + delay))
         self._update_timer.start()
