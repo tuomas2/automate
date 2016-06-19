@@ -100,7 +100,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
     logger = Instance(logging.Logger, transient=True)
 
     view = ["name", "status", "description", "safety_delay",
-            "safety_mode", "change_delay", "change_mode", 'next_scheduled_action'] + SystemObject.view
+            "safety_mode", "change_delay", "change_mode"] + SystemObject.view
 
     simple_view = []
 
@@ -266,7 +266,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
 
     @property
     def next_scheduled_action(self):
-        return getattr(self._timed_action, 'next_action')
+        return getattr(self._timed_action, 'next_action', None)
 
     def _request_status_change_in_queue(self, status, force=False):
         def timer_func(func, *args):
