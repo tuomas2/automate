@@ -100,7 +100,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
     logger = Instance(logging.Logger, transient=True)
 
     view = ["name", "status", "description", "safety_delay",
-            "safety_mode", "change_delay", "change_mode"] + SystemObject.view
+            "safety_mode", "change_delay", "change_mode", 'next_scheduled_action'] + SystemObject.view
 
     simple_view = []
 
@@ -264,6 +264,10 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
         """
         self.system.worker_thread.put(DummyStatusWorkerTask(self._request_status_change_in_queue, status, force=force))
 
+    @property
+    def next_scheduled_action(self):
+        return getattr(self._timed_action, 'next_action')
+
     def _request_status_change_in_queue(self, status, force=False):
         def timer_func(func, *args):
             func(*args)
@@ -313,6 +317,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
                 self._timed_action = threading.Timer(delaytime, timer_func,
                                                      args=(self._add_statuschange_to_queue, status, getattr(self, "program", None), True))
                 self._timed_action.name = "Safety/change_delay for %s timed at %s (%f sek)" % (self.name, time_after_delay, delaytime)
+                self._timed_action.next_action = time_after_delay
                 self._timed_action.start()
                 return False
 
