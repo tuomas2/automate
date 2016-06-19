@@ -23,6 +23,8 @@
 
 from __future__ import unicode_literals
 from builtins import bytes
+
+import datetime
 from future import standard_library
 standard_library.install_aliases()
 
@@ -543,7 +545,8 @@ class Delay(AbstractRunner):
             delay = self.call_eval(self.delay, caller, **kwargs)
             timer = threading.Timer(delay, None)
             timer.function = threaded(self._run, caller, timer, **kwargs)
-            timer.name = "Timer for " + str(self) + " %d sek" % delay
+            time_after_delay = datetime.datetime.now() + datetime.timedelta(seconds=delay)
+            timer.name = "Timer for %s timed at %s (%d sek)" % (self, time_after_delay, delay)
             timer.start()
             timers.append(timer)
 

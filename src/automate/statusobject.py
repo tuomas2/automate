@@ -29,6 +29,7 @@ import threading
 import time
 import sys
 
+import datetime
 from traits.api import (cached_property, Any, CBool, Instance, Dict, Str, CFloat,
                         List, Enum, Bool, Property, Event)
 from traits.trait_errors import TraitError
@@ -306,11 +307,12 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
             else:
                 timesince = time.time() - self._last_changed
                 delaytime = max(0, self.safety_delay - timesince, changedelay)
+                time_after_delay = datetime.datetime.now() + datetime.timedelta(seconds=delaytime)
                 logger("Scheduling safety/change_delay timer for %f sek. Now %s. Going to change to %s.",
                        delaytime, self._status, status)
                 self._timed_action = threading.Timer(delaytime, timer_func,
                                                      args=(self._add_statuschange_to_queue, status, getattr(self, "program", None), True))
-                self._timed_action.name = "Safety/change_delay for " + self.name + " %f sek" % delaytime
+                self._timed_action.name = "Safety/change_delay for %s timed at %s (%f sek)" % (self.name, time_after_delay, delaytime)
                 self._timed_action.start()
                 return False
 
