@@ -297,11 +297,15 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
                 logger('Status same %s, no need to change', status)
                 return
 
-            changedelay = self.change_delay - (timenow - self._change_start)
-            if changedelay < 0:
-                changedelay = self.change_delay
+            orig_changedelay = self.change_delay if changedelay_active else 0
+            safetydelay = self.safety_delay if safetydelay_active else 0
 
-            if run_now or (changedelay <= 0. and (timenow - self._last_changed > self.safety_delay)):
+            changedelay = orig_changedelay - (timenow - self._change_start)
+
+            if changedelay < 0:
+                changedelay = orig_changedelay
+
+            if run_now or (changedelay <= 0. and (timenow - self._last_changed > safetydelay)):
                 logger("Adding status change to queue, about to change status to %s", status)
                 if self.system.two_phase_queue:
                     self._add_statuschange_to_queue(status, getattr(self, "program", None))
@@ -310,7 +314,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
 
             else:
                 timesince = time.time() - self._last_changed
-                delaytime = max(0, self.safety_delay - timesince, changedelay)
+                delaytime = max(0, safetydelay - timesince, changedelay)
                 time_after_delay = datetime.datetime.now() + datetime.timedelta(seconds=delaytime)
                 logger("Scheduling safety/change_delay timer for %f sek. Now %s. Going to change to %s.",
                        delaytime, self._status, status)
