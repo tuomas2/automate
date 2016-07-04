@@ -241,7 +241,7 @@ class System(SystemBase):
         if not self.filename:
             self.logger.error('Filename not specified. Could not save state')
             return
-        self.logger.info('Saving system state to %s', self.filename)
+        self.logger.debug('Saving system state to %s', self.filename)
         with open(self.filename, 'wb') as file, self.worker_thread.queue.mutex:
             pickle.dump((list(self.objects)), file, 2)
 
