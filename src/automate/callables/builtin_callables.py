@@ -25,8 +25,12 @@ from __future__ import unicode_literals
 from builtins import bytes
 
 import datetime
+
 from future import standard_library
+
 standard_library.install_aliases()
+
+from http.client import HTTPException
 
 import re
 import threading
@@ -1082,6 +1086,7 @@ class RegexMatch(AbstractCallable):
             return ''
 
 
+
 class RemoteFunc(AbstractCallable):
 
     """
@@ -1106,9 +1111,9 @@ class RemoteFunc(AbstractCallable):
             _kwargs = {k: self.call_eval(v, caller, **kwargs) for k, v in list(self._kwargs.items())}
             try:
                 return getattr(server, funcname)(*args, **_kwargs)
-            except xmlrpc.client.Fault as e:
-                self.logger.error(
-                    'Could call remote function (%s,%s)(*%s, **%s), error: %s', server, funcname, args, _kwargs, e)
+            except (xmlrpc.client.Fault, HTTPException) as e:
+                self.logger.exception(
+                    'Exception occurred in remote function call (%s,%s)(*%s, **%s), error: %s', server, funcname, args, _kwargs, e)
         except (socket.gaierror, IOError, xmlrpc.client.Fault) as e:
             self.logger.error('Could call remote function, error: %s', e)
 
