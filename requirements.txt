@@ -9,4 +9,4 @@ pytest==2.8.3
 pytest-capturelog==0.7
 pytest-xdist==1.13.1
 pytest-pycharm==0.3.0
--e git+git@github.com:enthought/traits.git@ac5d0296def6a389f932add5fbcab2eef6e7334e#egg=Traits
+traits==4.6.0

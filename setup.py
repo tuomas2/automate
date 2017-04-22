@@ -14,10 +14,10 @@ setupopts = dict(
     packages=find_packages('src'),
     package_dir={'': 'src'},
     install_requires=[
-        'traits>=4.5.0,<4.7.0',
+        'traits>=4.6.0,<4.7.0',
         'croniter==0.3.8',
         'pyinotify==0.9.6',
-        'ipython==4.0',
+        'ipython==6.0',
         'ansiconv==1.0',
         'colorlog==2.6',
         'future>=0.15.2',
