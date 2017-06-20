@@ -7,6 +7,7 @@ setupopts = dict(
     version='0.9.5.dev0',
     packages=find_packages('src'),
     package_dir={'': 'src'},
+    zip_safe=False,
     install_requires=[
         "ansiconv",
         "colorlog",
