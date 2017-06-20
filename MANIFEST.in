@@ -1,3 +1,10 @@
 include LICENCE.txt
 include examples/*.py
 include tests/*.py
+
+include *.in
+include *.txt
+recursive-exclude docs
+
+recursive-include src/automate/plugins/webui/static *.*
+recursive-include src/automate/plugins/webui/templates *.html
