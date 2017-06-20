@@ -208,6 +208,8 @@ class TestProgramFeatures(object):
             assert p.actual_targets == {mysys.a1}
 
     def test_triggerlist_targetlist_change2_namever(self, mysys):
+        # TODO: investigate failure in https://travis-ci.org/tuomas2/automate/jobs/245124552
+        # TODO: check also similar tests above.
         p = mysys.p
         #add = {p} if isinstance(p, StatusObject) else set()
         add = set()
