@@ -17,14 +17,6 @@
 # along with automate-rpc.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
-__author__ = "Tuomas Airaksinen"
-__copyright__ = "Copyright 2015, Tuomas Airaksinen"
-__credits__ = []
-__license__ = "GPL"
-__version__ = '0.9.3'
-__maintainer__ = "Tuomas Airaksinen"
-__email__ = "tuomas.airaksinen@gmail.com"
-__status__ = "Beta"
 
 from .rpc import RpcService
 

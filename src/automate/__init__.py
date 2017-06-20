@@ -23,14 +23,13 @@
 
 from __future__ import absolute_import
 from __future__ import unicode_literals
-__author__ = "Tuomas Airaksinen"
-__copyright__ = "Copyright 2015, Tuomas Airaksinen"
-__credits__ = []
-__license__ = "GPL"
-__version__ = '0.9.3'
-__maintainer__ = "Tuomas Airaksinen"
-__email__ = "tuomas.airaksinen@gmail.com"
-__status__ = "Beta"
+
+import pkg_resources
+
+try:
+    __version__ = pkg_resources.get_distribution("automate").version
+except pkg_resources.DistributionNotFound:
+    __version__ = 'not installed'
 
 from . import traits_fixes
 from .common import *
