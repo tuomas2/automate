@@ -20,8 +20,8 @@
    :target: https://github.com/tuomas2/automate/blob/master/LICENSE.txt
 
 
-Automate BETA
-=============
+Automate
+========
 
 - Github URL: http://github.com/tuomas2/automate
 - Read full documentation at http://python-automate.readthedocs.org/
@@ -49,7 +49,7 @@ Highlights:
 * Intelligent design:
 
   * Comprehensively tested via ``py.test`` unit/integration tests
-  * Takes advantage of `Traits <http://traits.readthedocs.org/en/4.5.0/>`_ library, especially its
+  * Takes advantage of `Traits <http://traits.readthedocs.org/en/4.6.0/>`_ library, especially its
     notification system.
   * `IPython <http://ipython.org>`_ console to monitor, modify and control system on-the-fly
   * Versatile function/callable library to write state program logic
