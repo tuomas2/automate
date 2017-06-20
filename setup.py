@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setupopts = dict(
     name="automate",
-    version='0.9.4-dev0',
+    version='0.9.3-dev0',
     packages=find_packages('src'),
     package_dir={'': 'src'},
     install_requires=[
