@@ -17,7 +17,7 @@ setupopts = dict(
         'traits>=4.6.0,<4.7.0',
         'croniter==0.3.8',
         'pyinotify==0.9.6',
-        'ipython==6.0',
+        'ipython~=5.0',
         'ansiconv==1.0',
         'colorlog==2.6',
         'future>=0.15.2',
