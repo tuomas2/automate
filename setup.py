@@ -23,6 +23,7 @@ setupopts = dict(
                 "django-crispy-forms~=1.6",
                 "tornado~=4.5",
             ],
+        'rpc': ['tornado~=4.5'],
         'raspberrypi': ['RPIO'],
         'arduino': ['pyfirmata'],
     },

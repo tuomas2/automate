@@ -3,8 +3,6 @@
 Web User Interface for Automate
 ===============================
 
-Github URL: http://github.com/tuomas2/automate-webui
-
 Introduction
 ------------
 
@@ -31,15 +29,9 @@ Main features are illustrated with a few screenshots:
 Installation
 ------------
 
-Install from Pypi::
+Install extras::
 
-    pip install automate-webui
-
-Optionally, you could install also by cloning GIT repository and installing manually::
-
-    git clone https://github.com/tuomas2/automate-webui.git
-    cd automate-webui
-    ./setup.py install
+    pip install automate[web]
 
 Main view
 ^^^^^^^^^
