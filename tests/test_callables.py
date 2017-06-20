@@ -1134,7 +1134,7 @@ def test_delay(caplog, mysys):
     mysys.namespace['c'] = c
     c.call(prog)
     assert 'Scheduling' in caplog.text()
-    time.sleep(0.5)
+    time.sleep(1.5)
     print('2', caplog.text())
     assert 'Time is up' in caplog.text()
 
@@ -1147,7 +1147,7 @@ def test_delay_cancel(caplog, prog):
     assert 'Scheduling' in caplog.text()
     assert c.get_state(prog).timers
     c.cancel(prog)
-    time.sleep(0.5)
+    time.sleep(1.5)
     # print caplog.text()
     assert not c.get_state(prog)
     assert 'Cancelling Delay' in caplog.text()
@@ -1175,7 +1175,7 @@ def test_delay_secondtry(caplog, mysys):
     assert 'Scheduling' in caplog.text()
     c.call(prog)
     assert len(c.get_state(prog).timers) == 2
-    time.sleep(0.5)
+    time.sleep(1.5)
     assert "Time is up" in caplog.text()
     assert len(c.get_state(prog).timers) == 0
 
@@ -1366,7 +1366,7 @@ def test_self_delay(self_sys):
     S.s.status = 1
     S.flush()
     assert S.s.status == 1
-    time.sleep(0.5)
+    time.sleep(1.5)
     S.flush()
     assert S.s.status == 0
 
