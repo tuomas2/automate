@@ -1,6 +1,0 @@
-pytest
-pytest-capturelog
-coveralls
-pytest-cov
-mock
-traits==4.6.0

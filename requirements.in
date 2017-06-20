@@ -25,3 +25,4 @@ pytest
 pytest-capturelog
 pytest-xdist
 pytest-pycharm
+mock # py2.7
