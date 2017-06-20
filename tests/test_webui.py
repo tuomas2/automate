@@ -112,7 +112,15 @@ def u(url):
     return urlparse(url).path
 
 def test_web(sys_with_web, logged_client, constants):
-
     for p in constants.BASIC_VIEWS:
         res = logged_client.get(p)
         assert res.status_code == Http.OK
+
+
+# TODO:
+# - test creating new objects
+# - test editing objects via web
+# - test changing status via web, via REST AND via websockets
+# - test that console gets input
+# - test making change via console
+
