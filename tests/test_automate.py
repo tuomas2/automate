@@ -252,7 +252,7 @@ def test_shellsensor_delayed(sysloader):
     class mysys(System):
         p1 = ShellSensor(cmd='echo;echo test\necho test2\necho\n\n\nsleep 0.1\necho test3', filter=myfunc)
     s = sysloader.new_system(mysys)
-    time.sleep(0.2)
+    time.sleep(1)
     assert s.p1.status == 'test3'
     assert lines == ['\n', 'test\n', 'test2\n', '\n', 'test3\n']
 
