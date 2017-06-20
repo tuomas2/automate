@@ -110,7 +110,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Automate'
-copyright = u'2015, Tuomas Airaksinen'
+copyright = u'2015-2017, Tuomas Airaksinen'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
