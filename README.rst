@@ -64,7 +64,7 @@ Highlights:
 Example
 -------
 
-Let's take a look at a small Automate program as an example, which uses also ``automate-rpio`` extension.
+Let's take a look at a small Automate program as an example:
 
 .. code-block:: python
 
