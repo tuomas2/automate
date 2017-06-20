@@ -165,11 +165,14 @@ def test_lock(sysloader):
         assert l.context
         l.release()
         flag.append(1)
-    c = s.prg.on_deactivate = Delay(0.05, Func(locktst))
+    c = s.prg.on_deactivate = Delay(0.2, Func(locktst))
     c.call(s.prg)
-    with l:
-        l.acquire()
+    l.acquire()
+    # now l is locked, but locktst will release it.
+    l.acquire() # This will wait until l is released.
+
     assert flag
+    l.release() # final release.
 
 
 def test_sysobject_callable(sysloader):
