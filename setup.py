@@ -14,13 +14,13 @@ setupopts = dict(
     packages=find_packages('src'),
     package_dir={'': 'src'},
     install_requires=[
-        'traits>=4.6.0,<4.7.0',
-        'croniter==0.3.8',
-        'pyinotify==0.9.6',
-        'ipython~=5.0',
-        'ansiconv==1.0',
-        'colorlog==2.6',
-        'future>=0.15.2',
+#        'traits>=4.6.0,<4.7.0',
+#        'croniter==0.3.8',
+#        'pyinotify==0.9.6',
+#        'ipython~=5.0',
+#        'ansiconv==1.0',
+#        'colorlog==2.6',
+#        'future>=0.15.2',
         ],
     test_suite='py.test',
     tests_require=['pytest', 'pytest-capturelog'],
@@ -51,7 +51,15 @@ setupopts = dict(
                  "Topic :: Software Development",
                  "Topic :: Software Development :: Libraries",
                  "Topic :: Software Development :: Libraries :: Application Frameworks",
-                 ]
+                 ],
+    entry_points={'automate.extension': [
+        'arduino = automate.plugins.arduino:extension_classes',
+        'rpc = automate.plugins.rpc:extension_classes',
+        'rpio = automate.plugins.rpio:extension_classes',
+        'webui = automate.plugins.webui:extension_classes',
+    ]
+},
+
 )
 
 if __name__ == "__main__":
