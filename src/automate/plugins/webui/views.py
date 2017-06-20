@@ -151,7 +151,6 @@ def get_views(service):
         return render(request, 'views/single_tag_view.html',
                       {'source': 'tags_view', 'objs': objs, 'tag': tag})
 
-
     @route('^tag$')
     @require_login
     def tags_view(request, template='', only_user_editable=False, only_user_defined=False, only_groups=False):
