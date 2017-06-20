@@ -1,20 +1,14 @@
+# automate core
 ansiconv
 colorlog
 croniter~=0.3
 future
 ipython<6.0
 pyinotify
-pytest
-pytest-capturelog
-pytest-xdist
-pytest-pycharm
 traits~=4.6
 
 #arduino:
 pyfirmata
-
-#rpc:
-# -
 
 #rpio:
 RPIO
@@ -25,3 +19,9 @@ django-crispy-forms~=1.6
 
 #wsgi
 tornado~=4.5
+
+# testing
+pytest
+pytest-capturelog
+pytest-xdist
+pytest-pycharm
