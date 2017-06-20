@@ -10,6 +10,16 @@
    :target: https://readthedocs.org/projects/python-automate/?badge=master
    :alt: Documentation Status
 
+.. image:: https://img.shields.io/pypi/v/automate.svg
+   :target: https://pypi.python.org/pypi/automate
+
+.. image:: https://img.shields.io/pypi/pyversions/automate.svg
+   :target: https://pypi.python.org/pypi/automate
+
+.. image:: https://img.shields.io/badge/licence-GPL-blue.svg
+   :target: https://github.com/tuomas2/automate/blob/master/LICENSE.txt
+
+
 Automate BETA
 =============
 
