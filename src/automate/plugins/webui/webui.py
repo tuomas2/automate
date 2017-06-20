@@ -37,7 +37,7 @@ from tornado.websocket import WebSocketHandler, WebSocketClosedError
 from traits.api import CBool, Tuple, Int, Str, CSet, List, CInt, Dict, Unicode
 from automate.statusobject import StatusObject
 from django.core.wsgi import get_wsgi_application
-from automate_wsgi import TornadoService
+from automate.plugins.wsgi import TornadoService
 from .microdjango import setup_django
 from .views import get_views, set_globals
 

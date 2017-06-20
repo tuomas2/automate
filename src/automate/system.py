@@ -513,10 +513,6 @@ class System(SystemBase):
             ser.setup_system(self)
 
 
-# Load builtin plugins
-
-from .plugins import *
-
 # Load extensions
 
 from . import services, sensors, actuators, callables
