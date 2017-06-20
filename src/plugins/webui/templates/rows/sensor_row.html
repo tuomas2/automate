@@ -1,0 +1,33 @@
+{% load automate_tags %}
+{% load crispy_forms_tags %}
+<div class="row object_row request_panel" {% row_attrs sensor.name %}>
+  <div class='col-xs-3'>
+    <a>
+
+      {{ sensor.name }}
+    </a>
+    {% if groupview %}
+      ({{ sensor.class_name }})
+    {% endif %}
+
+  </div>
+  <div class='col-xs-9 edit_area object_status_column'>
+    {% if sensor.user_editable and sensor.data_type %}
+
+      {% if sensor.data_type == 'bool' %}
+        <a class="btn btn-default mytoggle" href="{% url 'toggle_sensor' sensor.name %}?source={{ source }}"
+           data-name="{{ sensor.name }}" data-status="{{ sensor.status }}">
+          {% object_status sensor %}
+        </a>
+      {% else %}
+        {% sensor_form sensor as form %}
+        {% crispy form %}
+      {% endif %}
+
+    {% else %}
+      {% object_status sensor %}
+    {% endif %}
+  </div>
+</div>
+<div class='row collapse'>
+</div>

@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% load automate_tags %}
+{% block content %}
+  <h1>Types view</h1>
+  Shows objects grouped by types<br>
+  <div class="row">
+    <div class="col-md-4 object_list_column">
+      <h2>Sensors</h2>
+      <hr>
+            <span class="title_row">
+                <div class="row">
+                  <div class="col-xs-9">
+                    Name
+                  </div>
+                  <div class="col-xs-3" style='text-align: right;'>
+                    Status
+                  </div>
+                </div>
+            </span>
+      <hr class='object_row'>
+      {% for i in system.sensors|name_sort %}
+        {% ifchanged %}
+          <div class="object_type_title">
+            {{ i.class_name }}s
+          </div>
+        {% endifchanged %}
+        {% include 'rows/sensor_row.html' with sensor=i %}
+        <hr class='object_row'>
+      {% endfor %}
+    </div>
+    <div class="col-md-4 object_list_column">
+      {% block programs %}
+
+        <h2>Programs</h2>
+        <hr>
+
+        <span class="title_row">
+                    <div class="row">
+                      <div class="col-xs-8">
+                        Name
+                      </div>
+                      <div class="col-xs-2" style='text-align: right;'>
+                        Pri
+                      </div>
+                      <div class="col-xs-2" style='text-align: right;'>
+                        Act
+                      </div>
+                    </div>
+                </span>
+        <hr class='object_row'>
+        {% for i in system.objects|name_sort %}
+          {% if i.is_program %}
+            {% include 'rows/program_row.html' with program=i  programlist=True %}
+            <hr class='object_row'>
+          {% endif %}
+        {% endfor %}
+      {% endblock %}
+    </div>
+
+    <div class="col-md-4 object_list_column">
+      {% for i in system.actuators|name_sort %}
+        {% if forloop.first %}
+          <h2>Actuators</h2>
+          <hr>
+          <span class="title_row">
+                        <div class="row">
+                          <div class="col-xs-9">
+                            Name
+                          </div>
+                          <div class="col-xs-3" style='text-align: right;'>
+                            Status
+                          </div>
+                        </div>
+                    </span>
+          <hr class='object_row'>
+
+        {% endif %}
+        {% ifchanged %}
+          <div class="object_type_title">
+            {{ i.class_name }}
+          </div>
+        {% endifchanged %}
+
+        {% include 'rows/actuator_row.html' with actuator=i %}
+        <hr class='object_row'>
+      {% endfor %}
+
+    </div>
+  </div>
+{% endblock %}
+

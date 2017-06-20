@@ -1,0 +1,6 @@
+{% extends 'views/tag_view.html' %}
+{% block info %}
+  <h1>User defined</h1>
+  Shows only objects that have some tags of the following [
+  {% for i in service.user_tags %}{{ i }}, {% endfor %}]<br><br>
+{% endblock %}

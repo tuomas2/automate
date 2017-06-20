@@ -1,0 +1,33 @@
+{% load automate_tags %}
+<div class="row object_row request_panel" {% row_attrs program.name %}>
+
+  <div class="col-xs-2">
+        <span class="toggleconditions">
+            <a>
+              {{ program.name }}
+            </a>
+          {% if groupview %}
+            ({{ program.class_name }})
+          {% endif %}
+
+        </span>
+
+  </div>
+  {% if programlist %}
+    <div class="col-xs-8 program_priority_column">
+      {{ program.priority }}
+    </div>
+    <div class="col-xs-2 program_active_column">
+      {% program_active program %}
+    </div>
+
+  {% else %}
+    <div class="col-xs-10 object_status_column">
+      {% program_active program %}
+    </div>
+
+  {% endif %}
+
+</div>
+<div class='row collapse'>
+</div>

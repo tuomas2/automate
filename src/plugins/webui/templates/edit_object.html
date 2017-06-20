@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+  <div class='object_list_column'>
+    <h2>
+      {% if continue_edit %}Please refine new {% endif %}
+      {{ editform.class_name }}
+    </h2>
+    {% crispy editform %}
+  </div>
+{% endblock %}

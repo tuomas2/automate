@@ -1,0 +1,18 @@
+{% load automate_tags %}
+<div class="row object_row">
+  <div class='col-xs-3 request_panel' {% row_attrs object.name %}>
+    <a>
+      {{ object.name }}
+    </a>
+    {% if groupview %}
+      ({{ object.class_name }})
+    {% endif %}
+
+  </div>
+  <div class='col-xs-9 object_status_column'>
+    {% object_status object %}
+  </div>
+</div>
+<div class='row collapse'>
+</div>
+

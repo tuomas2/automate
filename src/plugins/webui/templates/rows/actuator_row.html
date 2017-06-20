@@ -1,0 +1,38 @@
+{% load automate_tags %}
+<div class="actuator_element_{{ actuator.name }}">
+  <div class="row object_row request_panel" {% row_attrs actuator.name %}>
+    <div class="col-xs-3">
+      <a>
+        {{ actuator.name }}
+      </a>
+      {% if groupview %}
+        ({{ actuator.class_name }})
+      {% endif %}
+
+    </div>
+    <div class="col-xs-{% if service.show_actuator_details %}7{% else %}9{% endif %} object_status_column">
+      {% object_status actuator %}
+    </div>
+  </div>
+  <div class='row collapse'>
+  </div>
+  {% if service.show_actuator_details %}
+    {% for p in actuator.program_stack reversed %}
+      <div class="row object_row request_panel" {% row_attrs p.name actuator.name %}>
+        <div class="col-xs-offset-1 col-xs-2">
+          <a>
+            {{ p.name }}
+          </a>
+          {{ s }}
+        </div>
+        <div class="col-xs-9 object_status_column">
+          {% program_status actuator p %}
+        </div>
+      </div>
+
+      <div class='row collapse'>
+      </div>
+
+    {% endfor %}
+  {% endif %}
+</div>

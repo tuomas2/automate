@@ -1,0 +1,87 @@
+{% load automate_tags %}
+{% load crispy_forms_tags %}
+
+<div class="panel-body info_panel">
+  <div class="panel">
+    {# INFO LIST LOOP HERE #}
+    {% if info_items %}
+      <div class="panel panel-warning">
+        <div class="panel-heading">
+          <div class="row">
+            <div class="col-xs-9">
+              Info for {{ i.name }}
+            </div>
+
+            {% if i.editable and not service.read_only %}
+              <div class="col-xs-3" style='text-align: right;'>
+                <a class="btn btn-primary" href="{% url 'edit' i.name %}?source={{ source }}">Edit</a>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="panel-body">
+          {% for name, value in info_items %}
+            <div class="row">
+              <div class="col-xs-5">
+                <b>
+                  {{ name }}
+                </b>
+              </div>
+              <div class="col-xs-7">
+                {{ value }}
+              </div>
+            </div>
+          {% endfor %}
+          {% if textform %}
+            <div class='row'>
+              <div class='col-xs-12'>
+                <div class='container-fluid'>
+                  {% crispy textform %}
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+    {% if i.program_stack %}
+      <div class="panel panel-warning">
+        <div class="panel-heading">Controlling programs</div>
+        <div class="panel-body">
+          {% for p in i.program_stack reversed %}
+            <div class="row object_row request_panel" {% row_attrs p.name i.name %}>
+              <div class="col-xs-3">
+                <a>
+                  {{ p.name }}
+                </a>
+                {{ s }}
+              </div>
+              <div class="col-xs-9 object_status_column">
+                {% program_status i p %}
+              </div>
+            </div>
+
+            <div class='row collapse'>
+            </div>
+
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+    {% block panelcontent %}
+
+      {% if i.is_program %}
+        <div class="panel panel-warning">
+          <div class="panel-heading">Program features</div>
+          <div class="panel-body">
+            <b>Priority</b> {{ i.priority }}<br>
+            {% for name, attr in callables %}
+              <b>{{ name }}</b> {% condition_string i attr %}<br>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+    {% endblock %}
+  </div>
+</div>
