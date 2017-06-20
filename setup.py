@@ -6,6 +6,7 @@ setupopts = dict(
     name="automate",
     version='0.9.6.dev0',
     packages=find_packages('src'),
+    include_package_data=True,
     package_dir={'': 'src'},
     zip_safe=False,
     install_requires=[
