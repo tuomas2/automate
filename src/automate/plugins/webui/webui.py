@@ -124,7 +124,7 @@ class WebService(TornadoService):
 
             from django.conf import settings
             settings.TEMPLATE_CONTEXT_PROCESSORS = settings.TEMPLATE_CONTEXT_PROCESSORS + \
-                ('automate_webui.views.common_context',)
+                ('automate.plugins.webui.views.common_context',)
             set_globals(self, self.system)
             get_views(self)
         super(WebService, self).setup()

@@ -32,7 +32,7 @@ from django.utils.safestring import mark_safe
 from automate.statusobject import StatusObject
 from automate.program import Program
 
-from automate_webui.forms import QUICK_EDITS
+from ..forms import QUICK_EDITS
 
 logger = logging.getLogger('automate.webui')
 

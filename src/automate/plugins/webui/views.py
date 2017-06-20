@@ -57,10 +57,9 @@ def common_context(request):
         ('User defined', 'user_defined_view'),
     ]
     import automate
-    import automate_webui
+    from automate.plugins import webui
     return {'views': views, 'system': system, 'service': service,
-            'automate_version': automate.__version__,
-            'webui_version': automate_webui.__version__}
+            'automate_version': automate.__version__}
 
 
 def get_views(service):
