@@ -237,11 +237,9 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
     def _are_delays_active(self, new_status):
         try:
             mode = "rising" if new_status > self._status else "falling"
-        except TypeError as e:
-            if 'unorderable types' in str(e): # if it cannot be determined whether value is rising or falling, we'll assume it's rising
-                mode = 'rising'
-            else:
-                raise e
+        except TypeError:
+            # if we can not determine whether value is rising or falling, we'll assume it's rising
+            mode = 'rising'
         safety_active = False
         change_active = False
         if self.safety_delay > 0. and self.safety_mode in [mode, "both"]:
