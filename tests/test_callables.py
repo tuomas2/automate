@@ -1140,14 +1140,14 @@ def test_delay(caplog, mysys):
 
 
 def test_delay_cancel(caplog, prog):
-    c = Delay(0.05, Log('hep'))
+    c = Delay(1, Log('hep'))
     #mysys.namespace['c'] = c
     prog.on_activate = c
     c.call(prog)
     assert 'Scheduling' in caplog.text()
     assert c.get_state(prog).timers
     c.cancel(prog)
-    time.sleep(1.5)
+    time.sleep(2)
     # print caplog.text()
     assert not c.get_state(prog)
     assert 'Cancelling Delay' in caplog.text()
