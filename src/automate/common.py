@@ -19,14 +19,18 @@
 # ------------------------------------------------------------------
 #
 # If you like Automate, please take a look at this page:
-# http://python-automate.org/gospel/
+# http://evankelista.net/automate/
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
+from past.builtins import basestring
 from copy import copy
 import logging
 import re
 import keyword
 import threading
 from collections import Iterable
+from functools import wraps
 
 from traits.api import CSet, HasStrictTraits, Unicode, TraitType
 
@@ -51,7 +55,7 @@ class SystemBase(HasStrictTraits):
     pass
 
 
-class Group:
+class Group(object):
     pass
 
 
@@ -70,29 +74,30 @@ class Object(object):
 
 class LogicStr(Unicode):
 
-    def validate(self, object, name, value):
+    def validate(self, obj, name, value):
         v = value
-        f = object.system.eval_in_system_namespace(v)
+        f = obj.system.eval_in_system_namespace(v)
         if f is None:
-            self.error(object, name, value)
+            self.error(obj, name, value)
         return value
 
 
 class NameOrSensorActuatorBaseTrait(TraitType):
 
-    def validate(self, object, name, value):
-        from statusobject import StatusObject
+    def validate(self, obj, name, value):
+        from .statusobject import StatusObject
         v = value
         if isinstance(v, StatusObject):
             return v
-        if isinstance(v, (str, unicode)):
-            return object.system.name_to_system_object(v)
-        self.error(object, name, value)
+        if isinstance(v, basestring):
+            return obj.system.name_to_system_object(v)
+        self.error(obj, name, value)
         return value
 
 
 def threaded(func, *args, **kwargs):
     """ uses thread_init as a decorator-style """
+    @wraps(func)
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
@@ -183,45 +188,45 @@ class CompareMixin(object):
        """
 
     def __mul__(self, obj):
-        import callables
+        from . import callables
 
         return callables.Product(self, obj)
 
     def __add__(self, obj):
-        import callables
+        from . import callables
 
         return callables.Sum(self, obj)
 
     def __sub__(self, obj):
-        import callables
+        from . import callables
 
         return callables.Sum(self, -obj)
 
     def __neg__(self):
-        import callables
+        from . import callables
 
         return callables.Neg(self)
 
     def __lt__(self, obj):
-        import callables
+        from . import callables
 
         return callables.Less(self, obj)
 
     def __gt__(self, obj):
-        import callables
+        from . import callables
         return callables.More(self, obj)
 
 
 class TagSet(CSet):
 
     def validate(self, object, name, value):
-        if isinstance(value, (str, unicode)):
+        if isinstance(value, basestring):
             return set((i.strip() for i in value.split(',')))
         return super(TagSet, self).validate(object, name, value)
 
 
 def is_iterable(y):
-    if isinstance(y, (str, unicode)):
+    if isinstance(y, basestring):
         return False
     return isinstance(y, Iterable)
 
@@ -247,10 +252,10 @@ def deep_iterate(l):
     if is_iterable(l):
         l_list = l
         if isinstance(l, dict):
-            l_list = l.values()
+            l_list = list(l.values())
         for i in l_list:
             if is_iterable(i):
-                for j in deep_iterate(i):
+                for j in deep_iterate(i): #TODO: could use yield from (python 3.3)
                     yield j
             else:
                 yield i
@@ -260,8 +265,8 @@ def deep_iterate(l):
 
 def get_modules_all(base_class, _locals):
     r_types = {}
-    for k, v in copy(_locals).iteritems():
+    for k, v in list(copy(_locals).items()):
         if has_baseclass(v, base_class) and v is not base_class:
             r_types[k] = v
 
-    return r_types.keys()
+    return list(r_types.keys())

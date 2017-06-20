@@ -19,12 +19,13 @@
 # ------------------------------------------------------------------
 #
 # If you like Automate, please take a look at this page:
-# http://python-automate.org/gospel/
+# http://evankelista.net/automate/
 
 """
 Apply two fixeds to traits 4.5.0 that are necessary in order to Automate to function.
 Most likely these are not necessary (neither harmful) any more with 4.6.0.
 """
+from __future__ import unicode_literals
 
 import traits.traits_listener as tlistener
 original_register = tlistener.ListenerItem.register

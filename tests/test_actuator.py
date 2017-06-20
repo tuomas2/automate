@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+from builtins import range
 # -*- coding: utf-8 -*-
 # (c) 2015 Tuomas Airaksinen
 #
@@ -19,7 +21,7 @@
 # ------------------------------------------------------------------
 #
 # If you like Automate, please take a look at this page:
-# http://python-automate.org/gospel/
+# http://evankelista.net/automate/
 
 from collections import deque
 
@@ -248,7 +250,7 @@ def test_back_and_forth_on_activate(mysys):
     mysys.flush()
     assert mysys.act.status == LOW
     logger.debug('STARTING')
-    for i in xrange(AMOUNT):
+    for i in range(AMOUNT):
         mysys.sens.set_status(True)
         mysys.sens.set_status(False)
     mysys.flush()
@@ -266,7 +268,7 @@ def test_back_and_forth_on_activate_w_safety_delay(mysys):
     mysys.flush()
     assert mysys.act.status == LOW
     mysys.act._last_changed = time.time()
-    for i in xrange(AMOUNT):
+    for i in range(AMOUNT):
         mysys.sens.set_status(True)
         mysys.sens.set_status(False)
     mysys.sens.set_status(True)
@@ -281,6 +283,8 @@ def test_back_and_forth_on_update(mysys):
     mysys.prog.active_condition = Value(True)
     mysys.prog.update_condition = Value(True)
     mysys.prog.on_update = SetStatus(mysys.act, mysys.sens)
+    mysys.sens.set_status(True)
+    mysys.sens.set_status(False)
     mysys.flush()
     assert mysys.act.status == 0.0
 

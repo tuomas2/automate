@@ -3,8 +3,6 @@
 Raspberry Pi GPIO Support for Automate
 ======================================
 
-Github URL: http://github.com/tuomas2/automate-rpio
-
 Introduction
 ------------
 
@@ -13,15 +11,9 @@ This extension provides interface to Raspberry Pi GPIO via RPIO library. `RPIO l
 Installation
 ------------
 
-Install from Pypi::
+Install extras::
 
-    pip install automate-rpio
-
-Optionally, you could install also by cloning GIT repository and installing manually::
-
-    git clone https://github.com/tuomas2/automate-rpio.git
-    cd automate-rpio
-    ./setup.py install
+    pip install automate[raspberrypi]
 
 Example application
 -------------------

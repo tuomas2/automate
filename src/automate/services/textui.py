@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+from builtins import input
 # -*- coding: utf-8 -*-
 # (c) 2015 Tuomas Airaksinen
 #
@@ -19,7 +21,7 @@
 # ------------------------------------------------------------------
 #
 # If you like Automate, please take a look at this page:
-# http://python-automate.org/gospel/
+# http://evankelista.net/automate/
 
 from automate.common import ExitException
 from automate.service import AbstractUserService
@@ -112,7 +114,7 @@ class TextUIService(AbstractUserService):
         from IPython.terminal.ipapp import TerminalIPythonApp
         import automate
         self.system.namespace.allow_overwrite.extend(['_', '__', '___', '_i', '_ii', '_iii', 'quit'])
-        self.system.namespace.update({k: v for k, v in automate.__dict__.iteritems() if k not in self.system.namespace})
+        self.system.namespace.update({k: v for k, v in list(automate.__dict__.items()) if k not in self.system.namespace})
         term = TerminalIPythonApp(user_ns=self.system.namespace)
         self.system.namespace['term'] = term
         term.initialize()
@@ -133,7 +135,7 @@ class TextUIService(AbstractUserService):
                     self.logger.warning(
                         "Readline support disabled. Please install readline and rlcompleter if you want to use.")
                 try:
-                    c = raw_input(prompt)
+                    c = eval(input(prompt))
                 except EOFError:
                     return
                 if c[:1] == "%":

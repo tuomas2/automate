@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+from builtins import object
 # -*- coding: utf-8 -*-
 # (c) 2015 Tuomas Airaksinen
 #
@@ -19,7 +21,7 @@
 # ------------------------------------------------------------------
 #
 # If you like Automate, please take a look at this page:
-# http://python-automate.org/gospel/
+# http://evankelista.net/automate/
 
 import pytest
 
@@ -116,7 +118,7 @@ def test_register_function(mysys):
     assert mysys.namespace['func']()
     assert mysys.func()
 
-    class tst:
+    class tst(object):
 
         def hep(self):
             return self.status

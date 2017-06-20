@@ -19,18 +19,19 @@
 # ------------------------------------------------------------------
 #
 # If you like Automate, please take a look at this page:
-# http://python-automate.org/gospel/
+# http://evankelista.net/automate/
 
-__author__ = "Tuomas Airaksinen"
-__copyright__ = "Copyright 2015, Tuomas Airaksinen"
-__credits__ = []
-__license__ = "GPL"
-__version__ = '0.9.2'
-__maintainer__ = "Tuomas Airaksinen"
-__email__ = "tuomas.airaksinen@gmail.com"
-__status__ = "Beta"
+from __future__ import absolute_import
+from __future__ import unicode_literals
 
-import traits_fixes
+import pkg_resources
+
+try:
+    __version__ = pkg_resources.get_distribution("automate").version
+except pkg_resources.DistributionNotFound:
+    __version__ = 'not installed'
+
+from . import traits_fixes
 from .common import *
 from .program import *
 from .system import *

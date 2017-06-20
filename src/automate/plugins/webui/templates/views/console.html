@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+  <h2>Log console</h2>
+  <pre class="log">
+{{ log }}
+</pre>
+  {% if not service.read_only %}
+    <div id="command_form">
+      {% crispy cmdform %}
+    </div>
+    <script>
+      $('#id_cmd').focus();
+    </script>
+    {% if textarea %}
+      <a href="?textarea=">Switch to singleline</a>
+    {% else %}
+      <a href="?textarea=1">Switch to multiline</a>
+    {% endif %}
+  {% endif %}
+{% endblock %}

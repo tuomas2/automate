@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load automate_tags %}
+{% block content %}
+  {% block info %}
+    <h1>Tag {{ tag }}</h1><br>
+  {% endblock %}
+
+  <div class="row">
+    <div class="col-md-12 object_list_column">
+      <div class="group_content">
+        {% for obj in objs %}
+          {% if obj.object_type == 'sensor' %}
+            {% include 'rows/sensor_row.html' with sensor=obj %}
+          {% elif obj.object_type == 'actuator' %}
+            {% include 'rows/actuator_row.html' with actuator=obj %}
+          {% elif obj.object_type == 'program' %}
+            {% include 'rows/program_row.html' with program=obj %}
+          {% else %}
+            {% include 'rows/general_row.html' with object=obj %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+{% endblock %}
+

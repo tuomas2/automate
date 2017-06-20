@@ -19,20 +19,30 @@
 # ------------------------------------------------------------------
 #
 # If you like Automate, please take a look at this page:
-# http://python-automate.org/gospel/
+# http://evankelista.net/automate/
 
+from __future__ import absolute_import
+from __future__ import unicode_literals
 import logging
 import operator
 import threading
 import time
+import sys
 
+import datetime
 from traits.api import (cached_property, Any, CBool, Instance, Dict, Str, CFloat,
-                        List, Enum, Bool, Property)
+                        List, Enum, Bool, Property, Event)
+from traits.trait_errors import TraitError
 
 from automate.common import Lock, AbstractStatusObject, CompareMixin, nomutex
 from automate.worker import StatusWorkerTask, DummyStatusWorkerTask
 from automate.program import ProgrammableSystemObject, DefaultProgram
 from automate.systemobject import SystemObject
+
+if sys.version_info >= (3, 0):
+    TimerClass = threading.Timer
+else:
+    TimerClass = threading._Timer
 
 
 class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin):
@@ -73,7 +83,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
         return False
 
     # Thread of currently running action
-    _timed_action = Instance(threading._Timer, transient=True)
+    _timed_action = Instance(TimerClass, transient=True)
 
     # Reference of status change job that is in the worker queue is saved here
     _queued_job = Instance(StatusWorkerTask, transient=True)
@@ -116,7 +126,10 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
                     and isinstance(self.on_update, Empty))
 
     #: Status of the object.
-    status = Property(depends_on="_status", transient=True)
+    status = Property(depends_on="_status, _status_trigger", transient=True)
+
+    #: To force trigger status change events even if status itself does not change
+    _status_trigger = Event
 
     def get_status_display(self, **kwargs):
         """
@@ -148,7 +161,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
         super(StatusObject, self).setup_system(*args, **kwargs)
         self.data_type = self._status.__class__.__name__
 
-    def set_status(self, new_status, origin=None):
+    def set_status(self, new_status, origin=None, force=False):
         """
             For sensors, this is synonymous to::
 
@@ -203,7 +216,13 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
         self._change_start = 0.
         self._last_changed = time.time()
 
-        self._status = status
+        try:
+            if self._status == status:
+                self._status_trigger = True
+            else:
+                self._status = status
+        except TraitError as e:
+            self.logger.warning('Wrong type of status %s was passed to %s. Error: %s', status, self, e)
 
     def _add_statuschange_to_queue(self, status, prog, with_statuslock=False):
         # This function is used for delayed actions
@@ -216,7 +235,11 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
             self.system.worker_thread.put(DummyStatusWorkerTask(self._set_real_status, status, prog))
 
     def _are_delays_active(self, new_status):
-        mode = "rising" if new_status > self._status else "falling"
+        try:
+            mode = "rising" if new_status > self._status else "falling"
+        except TypeError:
+            # if we can not determine whether value is rising or falling, we'll assume it's rising
+            mode = 'rising'
         safety_active = False
         change_active = False
         if self.safety_delay > 0. and self.safety_mode in [mode, "both"]:
@@ -225,7 +248,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
             change_active = True
         return safety_active, change_active
 
-    def _do_change_status(self, status):
+    def _do_change_status(self, status, force=False):
         """
         This function is called by
            - set_status
@@ -237,9 +260,13 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
         This does not directly change status, but adds change request
         to queue.
         """
-        self.system.worker_thread.put(DummyStatusWorkerTask(self._request_status_change_in_queue, status))
+        self.system.worker_thread.put(DummyStatusWorkerTask(self._request_status_change_in_queue, status, force=force))
 
-    def _request_status_change_in_queue(self, status):
+    @property
+    def next_scheduled_action(self):
+        return getattr(self._timed_action, 'next_action', None)
+
+    def _request_status_change_in_queue(self, status, force=False):
         def timer_func(func, *args):
             func(*args)
             self._timed_action = None
@@ -263,16 +290,20 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
             if not self._change_start:
                 self._change_start = timenow
 
-            if status == self._status:
+            if status == self._status and not force:
                 self._change_start = 0
                 logger('Status same %s, no need to change', status)
                 return
 
-            changedelay = self.change_delay - (timenow - self._change_start)
-            if changedelay < 0:
-                changedelay = self.change_delay
+            orig_changedelay = self.change_delay if changedelay_active else 0
+            safetydelay = self.safety_delay if safetydelay_active else 0
 
-            if run_now or (changedelay <= 0. and (timenow - self._last_changed > self.safety_delay)):
+            changedelay = orig_changedelay - (timenow - self._change_start)
+
+            if changedelay < 0:
+                changedelay = orig_changedelay
+
+            if run_now or (changedelay <= 0. and (timenow - self._last_changed > safetydelay)):
                 logger("Adding status change to queue, about to change status to %s", status)
                 if self.system.two_phase_queue:
                     self._add_statuschange_to_queue(status, getattr(self, "program", None))
@@ -281,13 +312,14 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
 
             else:
                 timesince = time.time() - self._last_changed
-                delaytime = max(0, self.safety_delay - timesince, changedelay)
-                #self.logger.debug("Scheduling safety/change_delay timer for %s for %f", self, delaytime)
+                delaytime = max(0, safetydelay - timesince, changedelay)
+                time_after_delay = datetime.datetime.now() + datetime.timedelta(seconds=delaytime)
                 logger("Scheduling safety/change_delay timer for %f sek. Now %s. Going to change to %s.",
                        delaytime, self._status, status)
                 self._timed_action = threading.Timer(delaytime, timer_func,
                                                      args=(self._add_statuschange_to_queue, status, getattr(self, "program", None), True))
-                self._timed_action.name = "Safety/change_delay for " + self.name.encode("utf-8") + " %f sek" % delaytime
+                self._timed_action.name = "Safety/change_delay for %s timed at %s (%f sek)" % (self.name, time_after_delay, delaytime)
+                self._timed_action.next_action = time_after_delay
                 self._timed_action.start()
                 return False
 
@@ -329,7 +361,7 @@ class AbstractSensor(StatusObject):
             self._reset_timer = threading.Timer(self.reset_delay, lambda: self.set_status(self.default))
             self._reset_timer.start()
 
-    def set_status(self, status, origin=None):
+    def set_status(self, status, origin=None, force=False):
         """
             Compatibility to actuator class.
             Also :class:`~automate.callables.builtin_callables.SetStatus`
@@ -338,7 +370,7 @@ class AbstractSensor(StatusObject):
 
         if status != self.default:
             self._setup_reset_delay()
-        return self._do_change_status(status)
+        return self._do_change_status(status, force)
 
     def update_status(self):
         """A method to read and update actual status. Implement it in subclasses, if necessary"""
@@ -406,29 +438,29 @@ class AbstractActuator(StatusObject):
         self._program_lock = Lock("programlock")
         return super(AbstractActuator, self).__setstate__(*args, **kwargs)
 
-    def set_status(self, status, program=None):
+    def set_status(self, status, origin=None, force=False):
         """ For programs, to set current status of the actuator. Each
             active program has its status in :attr:`.program_stack`
             dictionary and the highest priority is realized in the actuator """
 
-        if not self.slave and program not in self.program_stack:
+        if not self.slave and origin not in self.program_stack:
             raise ValueError('Status cannot be changed directly')
 
         with self._actuator_status_lock:
-            self.logger.debug("set_status got through, program: %s", program)
+            self.logger.debug("set_status got through, program: %s", origin)
             if self.debug:
-                self.logger.info("Set_status %s %s %s", self.name, program, status)
+                self.logger.info("Set_status %s %s %s", self.name, origin, status)
 
             if self.slave:
-                return self._do_change_status(status)
+                return self._do_change_status(status, force)
 
-            self.logger.debug("Sets status %s for %s", status, program.name)
+            self.logger.debug("Sets status %s for %s", status, origin.name)
 
             with self._program_lock:
-                self.program_status[program] = status
+                self.program_status[origin] = status
 
-                if self.program == program:
-                    return self._do_change_status(status)
+                if self.program == origin:
+                    return self._do_change_status(status, force)
 
     def activate_program(self, program):
         """
@@ -504,7 +536,7 @@ class AbstractActuator(StatusObject):
             actevent = Empty()
             self.status = self.default
 
-        from program import DefaultProgram
+        from .program import DefaultProgram
 
         if not self.default_program:
             self.default_program = DefaultProgram(

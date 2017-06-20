@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h2>Threads</h2>
+  <ul>
+    {% for t in threads %}
+      <li>{{ t }}
+    {% endfor %}
+  </ul>
+
+{% endblock %}

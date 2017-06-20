@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 # -*- coding: utf-8 -*-
 # (c) 2015 Tuomas Airaksinen
 #
@@ -19,7 +20,7 @@
 # ------------------------------------------------------------------
 #
 # If you like Automate, please take a look at this page:
-# http://python-automate.org/gospel/
+# http://evankelista.net/automate/
 
 from automate.systemobject import SystemObject
 from automate.common import Group
@@ -49,7 +50,7 @@ class Namespace(dict):
         for name, obj in inspect.getmembers(system):
             if isinstance(obj, SystemObject):
                 objs.append((name, obj, tags))
-            if isinstance(obj, type(Group)):
+            if isinstance(obj, type) and issubclass(obj, Group):
                 add_tags = tags.copy()
                 if hasattr(obj, 'tags'):
                     add_tags = add_tags | set(obj.tags.split(','))
@@ -79,7 +80,7 @@ class Namespace(dict):
         for name, obj, groups in objs:
             obj.system = self.system
             if name in self:
-                raise NameError, '%s already in namespace!' % name
+                raise NameError('%s already in namespace!' % name)
             self[name] = obj
 
         self.logger.info('Set up system and groups into object tags')
@@ -123,7 +124,7 @@ class Namespace(dict):
             if o in self.reverse:
                 del self.reverse[o]
         except TypeError as e:
-            if not e.message.startswith("unhashable type"):
+            if not str(e).startswith("unhashable type"):
                 raise
 
         if isinstance(o, SystemObject) and o in self.system.objects:
@@ -131,7 +132,7 @@ class Namespace(dict):
         super(Namespace, self).__delitem__(key)
 
     def update(self, d):
-        for key, value in d.iteritems():
+        for key, value in list(d.items()):
             self[key] = value
 
     def __setitem__(self, name, value):
@@ -145,7 +146,7 @@ class Namespace(dict):
             if value in self.get('reverse', []):
                 is_alias = True
         except TypeError as e:
-            if not e.message.startswith("unhashable type"):
+            if not str(e).startswith("unhashable type"):
                 raise
 
         super(Namespace, self).__setitem__(name, value)

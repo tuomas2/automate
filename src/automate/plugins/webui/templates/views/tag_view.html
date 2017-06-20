@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load automate_tags %}
+{% block content %}
+  {% block info %}
+    <h1>Tag view</h1>
+    Shows objects grouped by tags<br><br>
+  {% endblock %}
+
+  <div class="row">
+    {% for group in groups %}
+      <div class="col-md-4 object_list_column">
+        {% for tag, objs in group %}
+          <div class="group_title"><a href="{% url "single_tag" tag %}">{{ tag }}</a></div>
+          <div class="group_content">
+            <hr class='object_row'>
+            {% for obj in objs %}
+              {% if obj.object_type == 'sensor' %}
+                {% include 'rows/sensor_row.html' with sensor=obj %}
+              {% elif obj.object_type == 'actuator' %}
+                {% include 'rows/actuator_row.html' with actuator=obj %}
+              {% elif obj.object_type == 'program' %}
+                {% include 'rows/program_row.html' with program=obj %}
+              {% else %}
+                {% include 'rows/general_row.html' with object=obj %}
+              {% endif %}
+              <hr class='object_row'>
+            {% endfor %}
+          </div>
+        {% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}
+

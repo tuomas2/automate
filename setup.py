@@ -2,26 +2,32 @@
 
 from setuptools import setup, find_packages
 
-def get_version(filename):
-    import re
-    with open(filename) as fh:
-        metadata = dict(re.findall("__([a-z]+)__ = '([^']+)'", fh.read()))
-        return metadata['version']
-
 setupopts = dict(
     name="automate",
-    version=get_version('src/automate/__init__.py'),
+    version='0.9.4-dev0',
     packages=find_packages('src'),
     package_dir={'': 'src'},
     install_requires=[
-        'traits==4.5.0',
-        'croniter==0.3.8',
-        'pyinotify==0.9.6',
-        'ipython==3.2',
-        'ansiconv==1.0',
-        'colorlog==2.6'],
-    test_suite='py.test',
-    tests_require=['pytest', 'pytest-capturelog'],
+        "ansiconv",
+        "colorlog",
+        "croniter~=0.3",
+        "future",
+        "ipython<6.0",
+        "pyinotify",
+        "traits~=4.6",
+        ],
+    extras_require={
+        'web':
+            [
+                "Django~=1.9",
+                "django-crispy-forms~=1.6",
+                "tornado~=4.5",
+            ],
+        'rpc': ['tornado~=4.5'],
+        'raspberrypi': ['RPIO'],
+        'arduino': ['pyfirmata'],
+    },
+
     download_url='https://pypi.python.org/pypi/automate',
     platforms = ['any'],
     author="Tuomas Airaksinen",
@@ -44,11 +50,22 @@ setupopts = dict(
                  "Operating System :: POSIX",
                  "Operating System :: POSIX :: Linux",
                  "Programming Language :: Python :: 2.7",
+                 "Programming Language :: Python :: 3",
+                 "Programming Language :: Python :: 3.5",
+                 "Programming Language :: Python :: 3.6",
                  "Topic :: Scientific/Engineering",
                  "Topic :: Software Development",
                  "Topic :: Software Development :: Libraries",
                  "Topic :: Software Development :: Libraries :: Application Frameworks",
-                 ]
+                 ],
+    entry_points={'automate.extension': [
+        'arduino = automate.plugins.arduino:extension_classes',
+        'rpc = automate.plugins.rpc:extension_classes',
+        'rpio = automate.plugins.rpio:extension_classes',
+        'webui = automate.plugins.webui:extension_classes',
+    ]
+},
+
 )
 
 if __name__ == "__main__":

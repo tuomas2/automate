@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+  <h2>UML</h2>
+
+  {% if puml_service %}
+    <p>UML graph powered by PlantUML. Does not refresh automatically! Get <a href="{% url "puml_raw" %}">plain text</a>.
+      Show/hide <a href='#' data-toggle="collapse" data-target="#legend">legend</a>
+    </p>
+
+    <div class='collapse' id='legend'>
+      <p>Arrow colors:
+      <ul>
+        {% for name, color in puml_service.arrow_colors.items %}
+          <li>
+            <div style='color:{{ color }};'>
+            {{ name }}</li>
+        {% endfor %}
+      </ul>
+      </p>
+      <p>Background colors:
+      <ul>
+        {% for name, color in puml_service.background_colors.items %}
+          <li>
+            <div style='background-color:{{ color }};'>
+            {{ name }}</li>
+        {% endfor %}
+      </ul>
+      </p>
+    </div>
+
+    <div class='row'>
+      <div class='col-xs-12'>
+        <img class='puml' src="{% url 'puml_svg' %}">
+      </div>
+    </div>
+  {% else %}
+    <p>
+      To view UML diagram of the system, please set up PlantUMLService for your system.
+    </p>
+  {% endif %}
+
+{% endblock %}

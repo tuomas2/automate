@@ -19,11 +19,15 @@
 # ------------------------------------------------------------------
 #
 # If you like Automate, please take a look at this page:
-# http://python-automate.org/gospel/
+# http://evankelista.net/automate/
 
 """
     Module for various Sensor classes.
 """
+from __future__ import unicode_literals
+from future import standard_library
+standard_library.install_aliases()
+from builtins import filter
 
 import time
 import socket
@@ -32,9 +36,10 @@ import subprocess
 import types
 import pyinotify
 import threading
-import Queue
+import queue
+from copy import deepcopy
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from croniter import croniter
 from traits.api import Any, CInt, CFloat, Unicode, CUnicode, List, CBool, Instance, CStr, Int
@@ -107,12 +112,12 @@ class AbstractNumericSensor(AbstractSensor):
         d.update(dict(value_min=self.value_min, value_max=self.value_max))
         return d
 
-    def set_status(self, status, origin=None):
+    def set_status(self, status, **kwargs):
         if status is None:
             clipped_status = None
         else:
             clipped_status = max(min(float(status), self.value_max), self.value_min)
-        super(AbstractNumericSensor, self).set_status(clipped_status, origin)
+        super(AbstractNumericSensor, self).set_status(clipped_status, **kwargs)
 
 
 class UserIntSensor(AbstractNumericSensor):
@@ -135,6 +140,14 @@ class UserStrSensor(AbstractSensor):
     """String-valued user-editable sensor"""
     user_editable = CBool(True)
     _status = CUnicode
+
+
+class CroniterOn(croniter):
+    pass
+
+
+class CroniterOff(croniter):
+    pass
 
 
 class CronTimerSensor(AbstractSensor):
@@ -162,113 +175,67 @@ class CronTimerSensor(AbstractSensor):
 
     #: Semicolon separated lists of cron-compatible strings that indicate
     #: when to switch status to ``True``
-    timer_on = CronListStr
+    timer_on = CronListStr("0 0 0 0 0")
 
     #: Semicolon separated lists of cron-compatible strings that indicate
     #: when to switch status to ``False``
-    timer_off = CronListStr
+    timer_off = CronListStr("0 0 0 0 0")
 
-    # Cronit objects
-    _cronit_on = List(transient=True)
-    _cronit_off = List(transient=True)
-
-    _timer_on = Any(transient=True)
-    _timer_off = Any(transient=True)
-
-    _timerlock = Any(transient=True)
+    _update_timer = Any(transient=True)  # Timer object
+    _timerlock = Any(transient=True)  # Lock object
 
     view = UserBoolSensor.view + ["timer_on", "timer_off"]
 
     def setup_system(self, *args, **traits):
         self._timerlock = Lock()
         super(CronTimerSensor, self).setup_system(*args, **traits)
-        self._setup_timer_on()
-        self._setup_timer_off()
         self.update_status()
+
+    def _now(self):
+        return datetime.now()
 
     def update_status(self):
         with self._timerlock:
-            if not (self._cronit_on and self._cronit_off):
-                return
-            from copy import deepcopy
+            now = self._now()
+            next_iters = [CroniterOn(i, now) for i in self.timer_on.split(";")] + \
+                         [CroniterOff(i, now) for i in self.timer_off.split(";")]
 
-            onprev = deepcopy(self._cronit_on)
-            offprev = deepcopy(self._cronit_off)
+            for i in next_iters:
+                i.get_next(datetime)
 
-            for i in onprev:
+            next_iters.sort(key=lambda x: x.get_current(datetime))
+
+            prev_iters = deepcopy(next_iters)
+
+            for i in prev_iters:
                 i.get_prev(datetime)
-            for i in offprev:
-                i.get_prev(datetime)
+            prev_iters.sort(key=lambda x: x.get_current(datetime))
 
-            onprev.sort(key=lambda x: x.get_current(datetime))
-            offprev.sort(key=lambda x: x.get_current(datetime))
-            self.status = onprev[-1].get_current(datetime) > offprev[-1].get_current(datetime)
+            self.status = isinstance(prev_iters[-1], CroniterOn)
 
-    def _switch_on(self):
-        self.status = 1
-        with self._timerlock:
-            self._cronit_on[0].get_next(datetime)
-        self._setup_timer_on()
-
-    def _switch_off(self):
-        self.status = 0
-        with self._timerlock:
-            self._cronit_off[0].get_next(datetime)
-        self._setup_timer_off()
-
-    @staticmethod
-    def _now():
-        return datetime.now()
-        #time.time()
+            self._setup_next_update(next_iters[0].get_current(datetime))
 
     def _timer_on_changed(self, name, new):
-        with self._timerlock:
-            self._cronit_on = [croniter(i, self._now()) for i in new.split(";")]
-            for i in self._cronit_on:
-                i.get_next(datetime)
-        self._setup_timer_on()
         self.update_status()
 
     def _timer_off_changed(self, name, new):
-        self._cronit_off = [croniter(i, self._now()) for i in new.split(";")]
-        for i in self._cronit_off:
-            i.get_next(datetime)
-        self._setup_timer_off()
         self.update_status()
 
-    def _setup_timer_on(self):
-        with self._timerlock:
-            if self._timer_on and self._timer_on.is_alive():
-                self._timer_on.cancel()
-            if not self._cronit_on:
-                return
+    def _setup_next_update(self, next_update_time):
+        now = self._now()
+        if self._update_timer and self._update_timer.is_alive():
+            self._update_timer.cancel()
 
-            self._cronit_on.sort(key=lambda x: x.get_current(datetime))
-            delay = self._cronit_on[0].get_current(datetime) - self._now()
-            self._timer_on = threading.Timer(delay.seconds, threaded(self._switch_on,))
-            self._timer_on.name = ("Timer for TimerSensor:on " + self.name.encode("utf-8") +
-                                   " at %s" % (self._now() + delay))
-            self._timer_on.start()
-
-    def _setup_timer_off(self):
-        with self._timerlock:
-            if self._timer_off and self._timer_off.is_alive():
-                self._timer_off.cancel()
-            if not self._cronit_on:
-                return
-            self._cronit_off.sort(key=lambda x: x.get_current(datetime))
-            delay = self._cronit_off[0].get_current(datetime) - self._now()
-            self._timer_off = threading.Timer(delay.seconds, threaded(self._switch_off))
-            self._timer_off.name = ("Timer for TimerSensor:off " + self.name.encode("utf-8") +
-                                    " at %s" % (self._now() + delay))
-            self._timer_off.start()
+        delay = next_update_time - now + timedelta(seconds=5)
+        self.logger.debug('Setting timer to %s, %s seconds, at %s', delay, delay.seconds, now+delay)
+        self._update_timer = threading.Timer(delay.seconds, threaded(self.update_status,))
+        self._update_timer.name = ("Timer for TimerSensor %s at %s" % (self.name, now + delay))
+        self._update_timer.start()
 
     def cleanup(self):
         with self._timerlock:
-            if self._timer_off:
-                self._timer_off.cancel()
-            if self._timer_on:
-                self._timer_on.cancel()
+            if self._update_timer:
+                self._update_timer.cancel()
 
 
 class FileChangeSensor(AbstractSensor):
@@ -346,7 +313,8 @@ class AbstractPollingSensor(AbstractSensor):
         if self.poll_active:
             self.update_status()
             self._pollthread = threading.Timer(self.interval, threaded(self._restart))
-            self._pollthread.name = "PollingSensor: " + self.name.encode("utf-8") + " %.2f sek" % self.interval
+            time_after_interval = datetime.now() + timedelta(seconds=self.interval)
+            self._pollthread.name = "PollingSensor: %s next poll at %s (%.2f sek)" % (self.name, time_after_interval, self.interval)
             self._pollthread.start()
 
     def update_status(self):
@@ -510,7 +478,7 @@ class ShellSensor(AbstractSensor):
     def cmd_loop(self):
         p = self._process = subprocess.Popen(self.cmd, shell=True, executable='bash', stdout=subprocess.PIPE)
         while True:
-            line = p.stdout.readline()
+            line = p.stdout.readline().decode('utf-8')
             self._queue.put(line)
             if not line:
                 self.logger.debug('Process exiting (cmd_loop)')
@@ -554,7 +522,7 @@ class ShellSensor(AbstractSensor):
                 self.status = s
 
     def setup(self):
-        self._queue = Queue.Queue()
+        self._queue = queue.Queue()
         t1 = threading.Thread(target=self.cmd_loop, name='ShellSensor.cmd_loop %s' % self.name)
         t1.start()
         t2 = threading.Thread(target=self.status_loop, name='ShellSensor.status_loop %s' % self.name)

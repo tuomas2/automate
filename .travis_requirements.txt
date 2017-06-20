@@ -1,4 +1,0 @@
-pytest
-pytest-capturelog
-coveralls
-pytest-cov

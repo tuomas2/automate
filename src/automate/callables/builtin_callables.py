@@ -19,11 +19,22 @@
 # ------------------------------------------------------------------
 #
 # If you like Automate, please take a look at this page:
-# http://python-automate.org/gospel/
+# http://evankelista.net/automate/
+
+from __future__ import unicode_literals
+from builtins import bytes
+
+import datetime
+
+from future import standard_library
+
+standard_library.install_aliases()
+
+from http.client import HTTPException
 
 import re
 import threading
-import xmlrpclib
+import xmlrpc.client
 import socket
 import subprocess
 
@@ -142,7 +153,7 @@ class Func(AbstractAction):
     def call(self, caller, **kwargs):
         if not caller:
             return
-        _kwargs = {k: self.call_eval(v, caller, **kwargs) for k, v in self._kwargs.iteritems()}
+        _kwargs = {k: self.call_eval(v, caller, **kwargs) for k, v in list(self._kwargs.items())}
         return_value = _kwargs.pop('return_value', True)
         args = [self.call_eval(i, caller, return_value=return_value, **kwargs) for i in self.args]
         if _kwargs.pop('add_caller', False):
@@ -252,17 +263,59 @@ class Eval(AbstractAction):
         pre_exec = _kwargs.pop('pre_exec', '')
 
         if pre_exec:
-            exec pre_exec.format(**self._kwargs) in namespace
+            exec(pre_exec.format(**self._kwargs), namespace)
         try:
             return eval(self.obj.format(**self._kwargs), namespace)
         except SyntaxError:
-            exec self.obj.format(**self._kwargs) in namespace
+            exec(self.obj.format(**self._kwargs), namespace)
             return True
 
 
 class Exec(Eval):
 
     """Synonym to :class:`.Eval`"""
+
+
+class GetService(AbstractAction):
+    """
+    Get service by name and number.
+
+    Usage::
+
+        GetService(name)
+        GetService(name, number)
+
+    Usage examples::
+
+        GetService('WebService')
+        GetService('WebService', 1)
+
+    """
+    def call(self, caller, **kwargs):
+        name = self._args[0]
+        num = self._args[1] if len(self._args) > 1 else 0
+        return self.system.services_by_name[name][num]
+
+
+class ReloadService(AbstractAction):
+    """
+    Reload given service.
+
+    Usage::
+
+        ReloadService(name, number)
+        ReloadService(name)
+
+    Usage examples::
+
+        ReloadService('WebService', 0)
+        ReloadService('ArduinoService')
+
+    """
+    def call(self, caller, **kwargs):
+        name = self._args[0]
+        num = self._args[1] if len(self._args) > 1 else 0
+        return self.system.services_by_name[name][num].reload()
 
 
 class Shell(AbstractAction):
@@ -278,7 +331,8 @@ class Shell(AbstractAction):
         Usage examples::
 
             Shell('/bin/echo test', output=True) # returns 'test'
-            Shell('mplayer something.mp3', no_wait=True) # returns PID of mplayer process that keeps running
+            Shell('mplayer something.mp3', no_wait=True) # returns PID of mplayer
+                                                         # process that keeps running
             Shell('/bin/cat', input='test', output=True) # returns 'test'.
     """
 
@@ -286,7 +340,7 @@ class Shell(AbstractAction):
         cmd = self.call_eval(self.obj, caller, **kwargs)
         input = self._kwargs.get('input', None)
         if input:
-            input = str(self.call_eval(input, caller, **kwargs))
+            input = bytes(self.call_eval(input, caller, **kwargs), 'utf-8')
         if not caller:
             return
         try:
@@ -300,7 +354,7 @@ class Shell(AbstractAction):
                 out, err = process.communicate(input)
                 retcode = process.poll()
                 if self._kwargs.get('output', False):
-                    return out
+                    return out.decode('utf-8')
                 else:
                     return retcode
         except Exception as e:
@@ -317,13 +371,17 @@ class SetStatus(AbstractAction):
 
             SetStatus(target, source)
             # sets status of target to the status of source.
+            SetStatus(target, source, Force=True)
+            # sets status to hardware level even if it is not changed
             SetStatus([actuator1, actuator2], [sensor1, sensor2])
-            # sets status of actuator 1 to status of sensor1 and status of actuator2 to status of sensor2.
+            # sets status of actuator 1 to status of sensor1 and
+            # status of actuator2 to status of sensor2.
     """
 
     def call(self, caller=None, trigger=None, **kwargs):
         if not caller:
             return
+        force = self._kwargs.get('force', False)
         values = self.call_eval(self.value, caller, **kwargs)
         objs = self.name_to_system_object(self.obj)
         if isinstance(objs, AbstractCallable):
@@ -343,13 +401,13 @@ class SetStatus(AbstractAction):
             obj = self.call_eval(obj, caller, return_value=False, trigger=trigger, **kwargs)
             self.system.logger.debug('SetStatus(%s, %s) by %s', obj, value, caller)
             try:
-                obj.set_status(value, caller)
-            except ValueError:
+                obj.set_status(value, origin=caller, force=force)
+            except ValueError as e:
                 self.system.logger.error(
-                    'Trying to set invalid status %s of type %s (by %s)', value, type(value), caller)
-            except AttributeError:
+                    'Trying to set invalid status %s of type %s (by %s). Error: %s', value, type(value), caller, e)
+            except AttributeError as e:
                 self.system.logger.error(
-                    'Trying to set status of invalid object %s of type %s, by %s', obj, type(obj), caller)
+                    'Trying to set status of invalid object %s of type %s, by %s. Error: %s', obj, type(obj), caller, e)
         return True
 
     def _give_triggers(self):
@@ -376,13 +434,13 @@ class SetAttr(AbstractAction):
         if not caller:
             return
         obj = self.obj
-        for attr, val in self._kwargs.iteritems():
+        for attr, val in list(self._kwargs.items()):
             val = self.call_eval(val, caller, **kwargs)
             setattr(obj, attr, val)
         return True
 
     def _give_triggers(self):
-        return self._kwargs.values()
+        return list(self._kwargs.values())
 
     def _give_targets(self):
         return self.obj
@@ -491,7 +549,8 @@ class Delay(AbstractRunner):
             delay = self.call_eval(self.delay, caller, **kwargs)
             timer = threading.Timer(delay, None)
             timer.function = threaded(self._run, caller, timer, **kwargs)
-            timer.name = "Timer for " + unicode(self).encode("utf-8") + " %d sek" % delay
+            time_after_delay = datetime.datetime.now() + datetime.timedelta(seconds=delay)
+            timer.name = "Timer for %s timed at %s (%d sek)" % (self, time_after_delay, delay)
             timer.start()
             timers.append(timer)
 
@@ -573,7 +632,8 @@ class IfElse(AbstractCallable):
 
     Usage::
 
-        IfElse(x, y, z) # if x, then run y, else run z, where x, y, and z are Callables or StatusObjects
+        IfElse(x, y, z) # if x, then run y, else run z, where x, y,
+                        # and z are Callables or StatusObjects
         IfElse(x, y)
     """
 
@@ -605,8 +665,9 @@ class Switch(AbstractCallable):
 
     Usage::
 
-        Switch(criterion, choice1, choice2...) # where criteria is integer-valued (Callable or StatusObject etc.)
-                                              # and choice1, 2... are Callables.
+        Switch(criterion, choice1, choice2...) # where criteria is integer-valued
+                                               # (Callable or StatusObject etc.)
+                                               # and choice1, 2... are Callables.
 
         Switch(criterion, {'value1': callable1, 'value2': 'callable2'})
     """
@@ -655,7 +716,8 @@ class Min(AbstractMathematical):
     Usage::
 
         Min(x, y, z...)
-        # where x,y,z are anything that can be evaluated as number (Callables, Statusobjects etc).
+        # where x,y,z are anything that can be
+        # evaluated as number (Callables, Statusobjects etc).
      """
 
     def call(self, caller=None, **kwargs):
@@ -672,7 +734,8 @@ class Max(AbstractMathematical):
     Usage::
 
         Max(x, y, z...)
-        # where x,y,z are anything that can be evaluated as number (Callables, Statusobjects etc).
+        # where x,y,z are anything that can be
+        # evaluated as number (Callables, Statusobjects etc).
     """
 
     def call(self, caller=None, **kwargs):
@@ -689,7 +752,8 @@ class Sum(AbstractMathematical):
     Usage::
 
         Sum(x, y, z...)
-        # where x,y,z are anything that can be evaluated as number (Callables, Statusobjects etc).
+        # where x,y,z are anything that can be
+        # evaluated as number (Callables, Statusobjects etc).
     """
 
     def call(self, caller=None, **kwargs):
@@ -706,7 +770,8 @@ class Product(AbstractMathematical):
     Usage::
 
         Product(x, y, z...)
-        # where x,y,z are anything that can be evaluated as number (Callables, Statusobjects etc).
+        # where x,y,z are anything that can be
+        # evaluated as number (Callables, Statusobjects etc).
 
     """
 
@@ -840,8 +905,13 @@ class Less(AbstractLogical):
     """
 
     def call(self, caller=None, **kwargs):
-        return self.call_eval(self.obj, caller, **kwargs) < self.call_eval(self.value, caller, **kwargs)
-
+        a = self.call_eval(self.obj, caller, **kwargs)
+        b = self.call_eval(self.value, caller, **kwargs)
+        try:
+            rv = a < b
+        except TypeError:
+            rv = False
+        return rv
 
 class More(AbstractLogical):
 
@@ -854,7 +924,13 @@ class More(AbstractLogical):
     """
 
     def call(self, caller=None, **kwargs):
-        return self.call_eval(self.obj, caller, **kwargs) > self.call_eval(self.value, caller, **kwargs)
+        a = self.call_eval(self.obj, caller, **kwargs)
+        b = self.call_eval(self.value, caller, **kwargs)
+        try:
+            rv = a > b
+        except TypeError:
+            rv = False
+        return rv
 
 
 class Value(AbstractLogical):
@@ -863,9 +939,9 @@ class Value(AbstractLogical):
 
     Usage::
 
-        Value(x) # returns value of x. Used to convert StatusObject into Callable, for example,
-                 # if StatusObject status needs to be used directly as a condition of
-                 # Program condition attributes.
+        Value(x) # returns value of x. Used to convert StatusObject into Callable,
+                 # for example, if StatusObject status needs to be used directly
+                 # as a condition of Program condition attributes.
 
     """
     _args = CList
@@ -882,7 +958,7 @@ class AbstractQuery(AbstractCallable):
     """
 
 
-class ReprObject:
+class ReprObject(object):
 
     def __init__(self, name):
         self.name = name
@@ -980,9 +1056,9 @@ class RegexSearch(AbstractCallable):
     """
 
     def call(self, caller=None, **kwargs):
-        matchstring = str(self.call_eval(self.obj, caller, **kwargs))
-        pattern = str(self.call_eval(self.value, caller, **kwargs))
-        match = re.search(matchstring, pattern, re.MULTILINE)
+        pattern = str(self.call_eval(self.obj, caller, **kwargs))
+        searchstring = str(self.call_eval(self.value, caller, **kwargs))
+        match = re.search(pattern, searchstring, re.MULTILINE)
         if match:
             return match.group(self._kwargs.get('group', 1))
         else:
@@ -1012,13 +1088,14 @@ class RegexMatch(AbstractCallable):
     """
 
     def call(self, caller=None, **kwargs):
-        matchstring = self.call_eval(self.obj, caller, **kwargs)
-        pattern = self.call_eval(self.value, caller, **kwargs)
-        match = re.match(matchstring, pattern, re.MULTILINE)
+        pattern = self.call_eval(self.obj, caller, **kwargs)
+        searchstring = self.call_eval(self.value, caller, **kwargs)
+        match = re.match(pattern, searchstring, re.MULTILINE)
         if match:
             return match.group(self._kwargs.get('group', 0))
         else:
             return ''
+
 
 
 class RemoteFunc(AbstractCallable):
@@ -1036,19 +1113,19 @@ class RemoteFunc(AbstractCallable):
         try:
             if self._cached_server is None:
                 host = self.call_eval(self.obj, caller, **kwargs)
-                self._cached_server = server = xmlrpclib.ServerProxy(host)
+                self._cached_server = server = xmlrpc.client.ServerProxy(host)
             else:
                 server = self._cached_server
 
             funcname = self.call_eval(self.value, caller, **kwargs)
             args = [self.call_eval(o, caller, **kwargs) for o in self.objects[2:]]
-            _kwargs = {k: self.call_eval(v, caller, **kwargs) for k, v in self._kwargs.iteritems()}
+            _kwargs = {k: self.call_eval(v, caller, **kwargs) for k, v in list(self._kwargs.items())}
             try:
                 return getattr(server, funcname)(*args, **_kwargs)
-            except xmlrpclib.Fault as e:
-                self.logger.error(
-                    'Could call remote function (%s,%s)(*%s, **%s), error: %s', server, funcname, args, _kwargs, e)
-        except (socket.gaierror, IOError, xmlrpclib.Fault) as e:
+            except (xmlrpc.client.Fault, HTTPException) as e:
+                self.logger.exception(
+                    'Exception occurred in remote function call (%s,%s)(*%s, **%s), error: %s', server, funcname, args, _kwargs, e)
+        except (socket.gaierror, IOError, xmlrpc.client.Fault) as e:
             self.logger.error('Could call remote function, error: %s', e)
 
 

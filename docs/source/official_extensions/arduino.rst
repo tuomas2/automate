@@ -3,8 +3,6 @@
 Arduino Support for Automate
 ============================
 
-Github URL: http://github.com/tuomas2/automate-arduino
-
 Introduction
 ------------
 
@@ -13,15 +11,9 @@ This extension provides interface to Arduino devices via `pyFirmata library <htt
 Installation
 ------------
 
-Install from Pypi::
+Install extras::
 
-    pip install automate-arduino
-
-Optionally, you could install also by cloning GIT repository and installing manually::
-
-    git clone https://github.com/tuomas2/automate-arduino.git
-    cd automate-arduino
-    ./setup.py install
+    pip install automate[arduino]
 
 Example application
 -------------------

@@ -1,0 +1,124 @@
+{% load crispy_forms_tags %}
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>{% block title %}{{ system.name }}{% endblock %}</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="{% static "bootstrap/css/bootstrap.min.css" %}" rel="stylesheet">
+  <link href="{% static "bootstrap/css/bootstrap-slider.css" %}" rel="stylesheet">
+  <script src="{% static "jquery.min.js" %}"></script>
+  <script src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
+  <script src="{% static "bootstrap/js/bootstrap-slider.js" %}"></script>
+  {% block jsscripts %}
+    <script src="{% static "scripts.js" %}"></script>
+  {% endblock %}
+  <!-- Custom styles for this template -->
+  <link href="{% static "style.css" %}" rel="stylesheet">
+  <script>
+    var source = "{{source}}";
+  </script>
+</head>
+
+<body>
+
+<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="{% url 'main' %}">{{ system.name }}</a>
+    </div>
+    <div class="collapse navbar-collapse">
+
+
+      <ul class="nav navbar-nav">
+
+        {% if not service.read_only %}
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+              New <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" role="menu">
+              <li><a href="{% url 'new' 'program' %}?source={{ source }}">Program</a></li>
+              <li><a href="{% url 'new' 'sensor' %}?source={{ source }}">Sensor</a></li>
+              <li><a href="{% url 'new' 'actuator' %}?source={{ source }}">Actuator</a></li>
+            </ul>
+          </li>
+        {% endif %}
+        <li class="dropdown">
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+            View <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu" role="menu">
+
+            {% for name, url, active in views %}
+              <li {% if active %}class="active" {% endif %}>
+                <a href="{% url url %}">{{ name }}</a>
+              </li>
+            {% endfor %}
+          </ul>
+        </li>
+        {% if service.custom_pages %}
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+              Custom <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" role="menu">
+              {% for name in service.custom_pages.keys %}
+                <li>
+                  <a href="{% url 'custom' name %}">{{ name }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+          </li>
+        {% endif %}
+        <li><a href="{% url 'console' %}">Console</a></li>
+        <li><a href="{% url 'threads' %}">Threads</a></li>
+        </i>
+        <li><a href="{% url 'plantuml' %}">UML</a></li>
+        <li><a href="{% url 'logout' %}">Log out</a></li>
+
+      </ul>
+    </div>
+    <!--/.nav-collapse -->
+  </div>
+</div>
+
+<div class="starter-template">
+  <div class="container">
+
+    {% if messages %}
+      <h2 class="messages">Messages from the system</h2>
+      <ul class="messages">
+        {% for message in messages %}
+          <li{% if message.tags %} class="messages {{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </div>
+</div>
+<div class="copyright">
+  Powered by <a href="http://github.com/tuomas2/automate/">Automate</a> {{ automate_version }}
+</div>
+<!-- /.container -->
+<!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script> -->
+
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+</body>
+</html>

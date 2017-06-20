@@ -1,3 +1,7 @@
+from __future__ import unicode_literals
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 # -*- coding: utf-8 -*-
 # (c) 2015 Tuomas Airaksinen
 #
@@ -19,9 +23,9 @@
 # ------------------------------------------------------------------
 #
 # If you like Automate, please take a look at this page:
-# http://python-automate.org/gospel/
+# http://evankelista.net/automate/
 
-import Queue
+import queue
 import logging
 import threading
 
@@ -77,14 +81,14 @@ class StatusWorkerThread(threading.Thread):
         self.logger.debug('Stop set')
 
     def __init__(self, *args, **kwargs):
-        self.queue = Queue.Queue()
+        self.queue = queue.Queue()
         self._stop = False
         self.logger = logging.getLogger('automate.StatusWorkerThread')
         super(StatusWorkerThread, self).__init__(*args, **kwargs)
 
     def manual_flush(self):
         if self.is_alive():
-            self.error('Worker thread is running, cannot flush manually')
+            self.logger.error('Worker thread is running, cannot flush manually')
             return
 
         self.logger.info('Flushing queue manually (worker thread not yet alive)')
