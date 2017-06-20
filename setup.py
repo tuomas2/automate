@@ -2,15 +2,9 @@
 
 from setuptools import setup, find_packages
 
-def get_version(filename):
-    import re
-    with open(filename) as fh:
-        metadata = dict(re.findall("__([a-z]+)__ = '([^']+)'", fh.read()))
-        return metadata['version']
-
 setupopts = dict(
     name="automate",
-    version=get_version('src/automate/__init__.py'),
+    version='0.9.4-dev0',
     packages=find_packages('src'),
     package_dir={'': 'src'},
     install_requires=[
