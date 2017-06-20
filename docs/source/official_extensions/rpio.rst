@@ -31,28 +31,28 @@ Class definitions
 Service
 ^^^^^^^
 
-.. autoclass:: automate_rpio.RpioService
+.. autoclass:: automate.plugins.rpio.RpioService
    :members:
 
 
 Sensors
 ^^^^^^^
 
-.. autoclass:: automate_rpio.RpioSensor
+.. autoclass:: automate.plugins.rpio.RpioSensor
    :members:
 
-.. autoclass:: automate_rpio.RpioSensor
+.. autoclass:: automate.plugins.rpio.RpioSensor
    :members:
 
 Actuators
 ^^^^^^^^^
 
-.. autoclass:: automate_rpio.RpioActuator
+.. autoclass:: automate.plugins.rpio.RpioActuator
    :members:
 
-.. autoclass:: automate_rpio.TemperatureSensor
+.. autoclass:: automate.plugins.rpio.TemperatureSensor
    :members:
 
-.. autoclass:: automate_rpio.RpioPWMActuator
+.. autoclass:: automate.plugins.rpio.RpioPWMActuator
    :members:
 

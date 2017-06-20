@@ -9,7 +9,7 @@ This extension provides Web server for WSGI-aware extensions, such as :ref:`auto
 Class definition
 ----------------
 
-.. autoclass:: automate_wsgi.TornadoService
+.. autoclass:: automate.plugins.wsgi.TornadoService
    :members:
 
 

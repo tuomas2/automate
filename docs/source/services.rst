@@ -10,26 +10,26 @@ There are two kinds of *Services* in Automate: *UserServices* and *SystemService
 
 *SystemServices* are mainly designed to implement a practical way of writing an interface between your
 custom SystemObjects and their corresponding resources (devices for example). For example,
-:class:`~automate_rpio.RpioService`
+:class:`~automate.plugins.rpio.RpioService`
 provide access to Raspberry Pi GPIO pins for
-:class:`~automate_rpio.RpioActuator` and
-:class:`~automate_rpio.RpioSensor` objects,
+:class:`~automate.plugins.rpio.RpioActuator` and
+:class:`~automate.plugins.rpio.RpioSensor` objects,
 and ArduinoService, correspondingly, provides access to Arduino devices for ArduinoActuator and ArduinoSensors.
 (Arduino and RPIO support are provided by extensions, see :ref:`automate-extensions`).
 
 *UserServices*, on the other hand, provide user interfaces to the system. For example,
-:class:`~automate_webui.WebService`
+:class:`~automate.plugins.webui.WebService`
 provides access to the system via web browser,
 :class:`~automate.services.textui.TextUIService`
 via *IPython* shell and
-:class:`~automate_rpc.RpcService`
+:class:`~automate.plugins.rpc.RpcService`
 via XmlRPC (remote procedure call) interface for other applications.
 
 If not automatically loaded (services with :attr:`~automate.service.AbstractService.autoload` set to ``True``),
 they need to be instantiated (contrary to :class:`~automate.systemobject.SystemObject`)
 outside the System, and given in the initialization of the system (:attr:`~automate.system.System.services`).
 For example of initialization and configuring of
-:class:`~automate_webui.WebService`, see :ref:`hello-world`.
+:class:`~automate.plugins.webui.WebService`, see :ref:`hello-world`.
 
 Services Class Definitions
 --------------------------

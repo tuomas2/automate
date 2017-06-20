@@ -7,7 +7,7 @@ Introduction
 ------------
 
 This extension provides XmlRPC API for external applications. Exported API is by default defined by
-:class:`automate_rpc.rpc.ExternalApi`.
+:class:`automate.plugins.rpc.rpc.ExternalApi`.
 
 Installation
 ------------
@@ -19,9 +19,9 @@ Install extras::
 Class definitions
 -----------------
 
-.. autoclass:: automate_rpc.RpcService
+.. autoclass:: automate.plugins.rpc.RpcService
    :members:
 
-.. autoclass:: automate_rpc.rpc.ExternalApi
+.. autoclass:: automate.plugins.rpc.rpc.ExternalApi
    :members:
 

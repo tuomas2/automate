@@ -34,10 +34,10 @@ All Automate components are derived from :class:`~traits.has_traits.HasTraits`, 
 Traits library, which provides automatic notification of attribute changes, which is used
 extensively in Automate. Due to traits, all Automate components are configured by passing
 attribute names as keyword arguments in object initialization (see for example attributes
-:attr:`~automate_arduino.AbstractArduinoActuator.pin`
+:attr:`~automate.plugins.arduino.AbstractArduinoActuator.pin`
 and
-:attr:`~automate_arduino.AbstractArduinoActuator.dev` traits of
-:class:`~automate_arduino.ArduinoDigitalActuator`
+:attr:`~automate.plugins.arduino.AbstractArduinoActuator.dev` traits of
+:class:`~automate.plugins.arduino.ArduinoDigitalActuator`
 in the example below).
 
 Automate system is written by subclassing :class:`~automate.system.System` and adding there desired
@@ -57,8 +57,8 @@ can be explicitly defined as follows::
 
 Some services (those that have :attr:`~automate.service.AbstractService.autoload` atribute set to True)
 do not need to be explicitly defined. For example,
-:class:`~automate_arduino.arduino_service..ArduinoService` would be used automatically
-loaded because of the usage of :class:`~automate_arduino.arduino_actuator.ArduinoDigitalActuator`,
+:class:`~automate.plugins.arduino.arduino_service..ArduinoService` would be used automatically
+loaded because of the usage of :class:`~automate.plugins.arduino.arduino_actuator.ArduinoDigitalActuator`,
 with default settings (``dev='/dev/ttyUSB0'``). Instantiating
 System will launch IPython shell to access the system internals from the command line. This can be prevented, if
 necessary, by defining keyword argument :attr:`~automate.system.System.exclude_services` as
