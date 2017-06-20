@@ -31,8 +31,8 @@ Highlights:
 
 * Supported hardware:
 
-  * Raspberry Pi GPIO input/output ports (``automate-rpio`` extension via `RPIO <http://pythonhosted.org/RPIO/>`_ library)
-  * Arduino analog and digital input/output ports (``automate-arduino`` extension via `pyFirmata <https://github.com/tino/pyFirmata>`_ library)
+  * Raspberry Pi GPIO input/output ports
+  * Arduino analog and digital input/output ports (via `pyFirmata <https://github.com/tino/pyFirmata>`_ library)
   * Easy to write extensions to support other hardware
 
 * System state saving and restoring via serialization
@@ -44,9 +44,9 @@ Highlights:
   * `IPython <http://ipython.org>`_ console to monitor, modify and control system on-the-fly
   * Versatile function/callable library to write state program logic
 
-* RPC and Websocket interfaces (provided by `automate-rpc` and `automate-webui`) to connect
+* RPC and Websocket interfaces to connect
   between other applications or other Automate systems.
-* Comprehensive and customizable Web User Interface via `automate-webui <http://github.com/tuomas2/automate-webui>`_ extension.
+* Comprehensive and customizable Web User Interface
 * UML graphs can be drawn automaticlaly of the system (as can be seen in the examples of this documentation)
 
 .. _hello-world:
@@ -96,18 +96,9 @@ in within virtual environment (see `virtualenv <https://virtualenv.pypa.io/en/la
 
     pip install automate
 
-#. If you want to install some extensions too, you may also run::
+Optionally, you can specify some of the extras, i.e. web, rpc, raspberrypi, arduino::
 
-    pip install automate-webui
-    pip install automate-rpc
-    pip install automate-arduino
-    pip install automate-rpio
-
-Optionally, you could install also by cloning GIT repository and installing manually::
-
-    git clone https://github.com/tuomas2/automate.git
-    cd automate
-    ./setup.py install
+   pip install automate[web,rpc,raspberrypi,arduino]
 
 Licence
 -------
