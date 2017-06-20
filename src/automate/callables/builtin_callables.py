@@ -905,8 +905,13 @@ class Less(AbstractLogical):
     """
 
     def call(self, caller=None, **kwargs):
-        return self.call_eval(self.obj, caller, **kwargs) < self.call_eval(self.value, caller, **kwargs)
-
+        a = self.call_eval(self.obj, caller, **kwargs)
+        b = self.call_eval(self.value, caller, **kwargs)
+        try:
+            rv = a < b
+        except TypeError:
+            rv = False
+        return rv
 
 class More(AbstractLogical):
 
@@ -919,7 +924,13 @@ class More(AbstractLogical):
     """
 
     def call(self, caller=None, **kwargs):
-        return self.call_eval(self.obj, caller, **kwargs) > self.call_eval(self.value, caller, **kwargs)
+        a = self.call_eval(self.obj, caller, **kwargs)
+        b = self.call_eval(self.value, caller, **kwargs)
+        try:
+            rv = a > b
+        except TypeError:
+            rv = False
+        return rv
 
 
 class Value(AbstractLogical):
