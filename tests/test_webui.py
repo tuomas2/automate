@@ -85,10 +85,8 @@ def constants(sys_with_web):
     return Pages
 
 
-def u(url):
-    return urlparse(url).path
-
-def test_web(sys_with_web, constants):
+@pytest.fixture()
+def logged_client(sys_with_web, constants):
     client = Client()
     res = client.get('/')
     assert res.status_code == Http.REDIR
@@ -100,11 +98,8 @@ def test_web(sys_with_web, constants):
     res = client.get(constants.ROOT)
     assert res.status_code == Http.REDIR
     assert u(res.url) == constants.TAGS
-    for p in constants.BASIC_VIEWS:
-        res = client.get(p)
-        assert res.status_code == Http.OK
 
-    # Test logout
+    yield client
 
     res = client.get(constants.LOGOUT)
     for p in constants.BASIC_VIEWS:
@@ -112,3 +107,12 @@ def test_web(sys_with_web, constants):
         assert res.status_code == Http.REDIR
         assert u(res.url).startswith(constants.LOGIN)
 
+
+def u(url):
+    return urlparse(url).path
+
+def test_web(sys_with_web, logged_client, constants):
+
+    for p in constants.BASIC_VIEWS:
+        res = logged_client.get(p)
+        assert res.status_code == Http.OK
