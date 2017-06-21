@@ -63,9 +63,9 @@
           </a>
           <ul class="dropdown-menu" role="menu">
 
-            {% for name, url, active in views %}
+            {% for title, url, active in views %}
               <li {% if active %}class="active" {% endif %}>
-                <a href="{% url url %}">{{ name }}</a>
+                <a href="{{url}}">{{ title }}</a>
               </li>
             {% endfor %}
           </ul>

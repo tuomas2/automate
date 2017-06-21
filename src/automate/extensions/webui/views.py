@@ -49,17 +49,18 @@ def set_globals(_service, _system):
 
 def common_context(request):
     global system, service
-    views = [
+    _views = [
         ('By types', 'system'),
         ('By groups', 'tag_view_only_groups'),
         ('By tags', 'tags_view'),
         ('User editable', 'user_editable_view'),
         ('User defined', 'user_defined_view'),
     ]
-    import automate
-    from automate.extensions import webui
+    current_view = request.resolver_match.view_name
+    views = [(title, reverse(name), name==current_view) for title, name in _views]
+    from automate import __version__
     return {'views': views, 'system': system, 'service': service,
-            'automate_version': automate.__version__}
+            'automate_version': __version__}
 
 
 def get_views(service):

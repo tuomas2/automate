@@ -14,11 +14,11 @@ pyfirmata
 RPIO
 
 #webui
-Django<1.9
-django-crispy-forms~=1.6
+Django
+django-crispy-forms
 
 #wsgi
-tornado~=4.5
+tornado
 
 # testing
 pytest

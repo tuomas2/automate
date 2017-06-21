@@ -123,8 +123,7 @@ class WebService(TornadoService):
             setup_django(DEBUG=self.debug, **self.django_settings)
 
             from django.conf import settings
-            settings.TEMPLATE_CONTEXT_PROCESSORS = settings.TEMPLATE_CONTEXT_PROCESSORS + \
-                ('automate.extensions.webui.views.common_context',)
+            settings.TEMPLATES[0]['OPTIONS']['context_processors'] += ['automate.extensions.webui.views.common_context']
             set_globals(self, self.system)
             get_views(self)
         super(WebService, self).setup()
@@ -249,9 +248,9 @@ class WebService(TornadoService):
                 except WebSocketClosedError:
                     pass
 
-    def update_sockets(self, obj, name, old, new):
+    def update_sockets(self, obj, attribute, old, new):
         if isinstance(obj, StatusObject):
-            self.logger.debug('Update_sockets %s %s %s %s', obj, name, old, new)
+            self.logger.debug('Update_sockets %s %s %s %s', obj, attribute, old, new)
             for s in self._sockets:
                 if s.last_message and (s.last_message < datetime.datetime.now()
                                        - datetime.timedelta(seconds=self.websocket_timeout)):
@@ -260,13 +259,13 @@ class WebService(TornadoService):
                     s.close(code=1000, reason='Timeout')
                     continue
                 if obj.name in s.subscribed_objects:
-                    if name == 'program_status_items' and self.show_actuator_details:
+                    if attribute == 'program_status_items' and self.show_actuator_details:
                         new_actuator_html = render_to_string(
                             'rows/actuator_row.html', dict(actuator=obj, source='__SOURCE__', service=self))
                         s.write_json(action='update_actuator', name=obj.name, html=new_actuator_html)
-                    elif name == 'active':
+                    elif attribute == 'active':
                         s.write_json(action='program_active', name=obj.name, active=obj.active)
-                    elif name in ['status', 'changing']:
+                    elif attribute in ['status', 'changing']:
                         s.write_json(action='object_status',
                                      name=obj.name,
                                      status=obj.status,

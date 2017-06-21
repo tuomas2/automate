@@ -27,6 +27,7 @@ import logging
 
 from django import template
 from django.core.urlresolvers import reverse
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 
 from automate.statusobject import StatusObject
@@ -82,7 +83,7 @@ def program_active(obj):
 def row_attrs(context, name, prefix=""):
     source = context['source']
     url = reverse('info_panel', args=(name,))
-    return 'data-url="{url}?source={source}" data-name="{name}"'.format(
+    return format_html('data-url="{url}?source={source}" data-name="{name}"',
         name=name,
         url=url,
         source=source,
