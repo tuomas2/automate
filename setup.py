@@ -12,20 +12,20 @@ setupopts = dict(
     install_requires=[
         "ansiconv",
         "colorlog",
-        "croniter~=0.3",
+        "croniter~=0.3.0",
         "future",
         "ipython<6.0",
         "pyinotify",
-        "traits~=4.6",
+        "traits~=4.6.0",
         ],
     extras_require={
         'web':
             [
-                "Django~=1.9",
-                "django-crispy-forms~=1.6",
-                "tornado~=4.5",
+                "Django~=1.9.0",
+                "django-crispy-forms~=1.6.0",
+                "tornado~=4.5.0",
             ],
-        'rpc': ['tornado~=4.5'],
+        'rpc': ['tornado~=4.5.0'],
         'raspberrypi': ['RPIO'],
         'arduino': ['pyfirmata'],
     },
