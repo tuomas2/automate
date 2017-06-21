@@ -1,7 +1,7 @@
 # automate core
 ansiconv
 colorlog
-croniter~=0.3
+croniter~=0.3.0
 future
 ipython<6.0
 pyinotify

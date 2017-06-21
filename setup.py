@@ -21,7 +21,7 @@ setupopts = dict(
     extras_require={
         'web':
             [
-                "Django~=1.9.0",
+                "Django~=1.11.0",
                 "django-crispy-forms~=1.6.0",
                 "tornado~=4.5.0",
             ],
