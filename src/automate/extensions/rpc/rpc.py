@@ -21,7 +21,7 @@ from builtins import object
 from . import wsgi_xmlrpc
 from traits.api import CSet, Str, Any
 
-from automate.plugins.wsgi.abstractwsgi import TornadoService
+from automate.extensions.wsgi.abstractwsgi import TornadoService
 
 
 class ExternalApi(object):

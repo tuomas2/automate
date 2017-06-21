@@ -80,6 +80,6 @@ in 8086. It will go to UML view by default and in "User defined" -view you will 
 WebService class definition
 ---------------------------
 
-.. autoclass:: automate.plugins.webui.WebService
+.. autoclass:: automate.extensions.webui.WebService
    :members:
 

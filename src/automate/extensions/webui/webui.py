@@ -37,7 +37,7 @@ from tornado.websocket import WebSocketHandler, WebSocketClosedError
 from traits.api import CBool, Tuple, Int, Str, CSet, List, CInt, Dict, Unicode
 from automate.statusobject import StatusObject
 from django.core.wsgi import get_wsgi_application
-from automate.plugins.wsgi import TornadoService
+from automate.extensions.wsgi import TornadoService
 from .microdjango import setup_django
 from .views import get_views, set_globals
 
@@ -124,7 +124,7 @@ class WebService(TornadoService):
 
             from django.conf import settings
             settings.TEMPLATE_CONTEXT_PROCESSORS = settings.TEMPLATE_CONTEXT_PROCESSORS + \
-                ('automate.plugins.webui.views.common_context',)
+                ('automate.extensions.webui.views.common_context',)
             set_globals(self, self.system)
             get_views(self)
         super(WebService, self).setup()

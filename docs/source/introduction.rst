@@ -48,9 +48,9 @@ Let us consider following short Automate program as a first example:
 
 This simple example has two sensors ``hardware_switch``, ``web_switch``, actuator (``lamp``) and a ``program`` that
 contains logic what to do and when. Here, ``lamp`` is switched on if either ``web_switch`` or ``hardware_switch`` has
-status True. :class:`~automate.plugins.webui.webui.WebService` with default settings is enabled so that user can
+status True. :class:`~automate.extensions.webui.webui.WebService` with default settings is enabled so that user can
 monitor system and set
-status of ``web_switch``. The following figure (generated via :class:`~automate.plugins.webui.webui.WebService` interface)
+status of ``web_switch``. The following figure (generated via :class:`~automate.extensions.webui.webui.WebService` interface)
 illustrates the system in UML graph:
 
 .. image:: images/hello_world.svg

@@ -61,10 +61,10 @@ setupopts = dict(
                  "Topic :: Software Development :: Libraries :: Application Frameworks",
                  ],
     entry_points={'automate.extension': [
-        'arduino = automate.plugins.arduino:extension_classes',
-        'rpc = automate.plugins.rpc:extension_classes',
-        'rpio = automate.plugins.rpio:extension_classes',
-        'webui = automate.plugins.webui:extension_classes',
+        'arduino = automate.extensions.arduino:extension_classes',
+        'rpc = automate.extensions.rpc:extension_classes',
+        'rpio = automate.extensions.rpio:extension_classes',
+        'webui = automate.extensions.webui:extension_classes',
     ]
 },
 

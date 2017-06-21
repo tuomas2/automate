@@ -32,33 +32,33 @@ Class definitions
 Service
 ^^^^^^^
 
-.. autoclass:: automate.plugins.arduino.ArduinoService
+.. autoclass:: automate.extensions.arduino.ArduinoService
    :members:
 
 Sensors
 ^^^^^^^
 
-.. autoclass:: automate.plugins.arduino.AbstractArduinoSensor
+.. autoclass:: automate.extensions.arduino.AbstractArduinoSensor
    :members:
 
-.. autoclass:: automate.plugins.arduino.ArduinoDigitalSensor
+.. autoclass:: automate.extensions.arduino.ArduinoDigitalSensor
    :members:
 
-.. autoclass:: automate.plugins.arduino.ArduinoAnalogSensor
+.. autoclass:: automate.extensions.arduino.ArduinoAnalogSensor
    :members:
 
 
 Actuators
 ^^^^^^^^^
 
-.. autoclass:: automate.plugins.arduino.AbstractArduinoActuator
+.. autoclass:: automate.extensions.arduino.AbstractArduinoActuator
    :members:
 
-.. autoclass:: automate.plugins.arduino.ArduinoDigitalActuator
+.. autoclass:: automate.extensions.arduino.ArduinoDigitalActuator
    :members:
 
-.. autoclass:: automate.plugins.arduino.ArduinoPWMActuator
+.. autoclass:: automate.extensions.arduino.ArduinoPWMActuator
    :members:
 
-.. autoclass:: automate.plugins.arduino.ArduinoServoActuator
+.. autoclass:: automate.extensions.arduino.ArduinoServoActuator
    :members:

@@ -21,7 +21,7 @@ from django.test import Client
 from future.backports.urllib.parse import urlparse
 
 from automate import *
-from automate.plugins.webui import WebService
+from automate.extensions.webui import WebService
 
 
 @pytest.fixture()

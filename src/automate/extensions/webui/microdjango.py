@@ -76,7 +76,7 @@ def setup_django(**kwargs):
             INSTALLED_APPS=['crispy_forms',
                             'django.contrib.staticfiles',
                             'django.contrib.messages',
-                            'automate.plugins.webui',
+                            'automate.extensions.webui',
                             ],
 
             STATIC_URL='/static/',
