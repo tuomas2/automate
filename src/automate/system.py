@@ -518,8 +518,12 @@ class System(SystemBase):
 from . import services, sensors, actuators, callables
 print('Loading extensions')
 for entry_point in pkg_resources.iter_entry_points('automate.extension'):
-    print('Loading extension %s' % entry_point)
-    ext_classes = entry_point.load(require=False)
+    print('Trying to load extension %s' % entry_point)
+    try:
+        ext_classes = entry_point.load(require=False)
+    except ImportError:
+        print('Loading extension %s failed. Perhaps missing requirements? Skipping.' % entry_point)
+        continue
     for ext_class in ext_classes:
         print('... %s' % ext_class.__name__)
         if issubclass(ext_class, AbstractService):
