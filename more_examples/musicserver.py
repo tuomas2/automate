@@ -478,7 +478,7 @@ if __name__ == '__main__':
     s = MusicServer.load_or_create('musicserver.dmp',
                                    services=[
                                        WebService(
-                                           http_port=8080,
+                                           http_port=int(os.getenv('HTTP_PORT', 8080)),
                                            http_auth=(os.getenv('AUTOMATE_USERNAME', 'test'), os.getenv('AUTOMATE_PASSWORD', 'test')),
                                            debug=False if is_raspi() else True,
                                            user_tags={'web'}, default_view='user_editable_view',
@@ -493,6 +493,6 @@ if __name__ == '__main__':
                                        RpcService(http_port=3031, view_tags={'web'}),
                                    ],
                                    logfile='music_server.log' if is_raspi() else '',
-                                   print_level=logging.INFO,
+                                   print_level=logging.INFO if is_raspi() else logging.DEBUG,
                                    log_level=logging.WARNING,
                                    )
