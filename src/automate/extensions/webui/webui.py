@@ -157,7 +157,9 @@ class WebService(TornadoService):
                 return True
 
             def write_json(self, **kwargs):
-                self.write_message(json.dumps(kwargs))
+                msg = json.dumps(kwargs)
+                service.logger.debug('Sending to client %s', msg)
+                self.write_message(msg)
 
             def open(self):
                 self.session_id = session_id = getattr(self.request.cookies.get('sessionid', None), 'value', None)
