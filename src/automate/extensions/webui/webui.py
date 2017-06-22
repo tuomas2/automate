@@ -35,12 +35,11 @@ import tornado.web
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
 
 from traits.api import CBool, Tuple, Int, Str, CSet, List, CInt, Dict, Unicode
+
+from automate.extensions.webui.djangoapp.views import set_globals
 from automate.statusobject import StatusObject
 from django.core.wsgi import get_wsgi_application
 from automate.extensions.wsgi import TornadoService
-from .microdjango import setup_django
-from .views import get_views, set_globals
-
 
 class WebService(TornadoService):
 
@@ -120,12 +119,16 @@ class WebService(TornadoService):
 
     def setup(self):
         if not self.slave:
-            setup_django(DEBUG=self.debug, **self.django_settings)
-
+            os.environ['DJANGO_SETTINGS_MODULE'] = 'automate.extensions.webui.settings'
             from django.conf import settings
-            settings.TEMPLATES[0]['OPTIONS']['context_processors'] += ['automate.extensions.webui.views.common_context']
+            settings.DEBUG = self.debug
+            if not 'SECRET_KEY' in self.django_settings:
+                self.logger.warning('Insecure settings! Please set proper SECRET_KEY in django_settings!')
+            for key, value in self.django_settings.items():
+                setattr(settings, key, value)
+
             set_globals(self, self.system)
-            get_views(self)
+
         super(WebService, self).setup()
         if not self.slave:
             self.system.request_service('LogStoreService').on_trait_change(self.push_log, 'most_recent_line')

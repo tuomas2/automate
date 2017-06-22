@@ -25,6 +25,7 @@ setupopts = dict(
                 "Django~=1.11.0",
                 "django-crispy-forms~=1.6.0",
                 "tornado~=4.5.0",
+#                "whitenoise",
             ],
         'rpc': ['tornado~=4.5.0'],
         'raspberrypi': ['RPi.GPIO'],

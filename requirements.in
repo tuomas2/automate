@@ -16,6 +16,7 @@ RPIO
 #webui
 Django
 django-crispy-forms
+#whitenoise
 
 #wsgi
 tornado

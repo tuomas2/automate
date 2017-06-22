@@ -7,4 +7,4 @@ include *.txt
 recursive-exclude docs
 
 recursive-include src/automate/extensions/webui/static *.*
-recursive-include src/automate/extensions/webui/templates *.html
+recursive-include src/automate/extensions/webui/djangoapp/templates *.html
