@@ -6,3 +6,12 @@
 
 0.10.3 (2017-06-22)
 -------------------
+
+- Added support for RPI.GPIO which is now default.
+  If RPIO is desired, set rpio attribute in RpioService.
+
+0.10.0
+------
+
+- Python 3 support
+- Merged extensions (webui, rpio, arduino, rpc) into main repository
