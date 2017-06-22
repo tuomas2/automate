@@ -1,0 +1,10 @@
+
+0.10
+
+- Python 3 support
+- Merged extensions (webui, rpio, arduino, rpc) into main repository
+
+0.10.3
+
+- Added support for RPI.GPIO which is now default.
+  If RPIO is desired, set rpio attribute in RpioService.
