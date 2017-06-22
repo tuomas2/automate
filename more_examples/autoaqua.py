@@ -473,5 +473,5 @@ s = autoaqua.load_or_create(
     ],
     print_level=logging.INFO,
     log_level=logging.INFO,
-    logfile="autoaqualog.txt",
+    logfile="autoaqua.log",
 )
