@@ -38,6 +38,9 @@ class AbstractArduinoActuator(AbstractActuator):
 
     _arduino = Instance(AbstractSystemService, transient=True)
 
+    view = AbstractActuator.view + ["pin"]
+    simple_view = AbstractActuator.simple_view + ["pin"]
+
     def setup(self, *args, **kwargs):
         super(AbstractArduinoActuator, self).setup(*args, **kwargs)
         self._arduino = self.system.request_service('ArduinoService')
