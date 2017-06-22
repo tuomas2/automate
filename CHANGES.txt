@@ -1,4 +1,4 @@
-0.10.6 (unreleased)
+0.10.6 (2017-06-23)
 -------------------
 
 - Fixed regression (SystemObject comparison)
