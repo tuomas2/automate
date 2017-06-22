@@ -26,7 +26,8 @@ setupopts = dict(
                 "tornado~=4.5.0",
             ],
         'rpc': ['tornado~=4.5.0'],
-        'raspberrypi': ['RPIO'],
+        'raspberrypi': ['RPi.GPIO'],
+        'rpio': ['RPIO'],
         'arduino': ['pyfirmata'],
     },
 
