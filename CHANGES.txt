@@ -1,7 +1,8 @@
 0.10.4 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Change web implementation to conform more to ordinary Django app style
+- Add some real-life examples in more_examples/
 
 
 0.10.3 (2017-06-22)

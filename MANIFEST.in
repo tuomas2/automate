@@ -1,10 +1,12 @@
 include LICENCE.txt
-include examples/*.py
 include tests/*.py
 
 include *.in
 include *.txt
-recursive-exclude docs
 
 recursive-include src/automate/extensions/webui/static *.*
 recursive-include src/automate/extensions/webui/djangoapp/templates *.html
+
+recursive-exclude docs *
+recursive-exclude examples *
+recursive-exclude more_examples *
