@@ -56,7 +56,7 @@ def common_context(request):
         ('User defined', 'user_defined_view'),
     ]
     current_view = request.resolver_match.view_name
-    views = [(title, reverse(name), name==current_view) for title, name in _views]
+    views = [(title, reverse(name), name == current_view) for title, name in _views]
     from automate import __version__
     return {'views': views, 'system': system, 'service': service,
             'automate_version': __version__}
@@ -67,9 +67,11 @@ def require_login(func):
     def wrapped(request, *args, **kwargs):
         if not request.session.get('logged_in', False):
             service.system.logger.debug('Require login')
-            return HttpResponseRedirect(reverse('login') + '?%s' % urlencode({'url': request.META['PATH_INFO']}))
+            return HttpResponseRedirect(
+                reverse('login') + '?%s' % urlencode({'url': request.META['PATH_INFO']}))
         service.system.flush()
         return func(request, *args, **kwargs)
+
     return wrapped
 
 
@@ -95,9 +97,11 @@ def login(request):
 def main(request):
     return HttpResponseRedirect(reverse(service.default_view))
 
+
 def logout(request):
     request.session['logged_in'] = False
     return HttpResponseRedirect('login')
+
 
 @require_login
 def custom(request, name):
@@ -107,15 +111,18 @@ def custom(request, name):
     except KeyError:
         raise Http404
 
+
 @require_login
 def puml_svg(request):
     svg = service.system.request_service('PlantUMLService').write_svg()
     return HttpResponse(content=svg, content_type='image/svg+xml')
 
+
 @require_login
 def puml_raw(request):
     puml = service.system.request_service('PlantUMLService').write_puml()
     return HttpResponse(content=puml, content_type='text/plain')
+
 
 @require_login
 def plantuml(request):
@@ -124,15 +131,18 @@ def plantuml(request):
                                                    'puml_service': puml_service,
                                                    })
 
+
 @require_login
 def system_view(request):
     return render(request, 'views/system.html', {'source': 'system'})
+
 
 @require_login
 def threads(request):
     threads = [t.name for t in threading.enumerate()]
     threads.sort()
     return render(request, 'views/threads.html', {'threads': threads})
+
 
 @require_login
 def single_tag(request, tag):
@@ -142,8 +152,10 @@ def single_tag(request, tag):
     return render(request, 'views/single_tag_view.html',
                   {'source': 'tags_view', 'objs': objs, 'tag': tag})
 
+
 @require_login
-def tags_view(request, template='', only_user_editable=False, only_user_defined=False, only_groups=False):
+def tags_view(request, template='', only_user_editable=False, only_user_defined=False,
+              only_groups=False):
     groups = {}
     if only_user_editable:
         objs = (i for i in service.system.objects_sorted if getattr(i, 'user_editable', False))
@@ -163,23 +175,29 @@ def tags_view(request, template='', only_user_editable=False, only_user_defined=
 
     gitems = sorted(groups.items())
     l = len(gitems)
-    g1 = gitems[:int(l/3) + 1]
-    g2 = gitems[int(l/3) + 1:2 * int(l/3) + 1]
-    g3 = gitems[2 * int(l/3) + 1:]
+    g1 = gitems[:int(l / 3) + 1]
+    g2 = gitems[int(l / 3) + 1:2 * int(l / 3) + 1]
+    g3 = gitems[2 * int(l / 3) + 1:]
     return render(request, 'views/tag_view.html' if not template else template,
-                  {'source': 'user_editable_view' if only_user_editable else 'tags_view', 'groups': [g1, g2, g3]})
+                  {'source': 'user_editable_view' if only_user_editable else 'tags_view',
+                   'groups': [g1, g2, g3]})
+
 
 @require_login
 def user_editable_view(request):
     return tags_view(request, template='views/user_editable_view.html', only_user_editable=True)
 
+
 @require_login
 def user_defined_view(request):
-    return tags_view(request, template='views/user_defined_view.html', only_groups=True, only_user_defined=True)
+    return tags_view(request, template='views/user_defined_view.html', only_groups=True,
+                     only_user_defined=True)
+
 
 @require_login
 def tag_view_only_groups(request):
     return tags_view(request, template='views/only_groups.html', only_groups=True)
+
 
 @require_login
 def info_panel(request, name):
@@ -199,17 +217,20 @@ def info_panel(request, name):
                        getattr(obj, i)) for i in view_items
                       if (not i.endswith('_str')
                           and i not in ['tags', 'name', 'priority', 'status']
-                          and (getattr(obj, i, None) or type(getattr(obj, i, None)) in (int, float)))]
+                          and (
+                          getattr(obj, i, None) or type(getattr(obj, i, None)) in (int, float)))]
 
         callables = ((i.capitalize().replace('_', ' '), i) for i in obj.callables)
 
         textform = TextForm({'status': obj.status, 'name': obj.name},
                             source=source) if obj.data_type in ['str', 'unicode'] else None
 
-        return render(request, 'info_panel.html', {'i': obj, 'source': source, 'info_items': info_items,
-                                                   'callables': callables, 'textform': textform})
+        return render(request, 'info_panel.html',
+                      {'i': obj, 'source': source, 'info_items': info_items,
+                       'callables': callables, 'textform': textform})
     else:
         raise Http404
+
 
 @require_login
 def toggle_sensor(request, sensorname):
@@ -225,6 +246,7 @@ def toggle_sensor(request, sensorname):
     service.system.flush()
     return HttpResponseRedirect(reverse(source))
 
+
 @require_login
 def toggle_value(request, name):
     """
@@ -238,6 +260,7 @@ def toggle_value(request, name):
         return HttpResponseRedirect(reverse('set_ready', args=(name, new_status)))
     else:
         return set_ready(request, name, new_status)
+
 
 @require_login
 def set_value(request, name, value):
@@ -253,9 +276,11 @@ def set_value(request, name, value):
     else:
         return set_ready(request, name, value)
 
+
 @require_login
 def set_ready(request, name, value):
     return render(request, 'views/toggle.html', {'name': name, 'status': value})
+
 
 @require_login
 def edit(request, name=None, type=None, cont=False):
@@ -293,14 +318,16 @@ def edit(request, name=None, type=None, cont=False):
             if name:
                 return HttpResponseRedirect(reverse(source))
             else:
-                return HttpResponseRedirect(reverse('continue_edit', args=(type, form.instance.name,))
-                                            + '?source=%s' % source)
+                return HttpResponseRedirect(
+                    reverse('continue_edit', args=(type, form.instance.name,))
+                    + '?source=%s' % source)
     else:
         form = FormType(request=request)
         form.setup_system(service.system)
         form.load(name)
     return render(request, 'edit_object.html', {'type': type, 'editform': form,
                                                 "continue_edit": cont, 'source': source})
+
 
 @require_login
 def continue_edit(request, type, name):
@@ -309,12 +336,14 @@ def continue_edit(request, type, name):
         raise Http404
     return edit(request, type=type, name=name, cont=True)
 
+
 @require_login
 def new(request, type):
     if service.read_only:
         service.logger.warning("Could not perform operation: read only mode enabled")
         raise Http404
     return edit(request, type=type, name=None)
+
 
 @require_login
 def console(request):
@@ -333,6 +362,7 @@ def console(request):
 
     log = mark_safe(service.system.request_service('LogStoreService').lastlog(lines=100))
     return render(request, 'views/console.html', dict(log=log, cmdform=cmdform, textarea=textarea))
+
 
 @require_login
 def set_status(request):

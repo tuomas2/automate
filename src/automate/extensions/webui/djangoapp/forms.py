@@ -39,25 +39,25 @@ fieldtypes = {int: forms.IntegerField, float: forms.FloatField, bool: forms.Bool
 
 
 class TextForm(forms.Form):
-
     """
     Larger text edit form shown in info panel for user_editable text objects
     """
     name = forms.CharField(widget=forms.HiddenInput())
-    status = forms.CharField(widget=forms.Textarea(attrs={'rows': 2, 'class': 'mytextbox'}), required=False)
+    status = forms.CharField(widget=forms.Textarea(attrs={'rows': 2, 'class': 'mytextbox'}),
+                             required=False)
 
     def __init__(self, data=None, source='', **kwargs):
         super(TextForm, self).__init__(data, **kwargs)
         from crispy_forms.helper import FormHelper
         from crispy_forms.layout import Layout, Submit
         self.helper = FormHelper()
-        self.helper.layout = Layout('name', 'status', Submit('set_status', 'Set', css_class='textform_submit'))
+        self.helper.layout = Layout('name', 'status',
+                                    Submit('set_status', 'Set', css_class='textform_submit'))
         self.helper.form_class = "form-horizontal"
         self.helper.form_action = reverse('set_status') + '?source=%s' % source
 
 
 class QuickEdit(forms.Form):
-
     """
     Small quick edit forms that are used in main views to edit object statuses
     """
@@ -91,11 +91,12 @@ class NumericQuickEdit(QuickEdit):
             if self.num_type is int:
                 field.step = 1
             else:
-                field.step = (sensor.value_max - sensor.value_min)/10000.
+                field.step = (sensor.value_max - sensor.value_min) / 10000.
 
             self.helper.layout = Layout('name', Field('status', template='slider.html'))
         else:
-            self.helper.layout = Layout('name', FieldWithButtons('status', Submit('set_status', '>')))
+            self.helper.layout = Layout('name',
+                                        FieldWithButtons('status', Submit('set_status', '>')))
 
 
 class IntQuickEdit(NumericQuickEdit):
@@ -115,11 +116,12 @@ class StrQuickEdit(QuickEdit):
 class BoolQuickEdit(QuickEdit):
     status = forms.BooleanField()
 
-QUICK_EDITS = dict(str=StrQuickEdit, unicode=StrQuickEdit, int=IntQuickEdit, float=FloatQuickEdit, bool=BoolQuickEdit)
+
+QUICK_EDITS = dict(str=StrQuickEdit, unicode=StrQuickEdit, int=IntQuickEdit, float=FloatQuickEdit,
+                   bool=BoolQuickEdit)
 
 
 class BaseForm(forms.Form):
-
     """
     Base crispy form for full-page forms such as LoginForm and SystemObjectForms
     """
@@ -142,7 +144,7 @@ class LoginForm(BaseForm):
     def clean(self):
         cleaned_data = super(LoginForm, self).clean()
         if (cleaned_data.get('username') != self.auth[0]
-                or cleaned_data.get('password') != self.auth[1]):
+            or cleaned_data.get('password') != self.auth[1]):
             raise forms.ValidationError('Username or password is not correct', code='invalid')
         return cleaned_data
 
@@ -187,7 +189,8 @@ class SystemObjectForm(BaseForm):
                 try:
                     setattr(obj, key, value)
                 except Exception as e:
-                    messages.error(self.request, 'Error was caught when trying to set %s: %s' % (key, e))
+                    messages.error(self.request,
+                                   'Error was caught when trying to set %s: %s' % (key, e))
 
     def clean_name(self):
         name = self.cleaned_data['name']
@@ -239,8 +242,9 @@ class ProgramForm(SystemObjectForm):
                 elif isinstance(cll, set):
                     val = repr(set(cll))
 
-                self.fields[key] = forms.CharField(initial=val, required=False,
-                                                   widget=forms.Textarea(attrs=dict(rows=val.count('\n') + 1)))
+                self.fields[key] = forms.CharField(
+                    initial=val, required=False,
+                    widget=forms.Textarea(attrs=dict(rows=val.count('\n') + 1)))
         super(ProgramForm, self).load(programname)
 
     def clean(self):
@@ -251,7 +255,8 @@ class ProgramForm(SystemObjectForm):
             for key in obj.callables + ['triggers', 'exclude_triggers']:
                 if key in self.changed_data:
                     try:
-                        LogicStr().validate(list(self.system.programs)[0], None, self.cleaned_data[key])
+                        LogicStr().validate(list(self.system.programs)[0], None,
+                                            self.cleaned_data[key])
                     except TraitError:
                         self.add_error(key, 'Invalid value')
 
@@ -309,12 +314,13 @@ class StatusObjectForm(ProgramForm):
 
     @property
     def types(self):
-        return sorted([key for key, value in self.module.__dict__.items()
-                       if isinstance(value, type) and issubclass(value, self.abstract_class) and not key.startswith('Abstract')])
+        return sorted(
+            [key for key, value in self.module.__dict__.items()
+             if isinstance(value, type) and issubclass(value, self.abstract_class)
+             and not key.startswith('Abstract')])
 
 
 class SensorForm(StatusObjectForm):
-
     @property
     def abstract_class(self):
         from automate.statusobject import AbstractSensor
@@ -327,7 +333,6 @@ class SensorForm(StatusObjectForm):
 
 
 class ActuatorForm(StatusObjectForm):
-
     @property
     def abstract_class(self):
         from automate.statusobject import AbstractActuator
@@ -337,5 +342,6 @@ class ActuatorForm(StatusObjectForm):
     def module(self):
         import automate.actuators
         return automate.actuators
+
 
 FORMTYPES = dict(program=ProgramForm, sensor=SensorForm, actuator=ActuatorForm)
