@@ -22,21 +22,21 @@
 # http://evankelista.net/automate/
 
 from __future__ import unicode_literals
-from builtins import bytes
 
 import datetime
+from builtins import bytes
 
 from future import standard_library
 
 standard_library.install_aliases()
-
-from http.client import HTTPException
 
 import re
 import threading
 import xmlrpc.client
 import socket
 import subprocess
+
+from http.client import HTTPException
 
 from traits.api import (CList, Any, Property, Set, Bool, Event, CBool, on_trait_change, cached_property)
 
