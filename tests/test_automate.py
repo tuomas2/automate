@@ -154,6 +154,7 @@ from automate.common import Lock
 
 
 def test_lock(sysloader):
+    # TODO: check why this is not robust (see https://travis-ci.org/tuomas2/automate/jobs/245711227)
     class mysys(System):
         prg = UserIntSensor()
     s = sysloader.new_system(mysys)
