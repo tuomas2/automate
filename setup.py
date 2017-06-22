@@ -17,6 +17,7 @@ setupopts = dict(
         "ipython<6.0",
         "pyinotify",
         "traits~=4.6.0",
+        "mock",
         ],
     extras_require={
         'web':

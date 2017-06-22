@@ -14,9 +14,3 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Automate.  If not, see <http://www.gnu.org/licenses/>.
-
-from .arduino import *
-from .rpc import *
-from .rpio import *
-from .webui import *
-from .wsgi import *
