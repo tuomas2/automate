@@ -110,6 +110,10 @@ Optionally, you can specify some of the extras, i.e. web, rpc, raspberrypi, ardu
 
    pip install automate[web,rpc,raspberrypi,arduino]
 
+or if you want them all::
+
+   pip install automate[all]
+
 Licence
 -------
 
