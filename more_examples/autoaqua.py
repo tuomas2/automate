@@ -436,7 +436,8 @@ tornado.log.access_log.setLevel(logging.WARNING)
 
 web = WebService(
         http_port=8080,
-        http_auth=(os.getenv('AUTOMATE_USERNAME', 'test'), os.getenv('AUTOMATE_PASSWORD', 'test'),
+        http_auth=(os.getenv('AUTOMATE_USERNAME', 'test'),
+                   os.getenv('AUTOMATE_PASSWORD', 'test'),
         ),
         debug = not is_raspi(),
         user_tags={'web'},
@@ -461,15 +462,16 @@ rpcs = RpcService(
     )
 
 
-s = autoaqua.load_or_create(filename='akvadumppi.dmp',
-                            services=[
-                                web,
-                                ard,
-                                rpcs,
-                                PlantUMLService(url='http://www.plantuml.com/plantuml/svg/'),
-                                StatusSaverService(),
-                            ],
-                            print_level=logging.INFO,
-                            log_level=logging.INFO,
-                            logfile="autoaqualog.txt",
-                            )
+s = autoaqua.load_or_create(
+    filename='akvadumppi.dmp',
+    services=[
+        web,
+        ard,
+        rpcs,
+        PlantUMLService(url='http://www.plantuml.com/plantuml/svg/'),
+        StatusSaverService(),
+    ],
+    print_level=logging.INFO,
+    log_level=logging.INFO,
+    logfile="autoaqualog.txt",
+)

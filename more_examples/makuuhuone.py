@@ -1,7 +1,7 @@
 # encoding:utf-8
 from __future__ import unicode_literals
 from automate import *
-from automate.extensions.arduino import ArduinoPWMActuator
+from automate.extensions.arduino import ArduinoPWMActuator, ArduinoDigitalActuator
 from automate.extensions.webui import WebService
 import time
 import os
@@ -21,20 +21,7 @@ def is_raspi():
     return platform.node() in ["raspi1", "raspi2", "raspi3"]
 
 
-def lirc_filter(line):
-    code, num, key, remote = line.split(' ')
-    return key
-
-
-class IsRaspi(SystemObject):
-
-    def call(self, caller, **kwargs):
-        return is_raspi()
-
-
 class Makuuhuone(System):
-    israspi = IsRaspi()
-
     class Commands(Group):
         tags = 'web'
         reload_arduino = UserEventSensor(
@@ -44,38 +31,21 @@ class Makuuhuone(System):
             on_activate=ReloadService('WebService'),
         )
 
-#    class In(Group):
-#        lirc_sensor = ShellSensor(cmd='irw', filter=lirc_filter, default='', reset_delay=0.3,
-#            active_condition=Value('lirc_sensor'),
-#            on_update=Switch('lirc_sensor',
-#                    {'KEY_GREEN': SetStatus('start', 1),
-#                     'KEY_YELLOW': SetStatus('radiodei', 1),
-#                     'KEY_BLUE': SetStatus('radiopatmos', 1),
-#                     'KEY_RED': SetStatus('stop', 1),
-#                     'KEY_7': SetStatus('preset1', 1),
-#                     'KEY_8': SetStatus('preset2', 1),
-#                     'KEY_9': SetStatus('preset3', 1),
-#                     'KEY_VOLUMEUP': SetStatus('volume', Value('volume')+1),
-#                     'KEY_VOLUMEDOWN': SetStatus('volume', Value('volume')-1),
-#                     'KEY_0': SetStatus('switch_off', 1),
-#                     'KEY_SHUFFLE': SetStatus('fade_out', 1),
-#                     'F_POWER': Shell('reboot'),
-#                    }
-#                ),
-#        )
-
     class Lamps(Group):
-        warm_lamp_out = ArduinoPWMActuator(dev=0, pin=9, default=0.)
-        cold_lamp_out = ArduinoPWMActuator(dev=0, pin=10, default=0.)
+        testpin = ArduinoDigitalActuator(dev=0, pin=13, default=False)
+        testpin_toggle = UserBoolSensor(on_update=SetStatus('testpin', 'testpin_toggle'))
 
-        warm_preset1 = UserFloatSensor(value_min=0., value_max=1., default=0.5)
-        cold_preset1 = UserFloatSensor(value_min=0., value_max=1., default=1.)
+        cold_lamp_out = ArduinoPWMActuator(dev=0, pin=5, default=0.) # 5,6 60kHz
+        warm_lamp_out = ArduinoPWMActuator(dev=0, pin=9, default=0.) # 9,10 30 kHz
 
-        warm_preset2 = UserFloatSensor(value_min=0., value_max=1., default=1.)
-        cold_preset2 = UserFloatSensor(value_min=0., value_max=1., default=0.)
+        warm_preset1 = UserFloatSensor(value_min=0., value_max=1., default=.8)
+        cold_preset1 = UserFloatSensor(value_min=0., value_max=1., default=.8)
+
+        warm_preset2 = UserFloatSensor(value_min=0., value_max=1., default=.4)
+        cold_preset2 = UserFloatSensor(value_min=0., value_max=1., default=.4)
 
         warm_preset3 = UserFloatSensor(value_min=0., value_max=1., default=.1)
-        cold_preset3 = UserFloatSensor(value_min=0., value_max=1., default=0.)
+        cold_preset3 = UserFloatSensor(value_min=0., value_max=1., default=.1)
 
         preset1 = UserBoolSensor(tags={'quick_lamps'},
                                  priority=2.,
@@ -135,22 +105,24 @@ import tornado.log
 tornado.log.access_log.setLevel(logging.WARNING)
 
 if __name__ == '__main__':
-    s = Makuuhuone.load_or_create('makuuhuone.dmp',
-                                  services=[
-                                       WebService(
-                                           http_port=8080,
-                                           http_auth=(os.getenv('AUTOMATE_USERNAME', 'test'), os.getenv('AUTOMATE_PASSWORD', 'test')),
-                                           debug=False if is_raspi() else True,
-                                           user_tags={'web'}, default_view='user_editable_view',
-                                           read_only=False,
-                                           show_actuator_details=False,
-                                           django_settings = {'SESSION_FILE_PATH': 'sessions' if is_raspi() else '/tmp',
-                                                              'SESSION_COOKIE_AGE': 52560000,
-                                                              'SECRET_KEY': os.getenv('AUTOMATE_SECRET_KEY', 'unsecure-default')},
-                                       ),
-                                       StatusSaverService(),
-                                   ],
-                                  logfile='makuuhuone.log' if is_raspi() else '',
-                                  print_level=logging.INFO,
-                                  log_level=logging.WARNING,
-                                  )
+    s = Makuuhuone.load_or_create(
+        'makuuhuone.dmp',
+        services=[
+            WebService(
+                http_port=8080,
+                http_auth=(os.getenv('AUTOMATE_USERNAME', 'test'),
+                           os.getenv('AUTOMATE_PASSWORD', 'test')),
+                debug=False if is_raspi() else True,
+                user_tags={'web'}, default_view='user_editable_view',
+                read_only=False,
+                show_actuator_details=False,
+                django_settings = {'SESSION_FILE_PATH': 'sessions' if is_raspi() else '/tmp',
+                                   'SESSION_COOKIE_AGE': 52560000,
+                                   'SECRET_KEY': os.getenv('AUTOMATE_SECRET_KEY', 'unsecure-default')},
+            ),
+            StatusSaverService(),
+        ],
+        logfile='makuuhuone.log' if is_raspi() else '',
+        print_level=logging.INFO,
+        log_level=logging.WARNING,
+    )

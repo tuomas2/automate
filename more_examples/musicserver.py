@@ -475,24 +475,26 @@ import tornado.log
 tornado.log.access_log.setLevel(logging.WARNING)
 
 if __name__ == '__main__':
-    s = MusicServer.load_or_create('musicserver.dmp',
-                                   services=[
-                                       WebService(
-                                           http_port=int(os.getenv('HTTP_PORT', 8080)),
-                                           http_auth=(os.getenv('AUTOMATE_USERNAME', 'test'), os.getenv('AUTOMATE_PASSWORD', 'test')),
-                                           debug=False if is_raspi() else True,
-                                           user_tags={'web'}, default_view='user_editable_view',
-                                           read_only=False,
-                                           show_actuator_details=False,
-                                           django_settings = {'SESSION_FILE_PATH': 'sessions' if is_raspi() else '/tmp',
-                                                              'SESSION_COOKIE_AGE': 52560000,
-                                                              'SECRET_KEY': os.getenv('AUTOMATE_SECRET_KEY', 'unsecure-default')},
-                                           #read_only = True,
-                                       ),
-                                       StatusSaverService(),
-                                       RpcService(http_port=3031, view_tags={'web'}),
-                                   ],
-                                   logfile='music_server.log' if is_raspi() else '',
-                                   print_level=logging.INFO if is_raspi() else logging.DEBUG,
-                                   log_level=logging.WARNING,
-                                   )
+    s = MusicServer.load_or_create(
+        'musicserver.dmp',
+        services=[
+            WebService(
+                http_port=int(os.getenv('HTTP_PORT', 8080)),
+                http_auth=(os.getenv('AUTOMATE_USERNAME', 'test'),
+                           os.getenv('AUTOMATE_PASSWORD', 'test')),
+                debug=False if is_raspi() else True,
+                user_tags={'web'}, default_view='user_editable_view',
+                read_only=False,
+                show_actuator_details=False,
+                django_settings = {'SESSION_FILE_PATH': 'sessions' if is_raspi() else '/tmp',
+                                   'SESSION_COOKIE_AGE': 52560000,
+                                   'SECRET_KEY': os.getenv('AUTOMATE_SECRET_KEY', 'unsecure-default')},
+                #read_only = True,
+            ),
+            StatusSaverService(),
+            RpcService(http_port=3031, view_tags={'web'}),
+        ],
+        logfile='music_server.log' if is_raspi() else '',
+        print_level=logging.INFO if is_raspi() else logging.DEBUG,
+        log_level=logging.WARNING,
+    )
