@@ -24,7 +24,6 @@ from traits.api import CBool, Any
 from automate.service import AbstractSystemService
 import signal
 
-
 class RpioService(AbstractSystemService):
 
     """
@@ -35,57 +34,77 @@ class RpioService(AbstractSystemService):
     #: Perform GPIO cleanup when exiting (default: False).
     gpio_cleanup = CBool(False)
 
+    #: Use RPIO instead of RPI.GPIO
+    rpio = CBool(False)
+
     _gpio_thread = Any
 
-    _RPIO = Any
+    _hw = Any
 
     def setup(self):
         self.logger.info("Initializing RpioService (Raspberry Pi GPIO support)")
         try:
-            import RPIO
-            import RPIO.PWM
+            if self.rpio:
+                import RPIO
+                import RPIO.PWM
+            else:
+                import RPi.GPIO as RPIO
         except (ImportError, SystemError):
             self.logger.warning('RPIO module could not be imported. Enabling mocked RPIO')
             self.logger.warning("To use Raspberry Pi GPIO ports (sensors / actuators) please install module RPIO")
             import mock
             RPIO = mock.MagicMock()
 
-        self._RPIO = RPIO
+        self._hw = RPIO
 
-        self._RPIO.setmode(RPIO.BCM)
-        self._gpio_thread = t = Thread(target=RPIO.wait_for_interrupts, name='RpioService thread')
-        t.daemon = True
-        t.start()
+        self._hw.setmode(RPIO.BCM)
+        if self.rpio:
+            self._gpio_thread = t = Thread(target=RPIO.wait_for_interrupts, name='RpioService thread')
+            t.daemon = True
+            t.start()
 
         self.logger.info("RPIO initialized")
 
     def cleanup(self):
-        self._RPIO.stop_waiting_for_interrupts()
-        self._RPIO.cleanup_interrupts()
-        self._gpio_thread.join()
+
+        if self.rpio:
+            self._hw.stop_waiting_for_interrupts()
+            self._hw.cleanup_interrupts()
+            self._gpio_thread.join()
+
         if self.gpio_cleanup:
-            self._RPIO.cleanup()
+            self._hw.cleanup()
 
     def enable_input_port(self, port, callback, pull_up_down):
-        self._RPIO.setup(port, self._RPIO.IN)
-        pud = {"down": self._RPIO.PUD_DOWN, "up": self._RPIO.PUD_UP, "none": self._RPIO.PUD_OFF}
-        self._RPIO.add_interrupt_callback(port, callback, edge="both", pull_up_down=pud[pull_up_down])
+        pud = {"down": self._hw.PUD_DOWN, "up": self._hw.PUD_UP, "none": self._hw.PUD_OFF}
+        if self.rpio:
+            self._hw.setup(port, self._hw.IN)
+            self._hw.add_interrupt_callback(port, callback, edge="both", pull_up_down=pud[pull_up_down])
+        else:
+            self._hw.setup(port, self._hw.IN, pull_up_down=pud[pull_up_down])
+            self._hw.add_event_callback(port, self._hw.RISING, lambda _port: callback(_port, True))
+            self._hw.add_event_callback(port, self._hw.FALLING, lambda _port: callback(_port, False))
 
     def get_input_status(self, port):
-        return self._RPIO.input(port)
+        return self._hw.input(port)
 
     def disable_input_port(self, port):
-        self._RPIO.del_interrupt_callback(port)
+        if self.rpio:
+            self._hw.del_interrupt_callback(port)
+        else:
+            self._hw.remove_event_detect(port)
 
     def enable_output_port(self, port):
-        self._RPIO.setup(port, self._RPIO.OUT)
+        self._hw.setup(port, self._hw.OUT)
 
     def disable_output_port(self, port):
-        self._RPIO.setup(port, self._RPIO.IN)
+        self._hw.setup(port, self._hw.IN)
 
     def get_pwm_module(self):
+        if not self.rpio:
+            self.logger.error('PWM supported only when rpio attribute in RpioService is enabled')
         try:
-            self._RPIO.PWM.setup()
+            self._hw.PWM.setup()
             signal.signal(signal.SIGCHLD, signal.SIG_IGN)
             self.logger.warning('SIGCHLD is now ignored totally due to RPIO.PWM bug. Might cause side effects!')
         except RuntimeError as e:
@@ -94,7 +113,7 @@ class RpioService(AbstractSystemService):
             else:
                 raise e
 
-        return self._RPIO.PWM
+        return self._hw.PWM
 
     def set_output_port_status(self, port, status):
-        self._RPIO.output(port, status)
+        self._hw.output(port, status)
