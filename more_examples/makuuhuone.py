@@ -35,6 +35,9 @@ class Makuuhuone(System):
         testpin = ArduinoDigitalActuator(dev=0, pin=13, default=False)
         testpin_toggle = UserBoolSensor(on_update=SetStatus('testpin', 'testpin_toggle'))
 
+        testpin2 = ArduinoDigitalActuator(dev=0, pin=12, default=False)
+        testpin_toggle2 = UserBoolSensor(on_update=SetStatus('testpin2', 'testpin_toggle2'))
+
         cold_lamp_out = ArduinoPWMActuator(dev=0, pin=5, default=0.) # 5,6 60kHz
         warm_lamp_out = ArduinoPWMActuator(dev=0, pin=9, default=0.) # 9,10 30 kHz
 
