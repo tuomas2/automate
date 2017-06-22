@@ -21,7 +21,8 @@ pbr==3.1.1                # via mock
 pexpect==4.2.1            # via ipython
 pickleshare==0.7.4        # via ipython
 prompt-toolkit==1.0.14    # via ipython
-ptyprocess==0.5.1         # via pexpect
+psutil==5.2.2
+ptyprocess==0.5.2         # via pexpect
 py==1.4.34                # via pytest, pytest-capturelog, pytest-xdist
 pyfirmata==1.0.3
 pygments==2.2.0           # via ipython
