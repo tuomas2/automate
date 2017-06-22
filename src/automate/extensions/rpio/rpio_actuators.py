@@ -36,25 +36,25 @@ class RpioActuator(AbstractActuator):
     #: Set to True to have inversed status value
     inverted = CBool(False)
 
-    _rpio = Instance(AbstractSystemService, transient=True)
+    _hw_service = Instance(AbstractSystemService, transient=True)
 
     view = AbstractActuator.view + ["port"]
 
     def setup(self):
-        self._rpio = self.system.request_service('RpioService')
-        self._rpio.enable_output_port(self.port)
+        self._hw_service = self.system.request_service('RpioService')
+        self._hw_service.enable_output_port(self.port)
 
     def _port_changed(self, old, new):
-        if not self._rpio:
+        if not self._hw_service:
             return
         if old:
-            self._rpio.disable_output_port(old)
+            self._hw_service.disable_output_port(old)
 
-        self._rpio.enable_output_port(new)
+        self._hw_service.enable_output_port(new)
 
     def _status_changed(self):
         self.logger.debug("%s gpio actuator status changed %s", self.name, repr(self._status))
-        self._rpio.set_output_port_status(self.port, self._status if not self.inverted else not self._status)
+        self._hw_service.set_output_port_status(self.port, self._status if not self.inverted else not self._status)
 
 
 class RpioPWMActuator(AbstractActuator):
@@ -86,18 +86,18 @@ class RpioPWMActuator(AbstractActuator):
 
     _pwm = Any(transient=True)
 
-    _rpio = Instance(AbstractSystemService, transient=True)
+    _hw_service = Instance(AbstractSystemService, transient=True)
 
     def _get__subcycle(self):
         return int(1. / self.frequency * 1e6)
 
     def setup(self):
-        self._rpio = self.system.request_service('RpioService')
-        self._pwm = self._rpio.get_pwm_module()
+        self._hw_service = self.system.request_service('RpioService')
+        self._pwm = self._hw_service.get_pwm_module()
         self._port_changed(None, self.port)
 
     def _port_changed(self, old, new):
-        if not self._rpio:
+        if not self._hw_service:
             return
 
         if old:

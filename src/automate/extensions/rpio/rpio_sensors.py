@@ -38,34 +38,34 @@ class RpioSensor(UserBoolSensor):
     inverted = Bool(False)
 
     #: Button setup: "down": pushdown resistor, "up": pushup resistor, or "none": no resistor set up.
-    buttontype = Enum("down", "up", "none")
+    button_type = Enum("down", "up", "none")
 
-    view = UserBoolSensor.view + ["port", "buttontype"]
+    view = UserBoolSensor.view + ["port", "button_type"]
 
-    _rpio = Instance(AbstractSystemService, transient=True)
+    _hw_service = Instance(AbstractSystemService, transient=True)
 
     def setup(self):
-        self._rpio = self.system.request_service('RpioService')
+        self._hw_service = self.system.request_service('RpioService')
 
-        self._rpio.enable_input_port(self.port, self.gpio_callback, self.buttontype)
+        self._hw_service.enable_input_port(self.port, self.gpio_callback, self.button_type)
 
-    def _buttontype_changed(self, new):
-        if self._rpio:
-            self._rpio.disable_input_port(self.port)
-            self._rpio.enable_input_port(self.port, self.gpio_callback, new)
+    def _button_type_changed(self, new):
+        if self._hw_service:
+            self._hw_service.disable_input_port(self.port)
+            self._hw_service.enable_input_port(self.port, self.gpio_callback, new)
 
     def gpio_callback(self, gpio_id, value):
         self.set_status(value if not self.inverted else not value)
 
     def update_status(self):
-        self.gpio_callback(None, self._rpio.get_input_status(self.port))
+        self.gpio_callback(None, self._hw_service.get_input_status(self.port))
 
     def _port_changed(self, old, new):
-        if not self._rpio:
+        if not self._hw_service:
             return
         if old:
-            self._rpio.disable_input_port(old)
-        self._rpio.enable_input_port(new, self.gpio_callback, self.buttontype)
+            self._hw_service.disable_input_port(old)
+        self._hw_service.enable_input_port(new, self.gpio_callback, self.button_type)
 
 
 class TemperatureSensor(AbstractPollingSensor):
