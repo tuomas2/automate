@@ -46,6 +46,26 @@ def set_globals(_service, _system):
     service = _service
 
 
+def get_groups(only_user_editable=False, only_user_defined=False, only_groups=False):
+    groups = {}
+    if only_user_editable:
+        objs = (i for i in service.system.objects_sorted if getattr(i, 'user_editable', False))
+    elif only_user_defined:
+        objs = (i for i in service.system.objects_sorted if service.user_tags & i.tags)
+    else:
+        objs = service.system.objects_sorted
+    for obj in objs:
+        for tag in obj.tags:
+            if only_groups:
+                if not tag.startswith('group:'):
+                    continue
+            if tag in groups:
+                groups[tag].append(obj)
+            else:
+                groups[tag] = [obj]
+    return groups
+
+
 def common_context(request):
     global system, service
     _views = [
@@ -57,8 +77,14 @@ def common_context(request):
     ]
     current_view = request.resolver_match.view_name
     views = [(title, reverse(name), name == current_view) for title, name in _views]
+
+    groups = get_groups()
+
+    tag_views = [(name, reverse('single_tag', args=(name,)), False)
+                 for name in sorted(groups.keys())]
+
     from automate import __version__
-    return {'views': views, 'system': system, 'service': service,
+    return {'views': views, 'tag_views': tag_views, 'system': system, 'service': service,
             'automate_version': __version__}
 
 
@@ -153,26 +179,12 @@ def single_tag(request, tag):
                   {'source': 'tags_view', 'objs': objs, 'tag': tag})
 
 
+
 @require_login
 def tags_view(request, template='', only_user_editable=False, only_user_defined=False,
               only_groups=False):
-    groups = {}
-    if only_user_editable:
-        objs = (i for i in service.system.objects_sorted if getattr(i, 'user_editable', False))
-    elif only_user_defined:
-        objs = (i for i in service.system.objects_sorted if service.user_tags & i.tags)
-    else:
-        objs = service.system.objects_sorted
-    for obj in objs:
-        for tag in obj.tags:
-            if only_groups:
-                if not tag.startswith('group:'):
-                    continue
-            if tag in groups:
-                groups[tag].append(obj)
-            else:
-                groups[tag] = [obj]
-
+    groups = get_groups(only_user_editable=only_user_editable,
+                        only_user_defined=only_user_defined, only_groups=only_groups)
     gitems = sorted(groups.items())
     l = len(gitems)
     g1 = gitems[:int(l / 3) + 1]
