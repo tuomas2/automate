@@ -84,10 +84,10 @@ class MusicServer(System):
 
     israspi = IsRaspi()
     email_sender = EmailSender(to_email=os.getenv('AUTOMATE_EMAIL', 'test@test.com'),
-                               smtp_hostname=os.getenv('AUTOMATE_SMTP_HOSTNAME'),
-                               smtp_username=os.getenv('AUTOMATE_EMAIL'),
-                               smtp_password=os.getenv('AUTOMATE_SMTP_PASSWORD'),
-                               smtp_fromemail=os.getenv('AUTOMATE_EMAIL'),
+                               smtp_hostname=os.getenv('AUTOMATE_SMTP_HOSTNAME', '-'),
+                               smtp_username=os.getenv('AUTOMATE_EMAIL', '-'),
+                               smtp_password=os.getenv('AUTOMATE_SMTP_PASSWORD', '-'),
+                               smtp_fromemail=os.getenv('AUTOMATE_EMAIL', '-'),
                                smtp_fromname="Automate",
                                )
 
@@ -478,10 +478,8 @@ if __name__ == '__main__':
     s = MusicServer.load_or_create('musicserver.dmp',
                                    services=[
                                        WebService(
-                                           http_port=8080 if is_raspi() else 8082,
-                                           http_auth=(
-                                               (os.getenv('AUTOMATE_USERNAME', 'test'), os.getenv('AUTOMATE_PASSWORD', 'test')),
-                                           ),
+                                           http_port=8080,
+                                           http_auth=(os.getenv('AUTOMATE_USERNAME', 'test'), os.getenv('AUTOMATE_PASSWORD', 'test')),
                                            debug=False if is_raspi() else True,
                                            user_tags={'web'}, default_view='user_editable_view',
                                            read_only=False,

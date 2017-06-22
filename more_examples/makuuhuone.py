@@ -139,9 +139,7 @@ if __name__ == '__main__':
                                   services=[
                                        WebService(
                                            http_port=8080,
-                                           http_auth=(
-                                                (os.getenv('AUTOMATE_USERNAME', 'test'), os.getenv('AUTOMATE_PASSWORD', 'test')),
-                                           ),
+                                           http_auth=(os.getenv('AUTOMATE_USERNAME', 'test'), os.getenv('AUTOMATE_PASSWORD', 'test')),
                                            debug=False if is_raspi() else True,
                                            user_tags={'web'}, default_view='user_editable_view',
                                            read_only=False,
