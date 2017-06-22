@@ -136,6 +136,9 @@ class SystemObject(HasStrictTraits):
             self.setup_system(traits.pop('system'))
             self.setup_callables()
 
+    def __lt__(self, other):
+        return self.name < other.name
+
     def __setstate__(self, state, trait_change_notify=True):
         self.logger = logging.getLogger('automate.%s' % self.__class__.__name__)
         self._order = state.pop('_order')
