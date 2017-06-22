@@ -12,21 +12,15 @@
       <p>Arrow colors:
       <ul>
         {% for name, color in puml_service.arrow_colors.items %}
-          <li>
-            <div style='color:{{ color }};'>
-            {{ name }}</li>
+          <li><span style='color:{{ color }};'>{{ name }}</span></li>
         {% endfor %}
       </ul>
-      </p>
       <p>Background colors:
       <ul>
         {% for name, color in puml_service.background_colors.items %}
-          <li>
-            <div style='background-color:{{ color }};'>
-            {{ name }}</li>
+          <li><span style='background-color:{{ color }};'>{{ name }}</span></li>
         {% endfor %}
       </ul>
-      </p>
     </div>
 
     <div class='row'>

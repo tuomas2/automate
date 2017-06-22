@@ -7,16 +7,14 @@
     <div class="col-md-4 object_list_column">
       <h2>Sensors</h2>
       <hr>
-            <span class="title_row">
-                <div class="row">
-                  <div class="col-xs-9">
-                    Name
-                  </div>
-                  <div class="col-xs-3" style='text-align: right;'>
-                    Status
-                  </div>
-                </div>
-            </span>
+      <div class="title_row row">
+        <div class="col-xs-9">
+          Name
+        </div>
+        <div class="col-xs-3" style='text-align: right;'>
+          Status
+        </div>
+      </div>
       <hr class='object_row'>
       {% for i in system.sensors|name_sort %}
         {% ifchanged %}
@@ -34,19 +32,17 @@
         <h2>Programs</h2>
         <hr>
 
-        <span class="title_row">
-                    <div class="row">
-                      <div class="col-xs-8">
-                        Name
-                      </div>
-                      <div class="col-xs-2" style='text-align: right;'>
-                        Pri
-                      </div>
-                      <div class="col-xs-2" style='text-align: right;'>
-                        Act
-                      </div>
-                    </div>
-                </span>
+        <div class="title_row row">
+          <div class="col-xs-8">
+            Name
+          </div>
+          <div class="col-xs-2" style='text-align: right;'>
+            Pri
+          </div>
+          <div class="col-xs-2" style='text-align: right;'>
+            Act
+          </div>
+        </div>
         <hr class='object_row'>
         {% for i in system.objects|name_sort %}
           {% if i.is_program %}
@@ -62,16 +58,14 @@
         {% if forloop.first %}
           <h2>Actuators</h2>
           <hr>
-          <span class="title_row">
-                        <div class="row">
-                          <div class="col-xs-9">
-                            Name
-                          </div>
-                          <div class="col-xs-3" style='text-align: right;'>
-                            Status
-                          </div>
-                        </div>
-                    </span>
+          <div class="title_row row">
+            <div class="col-xs-9">
+              Name
+            </div>
+            <div class="col-xs-3" style='text-align: right;'>
+              Status
+            </div>
+          </div>
           <hr class='object_row'>
 
         {% endif %}
