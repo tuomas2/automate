@@ -171,6 +171,8 @@ class ArduinoService(AbstractSystemService):
             #TODO: servo reload!
             if setup_func:
                 setup_func(dev, pin_nr)
+            else:
+                logger.error('Reloading not implemented for type %s (pin %d)', _type, pin_nr)
         self.logger.info('Arduino pins are now set up!')
 
     def setup_digital(self, dev, pin_nr):
