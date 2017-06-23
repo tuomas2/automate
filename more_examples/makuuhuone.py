@@ -35,11 +35,8 @@ class Makuuhuone(System):
         testpin = ArduinoDigitalActuator(dev=0, pin=13, default=False)
         testpin_toggle = UserBoolSensor(on_update=SetStatus('testpin', 'testpin_toggle'))
 
-        testpin2 = ArduinoDigitalActuator(dev=0, pin=12, default=False)
-        testpin_toggle2 = UserBoolSensor(on_update=SetStatus('testpin2', 'testpin_toggle2'))
-
-        cold_lamp_out = ArduinoPWMActuator(dev=0, pin=5, default=0.) # 5,6 60kHz
-        warm_lamp_out = ArduinoPWMActuator(dev=0, pin=9, default=0.) # 9,10 30 kHz
+        cold_lamp_out = ArduinoPWMActuator(dev=0, pin=5, default=0.)
+        warm_lamp_out = ArduinoPWMActuator(dev=0, pin=9, default=0.)  # 9,10 30 kHz
 
         warm_preset1 = UserFloatSensor(value_min=0., value_max=1., default=.8)
         cold_preset1 = UserFloatSensor(value_min=0., value_max=1., default=.8)
@@ -116,7 +113,7 @@ if __name__ == '__main__':
                 http_auth=(os.getenv('AUTOMATE_USERNAME', 'test'),
                            os.getenv('AUTOMATE_PASSWORD', 'test')),
                 debug=False if is_raspi() else True,
-                user_tags={'web'}, default_view='user_editable_view',
+                user_tags={'web'}, default_view='user_defined_view',
                 read_only=False,
                 show_actuator_details=False,
                 django_settings = {'SESSION_FILE_PATH': 'sessions' if is_raspi() else '/tmp',
