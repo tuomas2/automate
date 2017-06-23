@@ -112,7 +112,8 @@ class ArduinoService(AbstractSystemService):
         ard_devs = self.arduino_devs
         ard_types = self.arduino_dev_types
         samplerates = self.arduino_dev_sampling
-        assert len(ard_devs) == len(ard_types) == len(samplerates), 'Arduino configuration invalid!'
+        if not (len(ard_devs) == len(ard_types) == len(samplerates)):
+            raise RuntimeError('Arduino configuration invalid!')
 
         for i in range(len(ard_devs)):
             try:
@@ -166,10 +167,11 @@ class ArduinoService(AbstractSystemService):
             self.subscribe_analog(dev, pin_nr, sens)
 
         for (dev, pin_nr), (_type, pin) in digital_actuators:
-            setup_func = {'p': self.setup_pwm, 'd': self.setup_digital}.get(_type)
+            setup_func = {'p': self.setup_pwm, 'o': self.setup_digital}.get(_type)
+            #TODO: servo reload!
             if setup_func:
                 setup_func(dev, pin_nr)
-            #TODO: servo reload!
+        self.logger.info('Arduino pins are now set up!')
 
     def setup_digital(self, dev, pin_nr):
         if not self._boards[dev]:
