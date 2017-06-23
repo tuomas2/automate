@@ -21,6 +21,15 @@ def is_raspi():
     return platform.node() in ["raspi1", "raspi2", "raspi3"]
 
 
+def lirc_filter(line):
+    try:
+        code, num, key, remote = line.split(' ')
+    except ValueError:
+        key = '-'
+    print('Command ', key)
+    return key
+
+
 class Makuuhuone(System):
     class Commands(Group):
         tags = 'web'
@@ -30,6 +39,17 @@ class Makuuhuone(System):
         reload_web = UserEventSensor(
             on_activate=ReloadService('WebService'),
         )
+
+    class Lirc(Group):
+        lirc_sensor = ShellSensor(cmd='irw', filter=lirc_filter, default='', reset_delay=1.3,
+                                  active_condition=Value('lirc_sensor'),
+                                  on_update=Switch('lirc_sensor',
+                                                   {'KEY_1': SetStatus('preset1', 1),
+                                                    'KEY_2': SetStatus('preset2', 1),
+                                                    'KEY_3': SetStatus('preset3', 1),
+                                                    }
+                                                   ),
+                                  )
 
     class Lamps(Group):
         testpin = ArduinoDigitalActuator(dev=0, pin=13, default=False)

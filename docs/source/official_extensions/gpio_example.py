@@ -1,4 +1,5 @@
 from automate import *
+from automate.extensions.rpio import RpioSensor, RpioActuator
 
 
 class MySystem(System):
@@ -7,4 +8,4 @@ class MySystem(System):
     myprog = Program(active_condition=Value('mysensor'),
                      on_activate=SetStatus('myactuator', True))
 
-mysystem = MySystem(services=[WebService()])
+mysystem = MySystem()
