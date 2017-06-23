@@ -1,7 +1,7 @@
 0.10.7 (unreleased)
 -------------------
 
-- Nothing changed yet.
+- Fix arduino reloading
 
 
 0.10.6 (2017-06-23)
