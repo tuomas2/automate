@@ -175,6 +175,7 @@ class ArduinoService(AbstractSystemService):
 
     def setup_digital(self, dev, pin_nr):
         if not self._boards[dev]:
+            self._act_digital[(dev, pin_nr)] = PinTuple('o', None)
             return
         with self._locks[dev]:
             pin = self._boards[dev].get_pin("d:{pin}:o".format(pin=pin_nr))
@@ -182,6 +183,7 @@ class ArduinoService(AbstractSystemService):
 
     def setup_pwm(self, dev, pin_nr):
         if not self._boards[dev]:
+            self._act_digital[(dev, pin_nr)] = PinTuple('p', None)
             return
         with self._locks[dev]:
             pin = self._boards[dev].get_pin("d:{pin}:p".format(pin=pin_nr))
@@ -189,6 +191,7 @@ class ArduinoService(AbstractSystemService):
 
     def setup_servo(self, dev, pin_nr, min_pulse, max_pulse, angle):
         if not self._boards[dev]:
+            self._act_digital[(dev, pin_nr)] = PinTuple('s', None)
             return
         with self._locks[dev]:
             pin = self._boards[dev].get_pin("d:{pin}:s".format(pin=pin_nr))
