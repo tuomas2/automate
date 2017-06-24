@@ -282,12 +282,13 @@ class autoaqua(System):
                           Delay(IfElse('lamput', lamp_on_delay, lamp_off_delay),
                               SetStatus(lamppu3, 'lamput')),
                           Delay(IfElse('lamput', Value(2) * lamp_on_delay, Value(2) * lamp_off_delay),
-                               If(Not('lamput'),
-                                  RemoteFunc(raspi2host, 'set_status', 'akvadimmer', 1)
-                                  ),
-                               Delay(5,
+                               #If(Not('lamput'),
+                               #   RemoteFunc(raspi2host, 'set_status', 'akvadimmer', 1)
+                               #   ),
+                               #Delay(5,
                                    SetStatus(lamppu2, 'lamput')),
-                               )),
+                               #)
+                               ),
         )
 
         lamppu1_manual = UserBoolSensor(active_condition=Value('lamppu1_manual'),

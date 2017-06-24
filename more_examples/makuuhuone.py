@@ -120,7 +120,7 @@ class Makuuhuone(System):
 
         _count = UserIntSensor(default=0)
         _max = UserIntSensor(default=1000)
-        fade_time = UserIntSensor(default=1200)
+        fade_time = UserIntSensor(default=1800)
 
         _lighter = While(_count < _max,
                         SetStatus(_count, _count + 1),
