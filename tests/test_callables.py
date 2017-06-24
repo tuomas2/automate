@@ -1268,6 +1268,8 @@ nums = [1, 5, -2]
     (Product(*nums), 1 * 5 * -2),
     (Mult(*nums), 1 * 5 * -2),
     (Add(*nums), sum(nums)),
+    (Div(1,5), 1/5),
+    (Div(1.,5.), 1./5.),
 ])
 def test_math(prog, x, r):
     prog.on_deactivate = c = x
@@ -1328,6 +1330,7 @@ def test_logical2(prog):
 def test_logic_cmp():
     v1 = Value(1)
     v2 = Value(2)
+    assert v1 / v2 == Division(v1, v2)
     assert v1 * v2 == Product(v1, v2)
     assert v1 + v2 == Sum(v1, v2)
     assert v1 - v2 == Sum(v1, Neg(v2))

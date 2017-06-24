@@ -189,27 +189,30 @@ class CompareMixin(object):
 
     def __mul__(self, obj):
         from . import callables
-
         return callables.Product(self, obj)
 
     def __add__(self, obj):
         from . import callables
-
         return callables.Sum(self, obj)
 
     def __sub__(self, obj):
         from . import callables
-
         return callables.Sum(self, -obj)
 
     def __neg__(self):
         from . import callables
-
         return callables.Neg(self)
+
+    def __inv__(self):
+        from . import callables
+        return callables.Inv(self)
+
+    def __truediv__(self, other):
+        from . import callables
+        return callables.Division(self, other)
 
     def __lt__(self, obj):
         from . import callables
-
         return callables.Less(self, obj)
 
     def __gt__(self, obj):

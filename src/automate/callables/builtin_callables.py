@@ -787,6 +787,33 @@ class Mult(Product):
     """Synonym of Product"""
 
 
+class Division(AbstractMathematical):
+
+    """Give division of given objects
+
+    Usage::
+
+        Division(x, y)
+        # where x,y are anything that can be
+        # evaluated as number (Callables, Statusobjects etc).
+
+    """
+
+    def call(self, caller=None, **kwargs):
+        if len(self.objects) != 2:
+            raise RuntimeError('Wrong amount of arguments')
+
+        obj1, obj2 = self.objects
+        _val1 = self.call_eval(obj1, caller, **kwargs)
+        _val2 = self.call_eval(obj2, caller, **kwargs)
+        return _val1 / _val2
+
+
+class Div(Division):
+
+    """ Synonym of Division"""
+
+
 class Add(Sum):
 
     """Synonym of Sum """
@@ -866,6 +893,25 @@ class Neg(AbstractLogical):
     def call(self, caller=None, **kwargs):
         assert len(self.objects) == 1, 'Too many arguments'
         return -self.call_eval(self.obj, caller, **kwargs)
+
+
+class Inverse(AbstractLogical):
+
+    """Give inverse of specified callable (1/something)
+
+    Usage::
+
+        Inv(x) # returns 1/x
+    """
+
+    def call(self, caller=None, **kwargs):
+        assert len(self.objects) == 1, 'Too many arguments'
+        return 1./self.call_eval(self.obj, caller, **kwargs)
+
+
+class Inv(Inverse):
+
+    """ Synonym of Inverse """
 
 
 class Not(AbstractLogical):
