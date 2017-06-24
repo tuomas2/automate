@@ -21,7 +21,7 @@
 # If you like Automate, please take a look at this page:
 # http://evankelista.net/automate/
 
-from __future__ import unicode_literals
+from __future__ import unicode_literals, division
 
 import datetime
 from builtins import bytes
