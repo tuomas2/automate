@@ -111,10 +111,26 @@ class Makuuhuone(System):
                         do_after=Run(SetStatus(['preset1', 'preset2', 'preset3', 'fade_out', 'akvadimmer'], [0]*5))
                       )
 
+        _count = UserIntSensor(default=0)
+        _max = UserIntSensor(default=100)
+        fade_time = UserIntSensor(default=1200)
+
+        lighter = While(_count < _max,
+                        SetStatus(_count, _count + 1),
+                        SetStatus(warm_lamp_out, warm_preset1*_count/_max),
+                        SetStatus(cold_lamp_out, cold_preset1*_count/_max),
+                        Func(time.sleep, fade_time/_max),
+                        do_after=SetStatus(['preset1', 'fade_in', '_count'], [1, 0, 0]))
+
+        fade_in = UserBoolSensor(active_condition=Value('fade_in'), on_activate=Run('lighter'))
+
         fade_out = UserBoolSensor(tags={'quick_lamps'}, priority=3,
                                      active_condition=Value('fade_out'),
                                      on_activate=Run('dimmer')
                                  )
+        alarm_clock = CronTimerSensor(timer_on='30 7 * * *', timer_off='0 9 * * *',
+                                      active_condition=Value('alarm_clock'),
+                                      on_activate=SetStatus('fade_in', True))
 
     class SystemInfo(Group):
         load_average = PollingSensor(interval=10, status_updater=ToStr('{}', Func(os.getloadavg)))
