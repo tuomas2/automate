@@ -1,2 +1,3 @@
 *.dmp
 /deploy.sh
+*.log
