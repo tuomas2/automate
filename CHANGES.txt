@@ -1,4 +1,4 @@
-0.10.8 (unreleased)
+0.10.8 (2017-06-24)
 -------------------
 
 - Add Division/Div and Inverse/Inv callables
