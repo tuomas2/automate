@@ -256,8 +256,8 @@ class autoaqua(System):
             on_activate=ReloadService('ArduinoService'),
         )
 
-        lamput_ajastin1_k = UserBoolSensor(default=False)
-        lamput_ajastin2_k = UserBoolSensor(default=True)
+        lamput_ajastin1_k = UserBoolSensor(default=True)
+        lamput_ajastin2_k = UserBoolSensor(default=False)
 
     class Vesiaktuaattorit(Group):
         uvc = RelayActuator(port=portmap['uvc_filter'], default=0, safety_delay=30)
@@ -315,13 +315,13 @@ class autoaqua(System):
         co2_ajastin = CronTimerSensor(timer_on="30 12 * * *",  # oli 5:30 mutta muutan turvallisemmaksi...
                                   timer_off="0 16 * * *")
 
-        co2_ajastin_loma = CronTimerSensor(timer_on="0 7 * * *",
-                                       timer_off="30 12 * * *",
+        co2_ajastin_loma = CronTimerSensor(timer_on="30 17 * * *",
+                                       timer_off="0 20 * * *",
                                        tags="holiday")
 
         # Muista: tämä kontrolloi (myös) UVC:ta!
-        lamput_ajastin = CronTimerSensor(timer_on="0 13 * * *",
-                                         timer_off="0 21 * * *")
+        lamput_ajastin = CronTimerSensor(timer_on="0 14 * * *",
+                                         timer_off="0 22 * * *")
 
         lamppu1_ajastin = CronTimerSensor(timer_on="0 13,15,18 * * *",
                                           timer_off="0 21 * * *;2 14,17 * * *",
@@ -350,8 +350,8 @@ class autoaqua(System):
         #timer_on="0 10 * * mon-sat; 0 11 * * sun",
         # timer_off="30 20 * * mon-thu; 0 22 * * fri-sat,sun")
 
-        lamput_ajastin_loma = CronTimerSensor(timer_on="0 10 * * *",
-                                          timer_off="0 15 * * *",
+        lamput_ajastin_loma = CronTimerSensor(timer_on="0 18 * * *",
+                                          timer_off="0 22 * * *",
                                           tags="holiday")
 
         ajastinohjelma = Program(on_update=IfElse('lomamoodi',

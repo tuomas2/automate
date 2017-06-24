@@ -29,6 +29,13 @@ def lirc_filter(line):
     print('Command ', key)
     return key
 
+def calc_val(i, max_i):
+    """
+    Must return value between 0 and 1.
+    """
+    x = float(i)/max_i
+    return max(0., min(x**2, 1.0))
+
 
 class Makuuhuone(System):
     class Commands(Group):
@@ -112,13 +119,13 @@ class Makuuhuone(System):
                       )
 
         _count = UserIntSensor(default=0)
-        _max = UserIntSensor(default=100)
+        _max = UserIntSensor(default=1000)
         fade_time = UserIntSensor(default=1200)
 
         _lighter = While(_count < _max,
                         SetStatus(_count, _count + 1),
-                        SetStatus(warm_lamp_out, warm_preset1*_count/_max),
-                        SetStatus(cold_lamp_out, cold_preset1*_count/_max),
+                        SetStatus(warm_lamp_out, Func(calc_val, _count, _max) * warm_preset1),
+                        SetStatus(cold_lamp_out, Func(calc_val, _count, _max) * cold_preset1),
                         Func(time.sleep, fade_time/_max),
                         do_after=SetStatus(['preset1', 'fade_in', '_count'], [1, 0, 0]))
 
@@ -130,7 +137,7 @@ class Makuuhuone(System):
                                      active_condition=Value('fade_out'),
                                      on_activate=Run('_dimmer')
                                  )
-        alarm_clock = CronTimerSensor(timer_on='30 7 * * *', timer_off='0 9 * * *',
+        alarm_clock = CronTimerSensor(timer_on='0 7 * * *', timer_off='0 9 * * *',
                                       active_condition=Value('alarm_clock'),
                                       on_activate=SetStatus(fade_in, True))
 
