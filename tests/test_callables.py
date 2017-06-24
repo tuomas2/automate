@@ -23,6 +23,8 @@
 
 from __future__ import unicode_literals
 from __future__ import print_function
+from __future__ import division
+
 from builtins import range
 from builtins import object
 import pytest
@@ -1330,8 +1332,8 @@ def test_logical2(prog):
 def test_logic_cmp():
     v1 = Value(1)
     v2 = Value(2)
-    assert v1 / v2 == Division(v1, v2)
     assert v1 * v2 == Product(v1, v2)
+    assert v1 / v2 == Division(v1, v2)
     assert v1 + v2 == Sum(v1, v2)
     assert v1 - v2 == Sum(v1, Neg(v2))
     assert -v1 == Neg(v1)
