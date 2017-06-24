@@ -114,7 +114,7 @@ or if you want them all::
 
    pip install automate[all]
 
-Licence
+License
 -------
 
 Automate is free software: you can redistribute it and/or modify
