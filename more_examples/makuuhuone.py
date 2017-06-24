@@ -58,8 +58,8 @@ class Makuuhuone(System):
         cold_lamp_out = ArduinoPWMActuator(dev=0, pin=5, default=0.)
         warm_lamp_out = ArduinoPWMActuator(dev=0, pin=9, default=0.)  # 9,10 30 kHz
 
-        warm_preset1 = UserFloatSensor(value_min=0., value_max=1., default=.8)
-        cold_preset1 = UserFloatSensor(value_min=0., value_max=1., default=.8)
+        warm_preset1 = UserFloatSensor(value_min=0., value_max=1., default=1.)
+        cold_preset1 = UserFloatSensor(value_min=0., value_max=1., default=1.)
 
         warm_preset2 = UserFloatSensor(value_min=0., value_max=1., default=.4)
         cold_preset2 = UserFloatSensor(value_min=0., value_max=1., default=.4)
@@ -98,7 +98,7 @@ class Makuuhuone(System):
         fd_thr = UserFloatSensor(description='threshold', default=0.001, value_min=0.0001, value_max=0.01)
         fd_slp = UserFloatSensor(description='sleep time', default=0.1, value_min=0.00, value_max=1.)
 
-        dimmer = While(
+        _dimmer = While(
                         Or(
                             Value('cold_lamp_out'),
                             Value('warm_lamp_out'),
@@ -108,29 +108,31 @@ class Makuuhuone(System):
                         SetStatus('warm_lamp_out', IfElse(Value('warm_lamp_out') > Value(fd_thr),
                                                           Value('warm_lamp_out')*Value(fd_mpl), 0)),
                         Func(time.sleep, 'fd_slp'),
-                        do_after=Run(SetStatus(['preset1', 'preset2', 'preset3', 'fade_out', 'akvadimmer'], [0]*5))
+                        do_after=Run(SetStatus(['preset1', 'preset2', 'preset3', 'fade_out'], [0]*5))
                       )
 
         _count = UserIntSensor(default=0)
         _max = UserIntSensor(default=100)
         fade_time = UserIntSensor(default=1200)
 
-        lighter = While(_count < _max,
+        _lighter = While(_count < _max,
                         SetStatus(_count, _count + 1),
                         SetStatus(warm_lamp_out, warm_preset1*_count/_max),
                         SetStatus(cold_lamp_out, cold_preset1*_count/_max),
                         Func(time.sleep, fade_time/_max),
                         do_after=SetStatus(['preset1', 'fade_in', '_count'], [1, 0, 0]))
 
-        fade_in = UserBoolSensor(active_condition=Value('fade_in'), on_activate=Run('lighter'))
+        fade_in = UserBoolSensor(active_condition=Value('fade_in'),
+                                 on_activate=Run(SetStatus(_count, 0),
+                                                 '_lighter'))
 
         fade_out = UserBoolSensor(tags={'quick_lamps'}, priority=3,
                                      active_condition=Value('fade_out'),
-                                     on_activate=Run('dimmer')
+                                     on_activate=Run('_dimmer')
                                  )
         alarm_clock = CronTimerSensor(timer_on='30 7 * * *', timer_off='0 9 * * *',
                                       active_condition=Value('alarm_clock'),
-                                      on_activate=SetStatus('fade_in', True))
+                                      on_activate=SetStatus(fade_in, True))
 
     class SystemInfo(Group):
         load_average = PollingSensor(interval=10, status_updater=ToStr('{}', Func(os.getloadavg)))
