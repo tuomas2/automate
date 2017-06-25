@@ -1323,10 +1323,10 @@ def test_logical(prog, x, r):
 
 def test_logical2(prog):
     prog.on_deactivate = c = Neg(1, 1)
-    with pytest.raises(AssertionError):
+    with pytest.raises(RuntimeError):
         c.call(prog)
     c = prog.on_deactivate = Not(1, 1)
-    with pytest.raises(AssertionError):
+    with pytest.raises(RuntimeError):
         c.call(prog)
 
 
