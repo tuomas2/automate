@@ -199,7 +199,7 @@ class System(SystemBase):
     two_phase_queue = CBool(False)
 
     @classmethod
-    def load_or_create(cls, filename=None, **kwargs):
+    def load_or_create(cls, filename=None, no_input=False, **kwargs):
         """
             Load system from a dump, if dump file exists, or create a new system if it does not exist.
         """
@@ -225,6 +225,9 @@ class System(SystemBase):
             if savefile_more_recent():
                 return load()
             else:
+                if no_input:
+                    print('Program file more recent. Loading that instead.')
+                    return create()
                 while True:
                     answer = input('Program file more recent. Do you want to load it? (y/n) ')
                     if answer == 'y':
