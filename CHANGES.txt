@@ -1,4 +1,4 @@
-0.10.9 (unreleased)
+0.10.9 (2017-06-25)
 -------------------
 
 - Fix timezone problem caused by Django webui. Caused issues with CronTimerSensor
