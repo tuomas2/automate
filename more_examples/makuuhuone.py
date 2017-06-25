@@ -29,12 +29,20 @@ def lirc_filter(line):
     print('Command ', key)
     return key
 
-def calc_val(i, max_i):
+
+def calc_val(i, max_i, reverse=False):
     """
     Must return value between 0 and 1.
     """
-    x = float(i)/max_i
+    x = max(0., min(1., float(i)/max_i))
+    if reverse:
+        x = 1-x
+
     return max(0., min(x**2, 1.0))
+
+
+def calc_val_reverse(i, max_i):
+    return calc_val(i, max_i, reverse=True)
 
 
 class Makuuhuone(System):
@@ -101,33 +109,31 @@ class Makuuhuone(System):
 
         switch_off = UserEventSensor(tags={'quick_lamps'}, on_activate=SetStatus(['fade_out', 'preset1', 'preset2', 'preset3'], [0]*4))
 
-        fd_mpl = UserFloatSensor(description='multiplier', default=0.999, value_min=0.9, value_max=1.0)
-        fd_thr = UserFloatSensor(description='threshold', default=0.001, value_min=0.0001, value_max=0.01)
-        fd_slp = UserFloatSensor(description='sleep time', default=0.1, value_min=0.00, value_max=1.)
-
-        _dimmer = While(
-                        Or(
-                            Value('cold_lamp_out'),
-                            Value('warm_lamp_out'),
-                        ),
-                        SetStatus('cold_lamp_out', IfElse(Value('cold_lamp_out') > Value(fd_thr),
-                                                          Value('cold_lamp_out')*Value(fd_mpl), 0)),
-                        SetStatus('warm_lamp_out', IfElse(Value('warm_lamp_out') > Value(fd_thr),
-                                                          Value('warm_lamp_out')*Value(fd_mpl), 0)),
-                        Func(time.sleep, 'fd_slp'),
-                        do_after=Run(SetStatus(['preset1', 'preset2', 'preset3', 'fade_out'], [0]*5))
-                      )
-
         _count = UserIntSensor(default=0)
-        _max = UserIntSensor(default=1000)
-        fade_time = UserIntSensor(default=1800)
+        _max = UserIntSensor(default=100)
+        fade_in_time = UserIntSensor(default=1800)
+        fade_out_time = UserIntSensor(default=1800)
 
+        _fade_in_warm_start = UserFloatSensor(default=0.0)
+        _fade_in_cold_start = UserFloatSensor(default=0.0)
+
+
+        _dimmer = Run(SetStatus([_fade_in_cold_start, _fade_in_warm_start],
+                                [cold_lamp_out, warm_lamp_out]),
+                      While(_count < _max,
+                            SetStatus(_count, _count + 1),
+                            SetStatus(warm_lamp_out, Func(calc_val_reverse, _count, _max) * _fade_in_warm_start),
+                            SetStatus(cold_lamp_out, Func(calc_val_reverse, _count, _max) * _fade_in_cold_start),
+                            Func(time.sleep, fade_out_time / _max),
+                            do_after=SetStatus(['preset1', 'preset2', 'preset3', 'fade_out', '_count'], [0]*5)
+                            )
+                      )
         _lighter = While(_count < _max,
-                        SetStatus(_count, _count + 1),
-                        SetStatus(warm_lamp_out, Func(calc_val, _count, _max) * warm_preset1),
-                        SetStatus(cold_lamp_out, Func(calc_val, _count, _max) * cold_preset1),
-                        Func(time.sleep, fade_time/_max),
-                        do_after=SetStatus(['preset1', 'fade_in', '_count'], [1, 0, 0]))
+                         SetStatus(_count, _count + 1),
+                         SetStatus(warm_lamp_out, Func(calc_val, _count, _max) * warm_preset1),
+                         SetStatus(cold_lamp_out, Func(calc_val, _count, _max) * cold_preset1),
+                         Func(time.sleep, fade_in_time / _max),
+                         do_after=SetStatus(['preset1', 'fade_in', '_count'], [1, 0, 0]))
 
         fade_in = UserBoolSensor(active_condition=Value('fade_in'),
                                  on_activate=Run(SetStatus(_count, 0),
@@ -138,8 +144,10 @@ class Makuuhuone(System):
                                      on_activate=Run('_dimmer')
                                  )
         alarm_clock = CronTimerSensor(timer_on='0 7 * * *', timer_off='0 9 * * *',
-                                      active_condition=Value('alarm_clock'),
+                                      active_condition=And('alarm_enabled', Value('alarm_clock')),
                                       on_activate=SetStatus(fade_in, True))
+
+        alarm_enabled = UserBoolSensor(default=True)
 
     class SystemInfo(Group):
         load_average = PollingSensor(interval=10, status_updater=ToStr('{}', Func(os.getloadavg)))
