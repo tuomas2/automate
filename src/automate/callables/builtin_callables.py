@@ -392,7 +392,8 @@ class SetStatus(AbstractAction):
         if not is_iterable(values):
             values = [values] * len(objs)
         values = list(values)
-        assert len(objs) == len(values), ('SetStatus: length of targets should be equal to '
+        if len(objs) != len(values):
+            raise RuntimeError('SetStatus: length of targets should be equal to '
                                           'length of sources: %s != %s' % (len(objs), len(values)))
 
         self.system.logger.debug('SetStatus: objs %s, rv: %s', objs, values)
@@ -891,7 +892,8 @@ class Neg(AbstractLogical):
     """
 
     def call(self, caller=None, **kwargs):
-        assert len(self.objects) == 1, 'Too many arguments'
+        if len(self.objects) != 1:
+            raise RuntimeError('Too many arguments')
         return -self.call_eval(self.obj, caller, **kwargs)
 
 
@@ -905,7 +907,8 @@ class Inverse(AbstractLogical):
     """
 
     def call(self, caller=None, **kwargs):
-        assert len(self.objects) == 1, 'Too many arguments'
+        if len(self.objects) != 1:
+            raise RuntimeError('Too many arguments')
         return 1./self.call_eval(self.obj, caller, **kwargs)
 
 
@@ -924,7 +927,8 @@ class Not(AbstractLogical):
     """
 
     def call(self, caller=None, **kwargs):
-        assert len(self.objects) == 1, 'Too many arguments'
+        if len(self.objects) != 1:
+            raise RuntimeError('Too many arguments')
         return not self.call_eval(self.obj, caller, **kwargs)
 
 

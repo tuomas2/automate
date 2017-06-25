@@ -148,7 +148,8 @@ class AbstractCallable(SystemObject, CompareMixin):
         self._kwargs = kwargs
         super(AbstractCallable, self).__init__()
         super(SystemObject, self).__init__()
-        assert self.traits_inited()
+        if not self.traits_inited():
+            self.logger.error('Traits not inited!!!')
         if args:
             self._args = args
 
