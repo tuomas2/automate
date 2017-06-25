@@ -37,6 +37,7 @@ import os
 import logging
 import pickle
 import pkg_resources
+import argparse
 
 from traits.api import (CStr, Instance, CBool, CList, Property, CInt, CUnicode, Event, CSet, Str, cached_property,
                         on_trait_change)
@@ -203,6 +204,13 @@ class System(SystemBase):
         """
             Load system from a dump, if dump file exists, or create a new system if it does not exist.
         """
+        parser = argparse.ArgumentParser()
+        parser.add_argument('--no_input', action='store_true')
+        args = parser.parse_args()
+
+        if args.no_input:
+            print('Parameter --no_input was given')
+            no_input = True
 
         def savefile_more_recent():
             time_savefile = os.path.getmtime(filename)
