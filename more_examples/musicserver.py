@@ -425,4 +425,5 @@ if __name__ == '__main__':
         logfile='music_server.log' if is_raspi() else '',
         print_level=logging.INFO if is_raspi() else logging.DEBUG,
         log_level=logging.WARNING,
+        no_input=not is_raspi(),
     )

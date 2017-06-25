@@ -475,4 +475,5 @@ s = autoaqua.load_or_create(
     print_level=logging.INFO,
     log_level=logging.INFO,
     logfile="autoaqua.log",
+    no_input=not is_raspi(),
 )
