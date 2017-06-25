@@ -1,11 +1,10 @@
 # encoding:utf-8
 from __future__ import unicode_literals
 from automate import *
-from automate.extensions.arduino import ArduinoPWMActuator, ArduinoDigitalActuator, \
-    ArduinoDigitalSensor
+from automate.extensions.arduino import ArduinoDigitalActuator
 from automate.extensions.rpio import RpioSensor
 from automate.extensions.webui import WebService
-import time
+
 import os
 import psutil
 
@@ -32,19 +31,8 @@ def lirc_filter(line):
     return key
 
 
-class Makuuhuone(System):
-    class Commands(Group):
-        tags = 'web'
-        reload_arduino = UserEventSensor(
-            on_activate=ReloadService('ArduinoService'),
-        )
-        reload_web = UserEventSensor(
-            on_activate=ReloadService('WebService'),
-        )
-
-        testpin = ArduinoDigitalActuator(pin=13, default=False)
-        testpin_toggle = UserBoolSensor(on_update=SetStatus('testpin', 'testpin_toggle'))
-
+class Makuuhuone(lamps.LampGroupsMixin, System):
+    class RpioButtons(Group):
         button1 = RpioSensor(port=14, button_type='up', active_condition=Value('button1'), on_activate=Run('_toggler'))
         button2 = RpioSensor(port=15, button_type='up', active_condition=Value('button2'), on_activate=SetStatus('switch_off', 1))
         button3 = RpioSensor(port=18, button_type='up', active_condition=Value('button3'))
@@ -60,13 +48,18 @@ class Makuuhuone(System):
                                                    ),
                                   )
 
-    Lamps = lamps.get_lamps_group(enable_alarm=True)
-
-
     class SystemInfo(Group):
+        tags = 'web'
         load_average = PollingSensor(interval=10, status_updater=ToStr('{}', Func(os.getloadavg)))
         memory = PollingSensor(interval=10, status_updater=ToStr(Func(meminfo)))
 
+    class Debug(Group):
+        tags = 'web'
+        testpin = ArduinoDigitalActuator(pin=13, default=False)
+        testpin_toggle = UserBoolSensor(on_update=SetStatus('testpin', 'testpin_toggle'))
+        reload_arduino = UserEventSensor(
+            on_activate=ReloadService('ArduinoService'),
+        )
 
 import tornado.log
 tornado.log.access_log.setLevel(logging.WARNING)

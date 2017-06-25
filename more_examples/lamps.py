@@ -1,6 +1,8 @@
 from automate import *
 from automate.extensions.arduino import ArduinoPWMActuator
 
+import platform
+hostname = platform.node()
 
 def calc_val(i, max_i, reverse=False):
     """
@@ -17,16 +19,13 @@ def calc_val_reverse(i, max_i):
     return calc_val(i, max_i, reverse=True)
 
 
-def get_lamps_group(enable_alarm=False):
-    class Lamps(Group):
-        _toggler = IfElse('preset1', SetStatus('preset2', 1),
-                          IfElse('preset2', SetStatus('preset3', 1),
-                                 IfElse('preset3', SetStatus('preset3', 0),
-                                        SetStatus('preset1', 1))))
-
+class LampGroupsMixin:
+    class LampsHardware(Group):
         cold_lamp_out = ArduinoPWMActuator(dev=0, pin=9, default=0.)
         warm_lamp_out = ArduinoPWMActuator(dev=0, pin=10, default=0.)  # 9,10 30 kHz
 
+    class LampAdjustment(Group):
+        tags ='adj'
         warm_preset1 = UserFloatSensor(value_min=0., value_max=1., default=1.)
         cold_preset1 = UserFloatSensor(value_min=0., value_max=1., default=1.)
 
@@ -35,6 +34,14 @@ def get_lamps_group(enable_alarm=False):
 
         warm_preset3 = UserFloatSensor(value_min=0., value_max=1., default=.1)
         cold_preset3 = UserFloatSensor(value_min=0., value_max=1., default=.1)
+
+    class Lamps(Group):
+        tags = 'web'
+        _toggler = IfElse('preset1', SetStatus('preset2', 1),
+                          IfElse('preset2', SetStatus('preset3', 1),
+                                 IfElse('preset3', SetStatus('preset3', 0),
+                                        SetStatus('preset1', 1))))
+
 
         preset1 = UserBoolSensor(tags={'quick_lamps'},
                                  priority=2.,
@@ -75,8 +82,8 @@ def get_lamps_group(enable_alarm=False):
             SetStatus(_count, 0),
             While(_count < _max,
                   SetStatus(_count, _count + 1),
-                  SetStatus(warm_lamp_out, Func(calc_val_reverse, _count, _max) * _fade_in_warm_start),
-                  SetStatus(cold_lamp_out, Func(calc_val_reverse, _count, _max) * _fade_in_cold_start),
+                  SetStatus('warm_lamp_out', Func(calc_val_reverse, _count, _max) * _fade_in_warm_start),
+                  SetStatus('cold_lamp_out', Func(calc_val_reverse, _count, _max) * _fade_in_cold_start),
                   Func(time.sleep, fade_out_time / _max),
                   do_after=SetStatus(['preset1', 'preset2', 'preset3', 'fade_out', '_count'], [0]*5)
                   )
@@ -84,8 +91,8 @@ def get_lamps_group(enable_alarm=False):
 
         _lighter = While(_count < _max,
                          SetStatus(_count, _count + 1),
-                         SetStatus(warm_lamp_out, Func(calc_val, _count, _max) * warm_preset1),
-                         SetStatus(cold_lamp_out, Func(calc_val, _count, _max) * cold_preset1),
+                         SetStatus('warm_lamp_out', Func(calc_val, _count, _max) * Value('warm_preset1')),
+                         SetStatus('cold_lamp_out', Func(calc_val, _count, _max) * Value('cold_preset1')),
                          Func(time.sleep, fade_in_time / _max),
                          do_after=SetStatus(['preset1', 'fade_in', '_count'], [1, 0, 0]))
 
@@ -96,15 +103,12 @@ def get_lamps_group(enable_alarm=False):
         fade_out = UserBoolSensor(tags={'quick_lamps'}, priority=3,
                                      active_condition=Value('fade_out'),
                                      on_activate=Run(
-                                         SetStatus([_fade_in_cold_start, _fade_in_warm_start], [cold_lamp_out, warm_lamp_out]),
+                                         SetStatus([_fade_in_cold_start, _fade_in_warm_start], ['cold_lamp_out', 'warm_lamp_out']),
                                          '_dimmer')
-                                 )
-        alarm_clock = CronTimerSensor(timer_on='0 7 * * *', timer_off='0 9 * * *',
-                                      active_condition=And('alarm_enabled', Value('alarm_clock')),
-                                      on_activate=SetStatus(fade_in, True))
+                                  )
 
-        alarm_enabled = UserBoolSensor(default=enable_alarm)
-
+    class Aquarium(Group):
+        tags = 'adj'
         warm_preset_akva = UserFloatSensor(value_min=0., value_max=1., default=1)
         cold_preset_akva = UserFloatSensor(value_min=0., value_max=1., default=0.5)
 
@@ -117,10 +121,16 @@ def get_lamps_group(enable_alarm=False):
                 Or('warm_lamp_out', 'cold_lamp_out'),
                 SetStatus('akvadimmer', 0),
                 Run(
-                    SetStatus([_fade_in_cold_start, _fade_in_warm_start], [cold_preset_akva, warm_preset_akva]),
+                    SetStatus(['_fade_in_cold_start', '_fade_in_warm_start'], [cold_preset_akva, warm_preset_akva]),
                     Run('_dimmer'),
                     )
             )
         )
 
-    return Lamps
+    class AlarmClock(Group):
+        tags = 'adj'
+        alarm_clock = CronTimerSensor(timer_on='0 7 * * *', timer_off='0 9 * * *',
+                                      active_condition=And('alarm_enabled', Value('alarm_clock')),
+                                      on_activate=SetStatus('fade_in', True))
+
+        alarm_enabled = UserBoolSensor(tags={'quick_lamps', 'web'}, default=hostname == 'raspi3')

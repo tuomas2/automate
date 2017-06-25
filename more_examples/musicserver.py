@@ -55,8 +55,11 @@ def is_raspi():
     return platform.node() in ["raspi1", "raspi2"]
 
 def lirc_filter(line):
-    code, num, key, remote = line.split(' ')
-    return key
+    try:
+        code, num, key, remote = line.split(' ')
+        return key
+    except ValueError:
+        return '-'
 
 class IsRaspi(SystemObject):
 
@@ -67,13 +70,7 @@ raspi1host = 'http://raspi1:3030/' if is_raspi() else 'http://localhost:3030/'
 basetime = 5 if is_raspi() else 100
 
 
-class MusicServer(System):
-    #    class Test(Group):
-    #        tstint = UserIntSensor()
-    #        tstfloat = UserFloatSensor()
-    #        tststr = UserStrSensor()
-    #        tstbool = UserBoolSensor()
-
+class MusicServer(lamps.LampGroupsMixin, System):
     normal_volume = UserIntSensor(
         default=0,
         value_min=-50,
@@ -125,7 +122,7 @@ class MusicServer(System):
             #status_updater=Value(IfElse(mplayer_pid, Not(Shell(ToStr('ps {}', mplayer_pid))), 0)),
             status_updater=Value(IfElse(mplayer_pid, Func(os.path.isdir, ToStr('/proc/{}', mplayer_pid)), 0)),
             active_condition=Value('mplayer_alive'),
-            on_deactivate=Run('clear'),
+            on_deactivate=Run('_clear'),
         )
 
         mplayer = UserStrSensor(
@@ -169,25 +166,17 @@ class MusicServer(System):
                              Func(os.kill, 'mplayer_pid', signal.SIGCONT)),
         )
 
-        # clear = UserEventSensor(
-        #    on_activate=
-        clear = SetStatus([mplayer, youtube, livestreamer], [''] * 3)
-        #)
+        _clear = SetStatus([mplayer, youtube, livestreamer], [''] * 3)
+
+    class RpioButtons(Group):
+        button1 = RpioSensor(port=14, button_type='up', active_condition=Value('button1'), on_activate=Run('_toggler'))
+        button2 = RpioSensor(port=15, button_type='up', active_condition=Value('button2'), on_activate=SetStatus('switch_off', 1))
 
     class Commands(Group):
         tags = 'web'
 
-        button1 = RpioSensor(port=14, button_type='up', active_condition=Value('button1'), on_activate=Run('_toggler'))
-        button2 = RpioSensor(port=15, button_type='up', active_condition=Value('button2'), on_activate=SetStatus('switch_off', 1))
-        #button2 = RpioSensor(port=15, active_condition=Value('button2'), on_activate=SetStatus('preset2', Not('preset2')))
-        #button3 = RpioSensor(port=18, active_condition=Value('button3'), on_activate=SetStatus('preset3', Not('preset3')))
-
-
         reload_arduino = UserEventSensor(
             on_activate=ReloadService('ArduinoService'),
-        )
-        reload_web = UserEventSensor(
-            on_activate=ReloadService('WebService'),
         )
 
         radiodei = UserEventSensor(tags={'quick_music'},
@@ -208,7 +197,7 @@ class MusicServer(System):
         )
 
         stop = UserEventSensor(tags={'quick_music'},
-            on_activate=Run('reset_mplayer', 'clear'),
+            on_activate=Run('reset_mplayer', '_clear'),
         )
 
         restart_mpd = UserEventSensor(
@@ -223,19 +212,13 @@ class MusicServer(System):
             on_activate=Shell('mpc next'),
         )
 
-        #volumesensor = PollingSensor(
-        #    interval=basetime,
-        #    status_updater=RegexSearch(r'Front Left: (\d*)', Shell('amixer sget Master 2>/dev/null', output=True)),
-        #    #on_update=SetStatus('volume', 'volumesensor'),
-        #)
-
         read_volume = UserEventSensor(
             on_activate=Run(
                 SetStatus('volume', Func(float, RegexSearch(r'\[([-\.\d]+)dB\]', Shell('amixer sget Master 2>/dev/null', output=True)))),
                 SetStatus('volume_piano_only', Func(float, RegexSearch(r'\[([-\.\d]+)dB\]', Shell('amixer sget "Matrix 03 Mix A" 2>/dev/null', output=True)))),
                 SetStatus('volume_pcm_only', Func(float, RegexSearch(r'\[([-\.\d]+)dB\]', Shell('amixer sget "Matrix 01 Mix A" 2>/dev/null', output=True)))),
                 ),
-            tags = 'quick_music',
+            tags='quick_music,adj',
         )
 
         volume = UserIntSensor(tags={'quick_music'},
@@ -245,13 +228,14 @@ class MusicServer(System):
             on_update=Shell(ToStr('amixer -- sset "Master" {}dB', Value('volume')))
         )
 
-        volume_piano_only = UserIntSensor(tags={'quick_music'},
+        volume_piano_only = UserIntSensor(
+            tags={'quick_music'},
             default=0,
             value_min=-50,
             value_max=0,
             on_update=Run(
-                    Shell(ToStr('amixer -- sset "Matrix 03 Mix A" {}dB', Value('volume_piano_only'))),
-                    Shell(ToStr('amixer -- sset "Matrix 04 Mix B" {}dB', Value('volume_piano_only'))),
+                Shell(ToStr('amixer -- sset "Matrix 03 Mix A" {}dB', Value('volume_piano_only'))),
+                Shell(ToStr('amixer -- sset "Matrix 04 Mix B" {}dB', Value('volume_piano_only'))),
             )
         )
 
@@ -282,11 +266,7 @@ class MusicServer(System):
                                  )
         )
 
-        manual_mode = UserBoolSensor(tags={'quick_music'},
-            default=True,
-            #active_condition=Value('manual_mode'),
-            #on_activate=SetStatus('out_buffer', 1),
-        )
+        manual_mode = UserBoolSensor(tags={'quick_music'}, default=True)
 
     moc_alive = UserBoolSensor(default=False)
     #class Moc(Group):
@@ -337,37 +317,16 @@ class MusicServer(System):
                 SetStatus('volume_pcm_only', 'volume_pcm_only', force=True),
             )
         )
-#        def filter(line):
-#            start_str = 'Product: Scarlett 18i6 USB'
-#            stop_str = '
-#            pass
-#
-#        soundcard_ready = ShellSensor(cmd='tail -f /var/log/syslog', filter=filter, simple=True)
 
         playback_active = PollingSensor(
             interval=basetime,
             status_updater=Or('mplayer_alive', 'moc_alive', Not(Shell('mpc | grep playing'))),
         )
 
-        #set_piano_volume = Program(
-        #    active_condition=And('piano_on', 'soundcard_ready'),
-        #    on_activate=SetStatus('volume', 'piano_volume'),
-        #    on_deactivate=SetStatus('volume', 'normal_volume')
-        #)
-
         piano_on = PollingSensor(
-            #active_condition = Value('piano_on'),
-            #on_activate=SetStatus('out_buffer', 1),
             interval = basetime,
             status_updater=Not(Shell('aplaymidi -l | grep RD')),
         )
-        #midi = MidiSensor()
-        #fsc = FileChangeSensor(filename='/home/tuma/nauhoituksia/', silent=True)
-        # playback_active = SocketSensor(
-        #    port=9192,
-        #)
-
-    Lamps = lamps.get_lamps_group()
 
     class SystemInfo(Group):
         load_average = PollingSensor(interval=10, status_updater=ToStr('{}', Func(os.getloadavg)))
@@ -400,11 +359,6 @@ class MusicServer(System):
             on_update=SetStatus(out_actual, 'out_buffer'),
         )
 
-        #after_reset = Program(
-        #    update_condition=Value('out_buffer'),
-        #    on_update=If(Not(Or('manual_mode', 'piano_on')), Delay(5, Shell('mpc play'))),
-        #    exclude_triggers=['manual_mode', 'piano_on']
-        #)
 
 import tornado.log
 tornado.log.access_log.setLevel(logging.WARNING)
