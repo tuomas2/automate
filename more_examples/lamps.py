@@ -17,7 +17,7 @@ def calc_val_reverse(i, max_i):
     return calc_val(i, max_i, reverse=True)
 
 
-def get_lamps_group():
+def get_lamps_group(enable_alarm=False):
     class Lamps(Group):
 
         cold_lamp_out = ArduinoPWMActuator(dev=0, pin=9, default=0.)
@@ -99,7 +99,7 @@ def get_lamps_group():
                                       active_condition=And('alarm_enabled', Value('alarm_clock')),
                                       on_activate=SetStatus(fade_in, True))
 
-        alarm_enabled = UserBoolSensor(default=True)
+        alarm_enabled = UserBoolSensor(default=enable_alarm)
 
         warm_preset_akva = UserFloatSensor(value_min=0., value_max=1., default=1)
         cold_preset_akva = UserFloatSensor(value_min=0., value_max=1., default=0.5)

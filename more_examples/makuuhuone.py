@@ -54,7 +54,7 @@ class Makuuhuone(System):
                                                    ),
                                   )
 
-    Lamps = lamps.get_lamps_group()
+    Lamps = lamps.get_lamps_group(enable_alarm=True)
 
 
     class SystemInfo(Group):
