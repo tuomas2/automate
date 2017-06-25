@@ -176,13 +176,9 @@ class MusicServer(System):
 
     class Commands(Group):
         tags = 'web'
-        _toggler = IfElse('preset1', SetStatus('preset2', 1),
-                           IfElse('preset2', SetStatus('preset3', 1),
-                                IfElse('preset3', SetStatus('preset3', 0),
-                                    SetStatus('preset1', 1))))
 
-        button1 = RpioSensor(port=14, button_type='up', active_condition=Value('button1'), on_activate=_toggler)
-        button2 = RpioSensor(port=15, button_type='up')
+        button1 = RpioSensor(port=14, button_type='up', active_condition=Value('button1'), on_activate=Run('_toggler'))
+        button2 = RpioSensor(port=15, button_type='up', active_condition=Value('button2'), on_activate=SetStatus('switch_off', 1))
         #button2 = RpioSensor(port=15, active_condition=Value('button2'), on_activate=SetStatus('preset2', Not('preset2')))
         #button3 = RpioSensor(port=18, active_condition=Value('button3'), on_activate=SetStatus('preset3', Not('preset3')))
 

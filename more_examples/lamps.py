@@ -19,6 +19,10 @@ def calc_val_reverse(i, max_i):
 
 def get_lamps_group(enable_alarm=False):
     class Lamps(Group):
+        _toggler = IfElse('preset1', SetStatus('preset2', 1),
+                          IfElse('preset2', SetStatus('preset3', 1),
+                                 IfElse('preset3', SetStatus('preset3', 0),
+                                        SetStatus('preset1', 1))))
 
         cold_lamp_out = ArduinoPWMActuator(dev=0, pin=9, default=0.)
         warm_lamp_out = ArduinoPWMActuator(dev=0, pin=10, default=0.)  # 9,10 30 kHz
