@@ -28,6 +28,7 @@ from __future__ import unicode_literals
 
 import json
 import datetime
+import time
 import os
 
 from django.template.loader import render_to_string
@@ -127,6 +128,9 @@ class WebService(TornadoService):
             settings.DEBUG = self.debug
             if not 'SECRET_KEY' in self.django_settings:
                 self.logger.warning('Insecure settings! Please set proper SECRET_KEY in django_settings!')
+            if not 'TIME_ZONE' in self.django_settings:
+                os.environ.pop('TZ')  # Django uses America/Chicago as default timezone. Let's clean this up.
+                time.tzset()
             for key, value in self.django_settings.items():
                 setattr(settings, key, value)
 

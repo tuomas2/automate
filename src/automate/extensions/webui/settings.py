@@ -19,7 +19,6 @@ SECRET_KEY = 'insecure-default'
 ALLOWED_HOSTS = ['*']
 ROOT_URLCONF = 'automate.extensions.webui.djangoapp.urls'
 USE_TZ=False
-TIME_ZONE = "Europe/Helsinki"
 
 TEMPLATES = [
                 {
