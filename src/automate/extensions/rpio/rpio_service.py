@@ -110,7 +110,7 @@ class RpioService(AbstractSystemService):
             if 'has already been called before' in e.message:
                 pass
             else:
-                raise e
+                raise
 
         return self._hw.PWM
 

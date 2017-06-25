@@ -126,5 +126,5 @@ def sensor_form(context, sensor):
                                              source=context.get('source', 'main'), sensor=sensor)
     except Exception as e:
         logger.error('Error: %s', e)
-        raise e
+        raise
     return form

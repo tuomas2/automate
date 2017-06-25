@@ -133,7 +133,7 @@ class ArduinoService(AbstractSystemService):
                     self.logger.warning('Your arduino device %s is not available. Arduino will be mocked.', ard_devs[i])
                     self._boards.append(None)
                 else:
-                    raise e
+                    raise
             self._locks.append(Lock())
 
     def cleanup(self):
