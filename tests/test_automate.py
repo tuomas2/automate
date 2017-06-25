@@ -68,7 +68,7 @@ def test_namespace():
     sys.cleanup()
 
 
-@pytest.yield_fixture(params=[0, 1])
+@pytest.fixture(params=[0, 1])
 def mysys(request):
     class sysclass(System):
         mysensor = UserFloatSensor()

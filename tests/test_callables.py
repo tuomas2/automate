@@ -40,7 +40,7 @@ ORIGVAL = 1.25
 NEWVAL = 2.0
 
 
-@pytest.yield_fixture(params=[0, 1])
+@pytest.fixture(params=[0, 1])
 def mysys(request):
     if request.param == 0:
         class _mysys(System):
@@ -66,7 +66,7 @@ def mysys(request):
     sys.cleanup()
 
 
-@pytest.yield_fixture
+@pytest.fixture
 def prog(request):
     class _mysys(System):
         act = FloatActuator(default=ORIGVAL)
@@ -1341,7 +1341,7 @@ def test_logic_cmp():
     assert (v1 > v2) == More(v1, v2)
 
 
-@pytest.yield_fixture
+@pytest.fixture
 def self_sys():
     class sys(System):
         s2 = UserBoolSensor()

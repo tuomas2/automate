@@ -30,7 +30,7 @@ import logging
 from automate.system import System
 
 
-@pytest.yield_fixture(params=[1])
+@pytest.fixture(params=[1])
 def sysloader(request, tmpdir):
     filename = str(tmpdir.join('savefile.dmp'))
     if request.param:
@@ -61,7 +61,7 @@ def sysloader(request, tmpdir):
     loader.sys.cleanup()
 
 
-@pytest.yield_fixture(autouse=True)
+@pytest.fixture(autouse=True)
 def check_log(request, caplog):
     formatter = logging.Formatter(fmt='%(threadName)s:%(asctime)s:%(name)s:%(levelname)s:%(message)s')
     caplog.handler.setFormatter(formatter)

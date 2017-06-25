@@ -34,7 +34,7 @@ def progtype(request):
     return request.param
 
 
-@pytest.yield_fixture(params=[0, 1])
+@pytest.fixture(params=[0, 1])
 def mysys(request, progtype):
     class sys(System):
         s1 = UserBoolSensor()
@@ -94,7 +94,7 @@ def test_update_on_activate(mysys):
     assert a1.program_status[dp] == True
 
 
-@pytest.yield_fixture
+@pytest.fixture
 def freezesys(request):
     class sys(System):
         s1 = UserBoolSensor()
@@ -108,7 +108,7 @@ def freezesys(request):
     s.cleanup()
 
 
-@pytest.yield_fixture(params=[UserBoolSensor, BoolActuator])
+@pytest.fixture(params=[UserBoolSensor, BoolActuator])
 def freezesys2(request):
     class sys(System):
         s = request.param()
@@ -130,7 +130,7 @@ def test_freeze(freezesys):
     assert freezesys.s1.status == True
 
 
-@pytest.yield_fixture
+@pytest.fixture
 def freezesys_act(request):
     class sys(System):
         s1 = UserBoolSensor()

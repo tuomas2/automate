@@ -41,7 +41,7 @@ HIGH = 100.0
 AMOUNT = 20
 
 
-@pytest.yield_fixture(params=[0, 1, 2])
+@pytest.fixture(params=[0, 1, 2])
 def mysys_old(request):
     if request.param == 0:
         class _mysys(System):
@@ -114,13 +114,13 @@ def mysys_old(request):
 #    s.cleanup()
 
 
-@pytest.yield_fixture
+@pytest.fixture
 def mysys(mysys_old, sysloader):
     s = sysloader.new_system(mysys_old)
     s.namespace['defprog'] = s.act.program
     yield s
 
-#@pytest.yield_fixture
+#@pytest.fixture
 # def mysys(mysys_old):
 #    s = mysys_old(exclude_services=['TextUiService'])
 #    s.namespace['defprog'] = s.act.program
@@ -128,7 +128,7 @@ def mysys(mysys_old, sysloader):
 #    s.cleanup()
 
 
-@pytest.yield_fixture
+@pytest.fixture
 def mysys_groups():
     class _mysys(System):
 
