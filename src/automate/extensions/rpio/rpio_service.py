@@ -92,6 +92,7 @@ class RpioService(AbstractSystemService):
             self._hw.del_interrupt_callback(port)
         else:
             self._hw.remove_event_detect(port)
+            self._hw.cleanup(port)
 
     def enable_output_port(self, port):
         self._hw.setup(port, self._hw.OUT)

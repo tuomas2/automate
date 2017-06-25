@@ -377,7 +377,7 @@ class AbstractSensor(StatusObject):
 
     def _status_changed(self):
         if not self.silent:
-            self.logger.info("status changed to %s", repr(self.status))
+            self.logger.info("%s status changed to %s", self, repr(self.status))
 
     def __str__(self):
         return self.name
