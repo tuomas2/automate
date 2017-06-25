@@ -6,12 +6,15 @@ from automate.extensions.rpc import RpcService
 from automate.extensions.rpio import RpioActuator
 from automate.extensions.webui import WebService
 from automate.program import Program
+
+import lamps
 #import alsaseq
 from traits.api import Bool
 import time
 import os
 import signal
 import psutil
+
 
 import socket
 socket.setdefaulttimeout(30) # Do not keep waiting forever for RemoteFuncs
@@ -357,82 +360,7 @@ class MusicServer(System):
         #    port=9192,
         #)
 
-    class Lamps(Group):
-        warm_lamp_out = ArduinoPWMActuator(dev=0, pin=9, default=0.)
-        cold_lamp_out = ArduinoPWMActuator(dev=0, pin=10, default=0.)
-
-        warm_preset1 = UserFloatSensor(value_min=0., value_max=1., default=0.5)
-        cold_preset1 = UserFloatSensor(value_min=0., value_max=1., default=1.)
-
-        warm_preset2 = UserFloatSensor(value_min=0., value_max=1., default=1.)
-        cold_preset2 = UserFloatSensor(value_min=0., value_max=1., default=0.)
-
-        warm_preset3 = UserFloatSensor(value_min=0., value_max=1., default=.1)
-        cold_preset3 = UserFloatSensor(value_min=0., value_max=1., default=0.)
-
-        preset1 = UserBoolSensor(tags={'quick_lamps'},
-                                 priority=2.,
-                                 active_condition=Value('preset1'),
-                                 on_update=Run(SetStatus('warm_lamp_out', 'warm_preset1'),
-                                               SetStatus('cold_lamp_out', 'cold_preset1'),
-                                               SetStatus('preset2', 0),
-                                               SetStatus('preset3', 0),
-                                               ))
-
-        preset2 = UserBoolSensor(tags={'quick_lamps'}, priority=2.,
-                                 active_condition=Value('preset2'),
-                                 on_update=Run(SetStatus('warm_lamp_out', 'warm_preset2'),
-                                               SetStatus('cold_lamp_out', 'cold_preset2'),
-                                               SetStatus('preset1', 0),
-                                               SetStatus('preset3', 0),
-                                               ))
-
-        preset3 = UserBoolSensor(tags={'quick_lamps'}, priority=2.,
-                                 active_condition=Value('preset3'),
-                                 on_update=Run(SetStatus('warm_lamp_out', 'warm_preset3'),
-                                               SetStatus('cold_lamp_out', 'cold_preset3'),
-                                               SetStatus('preset1', 0),
-                                               SetStatus('preset2', 0),
-                                                ))
-
-        switch_off = UserEventSensor(tags={'quick_lamps'}, on_activate=SetStatus(['fade_out', 'preset1', 'preset2', 'preset3'], [0]*4))
-
-        fd_mpl = UserFloatSensor(description='multiplier', default=0.999, value_min=0.9, value_max=1.0)
-        fd_thr = UserFloatSensor(description='threshold', default=0.001, value_min=0.0001, value_max=0.01)
-        fd_slp = UserFloatSensor(description='sleep time', default=0.1, value_min=0.00, value_max=1.)
-
-        dimmer = While(
-                        Or(
-                            Value('cold_lamp_out'),
-                            Value('warm_lamp_out'),
-                        ),
-                        SetStatus('cold_lamp_out', IfElse(Value('cold_lamp_out') > Value(fd_thr),
-                                                          Value('cold_lamp_out')*Value(fd_mpl), 0)),
-                        SetStatus('warm_lamp_out', IfElse(Value('warm_lamp_out') > Value(fd_thr),
-                                                          Value('warm_lamp_out')*Value(fd_mpl), 0)),
-                        Func(time.sleep, 'fd_slp'),
-                        do_after=Run(SetStatus(['preset1', 'preset2', 'preset3', 'fade_out', 'akvadimmer'], [0]*5))
-                      )
-
-        fade_out = UserBoolSensor(tags={'quick_lamps'}, priority=3,
-                                     active_condition=Value('fade_out'),
-                                     on_activate=Run('dimmer')
-                                 )
-
-        warm_preset_akva = UserFloatSensor(value_min=0., value_max=1., default=1, user_editable=False)
-        cold_preset_akva = UserFloatSensor(value_min=0., value_max=1., default=0.5, user_editable=False)
-
-        akvadimmer = UserBoolSensor(priority=1., # lower priority light for aquarium (raspi1) remote use only
-                                 active_condition=Value('akvadimmer'),
-                                 on_activate=IfElse(
-                                                # if lamp already on, do not activate this function at all
-                                                Or('warm_lamp_out', 'cold_lamp_out'),
-                                                SetStatus('akvadimmer', 0),
-                                                Run(SetStatus('warm_lamp_out', 'warm_preset_akva'),
-                                                    SetStatus('cold_lamp_out', 'cold_preset_akva'),
-                                                    Run('dimmer'),
-                                                    )
-                                                ))
+    Lamps = lamps.get_lamps_group()
 
     class SystemInfo(Group):
         load_average = PollingSensor(interval=10, status_updater=ToStr('{}', Func(os.getloadavg)))
@@ -494,7 +422,7 @@ if __name__ == '__main__':
             StatusSaverService(),
             RpcService(http_port=3031, view_tags={'web'}),
         ],
-        logfile='musicserver.log' if is_raspi() else '',
+        logfile='music_server.log' if is_raspi() else '',
         print_level=logging.INFO if is_raspi() else logging.DEBUG,
         log_level=logging.WARNING,
     )
