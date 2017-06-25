@@ -59,9 +59,9 @@ class Makuuhuone(System):
         lirc_sensor = ShellSensor(cmd='irw', filter=lirc_filter, default='', reset_delay=1.3,
                                   active_condition=Value('lirc_sensor'),
                                   on_update=Switch('lirc_sensor',
-                                                   {'KEY_1': SetStatus('preset1', 1),
-                                                    'KEY_2': SetStatus('preset2', 1),
-                                                    'KEY_3': SetStatus('preset3', 1),
+                                                   {'KEY_1': SetStatus('preset1', Not('preset1')),
+                                                    'KEY_2': SetStatus('preset2', Not('preset2')),
+                                                    'KEY_3': SetStatus('preset3', Not('preset3')),
                                                     }
                                                    ),
                                   )
