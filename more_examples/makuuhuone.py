@@ -1,7 +1,9 @@
 # encoding:utf-8
 from __future__ import unicode_literals
 from automate import *
-from automate.extensions.arduino import ArduinoPWMActuator, ArduinoDigitalActuator
+from automate.extensions.arduino import ArduinoPWMActuator, ArduinoDigitalActuator, \
+    ArduinoDigitalSensor
+from automate.extensions.rpio import RpioSensor
 from automate.extensions.webui import WebService
 import time
 import os
@@ -40,8 +42,11 @@ class Makuuhuone(System):
             on_activate=ReloadService('WebService'),
         )
 
-        testpin = ArduinoDigitalActuator(dev=0, pin=13, default=False)
+        testpin = ArduinoDigitalActuator(pin=13, default=False)
         testpin_toggle = UserBoolSensor(on_update=SetStatus('testpin', 'testpin_toggle'))
+        button1 = RpioSensor(port=14, button_type='up', active_condition=Value('button1'), on_activate=SetStatus('preset1', Not('preset1')))
+        button2 = RpioSensor(port=15, button_type='up', active_condition=Value('button2'), on_activate=SetStatus('preset2', Not('preset2')))
+        button3 = RpioSensor(port=18, button_type='up', active_condition=Value('button3'), on_activate=SetStatus('preset3', Not('preset3')))
 
     class Lirc(Group):
         lirc_sensor = ShellSensor(cmd='irw', filter=lirc_filter, default='', reset_delay=1.3,
