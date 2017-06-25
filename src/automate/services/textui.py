@@ -117,7 +117,7 @@ class TextUIService(AbstractUserService):
         self.system.namespace.update({k: v for k, v in list(automate.__dict__.items()) if k not in self.system.namespace})
         term = TerminalIPythonApp(user_ns=self.system.namespace)
         self.system.namespace['term'] = term
-        term.initialize()
+        term.initialize([])
         term.start()
 
     def fallback_ui(self):
