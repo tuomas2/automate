@@ -54,6 +54,8 @@ def get_groups(only_user_editable=False, only_user_defined=False, only_groups=Fa
         objs = (i for i in service.system.objects_sorted if service.user_tags & i.tags)
     else:
         objs = service.system.objects_sorted
+    if not service.show_hidden:
+        objs = (i for i in objs if not i.name.startswith('_'))
     for obj in objs:
         for tag in obj.tags:
             if only_groups:
@@ -173,6 +175,9 @@ def threads(request):
 @require_login
 def single_tag(request, tag):
     objs = sorted([obj for obj in service.system.objects_sorted if tag in obj.tags])
+    if not service.show_hidden:
+        objs = (i for i in objs if not i.name.startswith('_'))
+
     if not objs:
         raise Http404
     return render(request, 'views/single_tag_view.html',

@@ -85,8 +85,11 @@ class WebService(TornadoService):
     #: In this dictionary you can define your custom Django settings which will override the default ones
     django_settings = Dict()
 
-    # From /set/object/value and /toggle/object, redirect to /set_ready/object/value after after executing action
+    #: From /set/object/value and /toggle/object, redirect to /set_ready/object/value after after executing action
     redirect_from_setters = CBool(True)
+
+    #: Show hidden objects in web UI (those prefixed with _)
+    show_hidden = CBool(False)
 
     _sockets = List
 
