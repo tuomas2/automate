@@ -383,6 +383,7 @@ def test_change_delay_rising(mysys):
 
 
 def test_change_delay_falling_issue23(mysys):
+    # TODO Check failing test on build https://travis-ci.org/tuomas2/automate/jobs/246826319
     mysys.act.change_delay = DELAYTIME  # = 3
     mysys.act.change_mode = 'falling'
     mysys.act._last_changed = time.time()
