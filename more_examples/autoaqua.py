@@ -199,13 +199,13 @@ class autoaqua(System):
                                             on_deactivate=SetStatus('silence_alarm', 0),
                                            )
         valot_manuaalimoodi = UserBoolSensor(default=1,
-                                             tags="switch,web",
+                                             tags="switch,web,quick",
                                              active_condition=Value('valot_manuaalimoodi'),
                                              on_update=SetStatus('lamput', 'valot_kytkin'),
                                              priority=3
                                              )
 
-        valot_kytkin = UserBoolSensor(default=0)
+        valot_kytkin = UserBoolSensor(default=0, tags='quick')
         lomamoodi = UserBoolSensor(default=0, tags="switch,web")
 
         tstacts_disable = OfType(AbstractActuator, exclude=['alarm', 'alarmtrigger'])
