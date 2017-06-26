@@ -366,7 +366,7 @@ def test_change_delay_both(mysys):
     assert mysys.act.status == LOW
 
 
-def test_change_delay_rising(mysys):
+def test_change_delay_falling(mysys):
     mysys.act.change_delay = DELAYTIME
     mysys.act.change_mode = 'falling'
     mysys.act._last_changed = time.time()
