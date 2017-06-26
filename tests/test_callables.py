@@ -698,7 +698,10 @@ def test_while_actuator_condition(sysloader):
 
 
 def test_while_akvadimmer(sysloader):
-    # TODO: check failing test https://travis-ci.org/tuomas2/automate/jobs/246618391
+    # TODO: check failing test
+    # https://travis-ci.org/tuomas2/automate/jobs/246618391
+    # https://travis-ci.org/tuomas2/automate/jobs/246832612
+
     called = []
 
     def myfunc():
