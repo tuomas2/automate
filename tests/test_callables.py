@@ -698,10 +698,6 @@ def test_while_actuator_condition(sysloader):
 
 
 def test_while_akvadimmer(sysloader):
-    # TODO: check failing test
-    # https://travis-ci.org/tuomas2/automate/jobs/246618391
-    # https://travis-ci.org/tuomas2/automate/jobs/246832612
-
     called = []
 
     def myfunc():
@@ -752,7 +748,7 @@ def test_while_akvadimmer(sysloader):
     s = sysloader.new_system(ms)
     s.akvadimmer.status = 1
     # Flushing system is not sufficient because While is threaded activity.
-    time.sleep(0.5)
+    time.sleep(1.0)
     assert len(called) == 8
     assert s.dimmer[0].status == False
     assert s.akvadimmer.status == 0
