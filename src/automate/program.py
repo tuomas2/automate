@@ -90,7 +90,6 @@ class ProgrammableSystemObject(SystemObject):
     def _get_status(self):
         return self.active
 
-    # Lock for trigger.
     _trigger_lock = Instance(Lock, transient=True)
 
     def __init__(self, *args, **kwargs):

@@ -179,6 +179,8 @@ class AbstractCallable(SystemObject, CompareMixin):
             lst2 = list(lst.items())
         elif isinstance(lst, list):
             lst2 = enumerate(lst)
+        else:
+            raise RuntimeError('Error in _fix_list, type %s', type(lst))
         for idx, obj in lst2:
             if isinstance(obj, basestring):
                 lst[idx] = self.name_to_system_object(obj)
