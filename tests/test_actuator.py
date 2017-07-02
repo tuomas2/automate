@@ -383,8 +383,6 @@ def test_change_delay_falling(mysys):
 
 
 def test_change_delay_falling_issue23(mysys):
-    # TODO Check failing test on build
-    # https://travis-ci.org/tuomas2/automate/jobs/246826319
     mysys.act.change_delay = DELAYTIME  # = 3
     mysys.act.change_mode = 'falling'
     mysys.act._last_changed = time.time()
@@ -400,7 +398,7 @@ def test_change_delay_falling_issue23(mysys):
     mysys.sens.set_status(False)
     time.sleep(0.9 * DELAYTIME)
     assert mysys.act.status == HIGH
-    time.sleep(0.2 * DELAYTIME)  # must wait full change_delay after set_status(False)!
+    time.sleep(0.4 * DELAYTIME)  # must wait full change_delay after set_status(False)!
     assert mysys.act.status == LOW
 
 
