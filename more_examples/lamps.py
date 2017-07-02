@@ -4,19 +4,51 @@ from automate.extensions.arduino import ArduinoPWMActuator
 import platform
 hostname = platform.node()
 
-def calc_val(i, max_i, reverse=False):
-    """
-    Must return value between 0 and 1.
-    """
-    x = max(0., min(1., float(i)/max_i))
-    if reverse:
-        x = 1-x
 
-    return max(0., min(x**2, 1.0))
+def clip_values(func):
+    @wraps(func)
+    def decorator(i, max_i, reverse=False):
+        x = max(0., min(1., float(i)/max_i))
+        if reverse:
+            x = 1-x
+        fx = func(x)
+        return max(0., min(fx, 1.0))
+    return decorator
+
+
+@clip_values
+def f1(x):
+    return 4*x**2
+
+
+@clip_values
+def f2(x):
+    if x < 0.5:
+        return 0.
+    return 4*x**2-4*x+1
+
+
+@clip_values
+def f3(x):
+    return x**2
+
+
+for f in [f1, f2, f3]:
+    assert f(-1, 100) == 0.0
+    assert f(0, 100) == 0.0
+    assert f(100, 100) == 1.0
+    assert f(101, 100) == 1.0
+
+
+#def calc_val_warm(i, max_i, reverse=False):
+#    return calc_val(2*i, max_i, reverse=reverse)
+
+calc_val_cold = f3
+calc_val_warm = f3
 
 
 def calc_val_reverse(i, max_i):
-    return calc_val(i, max_i, reverse=True)
+    return f3(i, max_i, reverse=True)
 
 
 class LampGroupsMixin:
@@ -29,8 +61,8 @@ class LampGroupsMixin:
         warm_preset1 = UserFloatSensor(value_min=0., value_max=1., default=1.)
         cold_preset1 = UserFloatSensor(value_min=0., value_max=1., default=1.)
 
-        warm_preset2 = UserFloatSensor(value_min=0., value_max=1., default=.4)
-        cold_preset2 = UserFloatSensor(value_min=0., value_max=1., default=.4)
+        warm_preset2 = UserFloatSensor(value_min=0., value_max=1., default=.3)
+        cold_preset2 = UserFloatSensor(value_min=0., value_max=1., default=.3)
 
         warm_preset3 = UserFloatSensor(value_min=0., value_max=1., default=.1)
         cold_preset3 = UserFloatSensor(value_min=0., value_max=1., default=.1)
@@ -72,8 +104,8 @@ class LampGroupsMixin:
 
         _count = UserIntSensor(default=0)
         _max = UserIntSensor(default=100)
-        fade_in_time = UserIntSensor(default=1800)
-        fade_out_time = UserIntSensor(default=1800)
+        fade_in_time = UserIntSensor(default=30*60)
+        fade_out_time = UserIntSensor(default=30*60)
 
         _fade_in_warm_start = UserFloatSensor(default=0.0)
         _fade_in_cold_start = UserFloatSensor(default=0.0)
@@ -91,8 +123,8 @@ class LampGroupsMixin:
 
         _lighter = While(_count < _max,
                          SetStatus(_count, _count + 1),
-                         SetStatus('warm_lamp_out', Func(calc_val, _count, _max) * Value('warm_preset1')),
-                         SetStatus('cold_lamp_out', Func(calc_val, _count, _max) * Value('cold_preset1')),
+                         SetStatus('warm_lamp_out', Func(calc_val_warm, _count, _max) * Value('warm_preset1')),
+                         SetStatus('cold_lamp_out', Func(calc_val_cold, _count, _max) * Value('cold_preset1')),
                          Func(time.sleep, fade_in_time / _max),
                          do_after=SetStatus(['preset1', 'fade_in', '_count'], [1, 0, 0]))
 
@@ -129,7 +161,7 @@ class LampGroupsMixin:
 
     class AlarmClock(Group):
         tags = 'adj'
-        alarm_clock = CronTimerSensor(timer_on='0 7 * * *', timer_off='0 9 * * *',
+        alarm_clock = CronTimerSensor(timer_on='20 7 * * *', timer_off='0 9 * * *',
                                       active_condition=And('alarm_enabled', Value('alarm_clock')),
                                       on_activate=SetStatus('fade_in', True))
 
