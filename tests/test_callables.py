@@ -825,7 +825,6 @@ def test_while_cancel(sysloader, caplog):
     s.f.status = 0  # : Deactivates program => cancels action
     s.flush()
     #assert w.get_state(s.f).threads[0]._cancel_while
-    # TODO: this test fails too often on Travis CI
     time.sleep(0.5)
     assert not w.get_state(s.f)
     assert 'Canceling While' in caplog.text()
