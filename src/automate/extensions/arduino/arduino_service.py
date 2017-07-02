@@ -168,7 +168,7 @@ class ArduinoService(AbstractSystemService):
 
         for (dev, pin_nr), (_type, pin) in digital_actuators:
             setup_func = {'p': self.setup_pwm, 'o': self.setup_digital}.get(_type)
-            #TODO: servo reload!
+            # TODO: servo reload not implemented
             if setup_func:
                 setup_func(dev, pin_nr)
             else:

@@ -293,7 +293,7 @@ class AbstractCallable(SystemObject, CompareMixin):
         """
             A property giving a generator that goes through all the children of this Callable (not recursive)
         """
-        return deep_iterate(self._args + list(self._kwargs.values())) #TODO: chain?
+        return deep_iterate(self._args + list(self._kwargs.values()))
 
     def _give_triggers(self):
         """Give all triggers of this object (non-recursive)"""

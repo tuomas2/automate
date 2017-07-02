@@ -258,7 +258,7 @@ def deep_iterate(l):
             l_list = list(l.values())
         for i in l_list:
             if is_iterable(i):
-                for j in deep_iterate(i): #TODO: could use yield from (python 3.3)
+                for j in deep_iterate(i): # TODO: when dropping python 2 support, we can use yield from here (python 3.3+)
                     yield j
             else:
                 yield i
