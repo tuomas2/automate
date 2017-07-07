@@ -70,7 +70,7 @@ class IsRaspi(SystemObject):
         return is_raspi()
 
 raspi1host = 'http://raspi1:3030/' if is_raspi() else 'http://localhost:3030/'
-basetime = 5 if is_raspi() else 100
+basetime = 5 # if is_raspi() else 100
 
 
 class MusicServer(lamps.LampGroupsMixin, System):
@@ -85,7 +85,21 @@ class MusicServer(lamps.LampGroupsMixin, System):
         value_max=0,
     )
 
-    mpc_instance = UserIntSensor(default=0, value_min=0, value_max=4, tags='quick_music,web')
+    mpc_instance = UserIntSensor(
+        default=0, value_min=0, value_max=4, tags='quick_music,web',
+        update_condition=Value(True),
+        active_condition=Value(True),
+        on_update=If('playback_active',
+                     Run(
+                         Shell('mpc -p 6600 pause'),
+                         Shell('mpc -p 6601 pause'),
+                         Shell('mpc -p 6602 pause'),
+                         Shell('mpc -p 6603 pause'),
+                         Shell('mpc -p 6604 pause'),
+                         Shell(ToStr('mpc -p 660{} play', Value('mpc_instance'))),
+                     )
+                     )
+    )
 
     israspi = IsRaspi()
     email_sender = EmailSender(to_email=os.getenv('AUTOMATE_EMAIL', 'test@test.com'),
@@ -326,13 +340,22 @@ class MusicServer(lamps.LampGroupsMixin, System):
             )
         )
 
-        playback_active = PollingSensor(
+        playback_active = SimplePollingSensor(
+            tags='web',
             interval=basetime,
-            status_updater=Or('mplayer_alive', 'moc_alive',
-                              Not(Shell(ToStr('mpc -p 660{} | grep playing',
-                                              Value('mpc_instance'))))),
+            triggers={'start', 'stop'},
+            active_condition=Value(True),
+            update_condition=Value(True),
+            on_update=SetStatus('playback_active',
+                                Or('mplayer_alive', 'moc_alive',
+                                   Not(Shell('mpc -p 6600 | grep playing')),
+                                   Not(Shell('mpc -p 6601 | grep playing')),
+                                   Not(Shell('mpc -p 6602 | grep playing')),
+                                   Not(Shell('mpc -p 6603 | grep playing')),
+                                   Not(Shell('mpc -p 6604 | grep playing')),
+                                   )
+                                ),
         )
-
         piano_on = PollingSensor(
             interval = basetime,
             status_updater=Not(Shell('aplaymidi -l | grep RD')),
