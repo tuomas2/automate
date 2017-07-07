@@ -77,16 +77,16 @@ class WSGIXMLRPCApplication(object):
             response = self.dispatcher._marshaled_dispatch(
                     data, getattr(self.dispatcher, '_dispatch', None)
                 )
-            response += '\n'
-        except: # This should only happen if the module is buggy
+            response += b'\n'
+        except Exception as e: # This should only happen if the module is buggy
             # internal error, report as HTTP server error
+            logger.error('POST handler crashed due to error %s', e)
             start_response("500 Server error", [('Content-Type', 'text/plain')])
             return []
         else:
             # got a valid XML RPC response
             start_response("200 OK", [('Content-Type','text/xml'), ('Content-Length', str(len(response)),)])
             return [response]
-
 
     def __call__(self, environ, start_response):
         return self.handler(environ, start_response)
