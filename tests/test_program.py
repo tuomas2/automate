@@ -211,6 +211,8 @@ class TestProgramFeatures(object):
         # TODO: investigate failure in https://travis-ci.org/tuomas2/automate/jobs/245124552
         # and                          https://travis-ci.org/tuomas2/automate/jobs/246254565
         #                              https://travis-ci.org/tuomas2/automate/jobs/247160904
+        #                            N https://travis-ci.org/tuomas2/automate/jobs/251122776
+        #                            N https://travis-ci.org/tuomas2/automate/jobs/251179301
         # TODO: check also similar tests above.
         p = mysys.p
         #add = {p} if isinstance(p, StatusObject) else set()
