@@ -199,7 +199,7 @@ class MusicServer(lamps.LampGroupsMixin, System):
         )
 
         radiodei = UserEventSensor(tags={'quick_music'},
-            on_activate=SetStatus('mplayer', 'mms://mms.radiodei.fi/RadioDeiR2HF')
+            on_activate=SetStatus('mplayer', 'http://isojako.radiodei.fi:8000/yleisohjelma')
         )
 
         radiopatmos = UserEventSensor(tags={'quick_music'},
