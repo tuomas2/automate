@@ -38,13 +38,16 @@ class Makuuhuone(lamps.LampGroupsMixin, System):
         button3 = RpioSensor(port=18, button_type='up', active_condition=Value('button3'))
 
     class Lirc(Group):
-        lirc_sensor = ShellSensor(cmd='irw', filter=lirc_filter, default='', reset_delay=1.3,
-                                  active_condition=Value('lirc_sensor'),
+        lirc_sensor = ShellSensor(cmd='irw', filter=lirc_filter, default='', reset_delay=0.5,
+                                  exclude_triggers={'preset1', 'preset2', 'preset3', 'switch_off'},
+                                  triggers={'lirc_sensor'},
+                                  active_condition=Value(True),
                                   on_update=Switch('lirc_sensor',
                                                    {'KEY_1': SetStatus('preset1', Not('preset1')),
                                                     'KEY_2': SetStatus('preset2', Not('preset2')),
                                                     'KEY_3': SetStatus('preset3', Not('preset3')),
-                                                    }
+                                                    'KEY_POWER': SetStatus('switch_off', Value(True)),
+                                                   }
                                                    ),
                                   )
 

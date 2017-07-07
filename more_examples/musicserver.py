@@ -54,12 +54,15 @@ def is_raspi():
     import platform
     return platform.node() in ["raspi1", "raspi2"]
 
+
 def lirc_filter(line):
     try:
         code, num, key, remote = line.split(' ')
-        return key
     except ValueError:
-        return '-'
+        key = '-'
+    print('Command ', key)
+    return key
+
 
 class IsRaspi(SystemObject):
 
@@ -288,8 +291,11 @@ class MusicServer(lamps.LampGroupsMixin, System):
     #    )
 
     class In(Group):
-        lirc_sensor = ShellSensor(cmd='irw', filter=lirc_filter, default='', reset_delay=0.3,
-            active_condition=Value('lirc_sensor'),
+        lirc_sensor = ShellSensor(cmd='irw', filter=lirc_filter, default='', reset_delay=0.5,
+            active_condition=Value(True),
+            triggers={'lirc_sensor'},
+            exclude_triggers={'preset1', 'preset2', 'preset3', 'start', 'radiodei',
+                              'radiopatmos', 'volume', 'switch_off', 'fade_out', 'reboot'},
             on_update=Switch('lirc_sensor',
                     {'KEY_GREEN': SetStatus('start', 1),
                      'KEY_YELLOW': SetStatus('radiodei', 1),
