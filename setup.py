@@ -22,7 +22,7 @@ all_extras_requirements = web_requirements + gpio_requirements + arduino_require
 
 setupopts = dict(
     name="automate",
-    version='0.10.10',
+    version='0.10.11.dev0',
     packages=find_packages('src'),
     include_package_data=True,
     package_dir={'': 'src'},
