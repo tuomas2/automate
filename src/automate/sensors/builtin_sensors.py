@@ -358,6 +358,16 @@ class PollingSensor(AbstractPollingSensor):
             self.status = self.type(self.status_updater.call(self))
 
 
+class SimplePollingSensor(AbstractPollingSensor):
+
+    """
+        Polling sensor calls on_update periodically.
+    """
+
+    def update_status(self):
+        self.on_update.call(self)
+
+
 class IntervalTimerSensor(AbstractPollingSensor):
 
     """
