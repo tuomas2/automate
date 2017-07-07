@@ -85,6 +85,8 @@ class MusicServer(lamps.LampGroupsMixin, System):
         value_max=0,
     )
 
+    mpc_instance = UserIntSensor(default=0, value_min=0, value_max=4, tags='quick_music,web')
+
     israspi = IsRaspi()
     email_sender = EmailSender(to_email=os.getenv('AUTOMATE_EMAIL', 'test@test.com'),
                                smtp_hostname=os.getenv('AUTOMATE_SMTP_HOSTNAME', '-'),
@@ -111,7 +113,7 @@ class MusicServer(lamps.LampGroupsMixin, System):
                                    SetStatus('launchtime', 0),
                                ),
                             ),
-                            Shell('mpc pause'),
+                            Shell(ToStr('mpc -p 660{} pause', Value('mpc_instance'))),
                             If('mplayer_pid',
                                 Func(os.kill, 'mplayer_pid', signal.SIGTERM),
                                 SetStatus('mplayer_pid', 0)
@@ -194,7 +196,7 @@ class MusicServer(lamps.LampGroupsMixin, System):
             active_condition=Value('start'),
             on_activate=Run('reset_mplayer',
                             WaitUntil(And('soundcard_ready', Not('launchtime')),
-                                      Shell('mpc play'),
+                                      Shell(ToStr('mpc -p 660{} play', Value('mpc_instance'))),
                                       SetStatus('start', 0))
                            )
         )
@@ -208,11 +210,11 @@ class MusicServer(lamps.LampGroupsMixin, System):
         )
 
         prev = UserEventSensor(
-            on_activate=Shell('mpc prev'),
+            on_activate=Shell(ToStr('mpc -p 660{} prev', Value('mpc_instance'))),
         )
 
         next = UserEventSensor(
-            on_activate=Shell('mpc next'),
+            on_activate=Shell(ToStr('mpc -p 660{} next', Value('mpc_instance'))),
         )
 
         read_volume = UserEventSensor(
@@ -254,13 +256,13 @@ class MusicServer(lamps.LampGroupsMixin, System):
 
         current = PollingSensor(
             interval=basetime,
-            status_updater=Shell('mpc current', output=True),
+            status_updater=Shell(ToStr('mpc -p 660{} current', Value('mpc_instance')),output=True),
         )
 
         reset = UserBoolSensor(
             priority=50.,
             active_condition=Value('reset'),
-            on_activate=Threaded(Shell('mpc pause'),
+            on_activate=Threaded(Shell(ToStr('mpc -p 660{} pause', Value('mpc_instance'))),
                                  SetStatus('out_actual', 0),
                                  WaitUntil(Not('out_hardware'),
                                      SetStatus('reset', 0),
@@ -295,7 +297,7 @@ class MusicServer(lamps.LampGroupsMixin, System):
             active_condition=Value(True),
             triggers={'lirc_sensor'},
             exclude_triggers={'preset1', 'preset2', 'preset3', 'start', 'radiodei',
-                              'radiopatmos', 'volume', 'switch_off', 'fade_out', 'reboot'},
+                              'radiopatmos', 'volume', 'switch_off', 'fade_out'},
             on_update=Switch('lirc_sensor',
                     {'KEY_GREEN': SetStatus('start', 1),
                      'KEY_YELLOW': SetStatus('radiodei', 1),
@@ -326,7 +328,9 @@ class MusicServer(lamps.LampGroupsMixin, System):
 
         playback_active = PollingSensor(
             interval=basetime,
-            status_updater=Or('mplayer_alive', 'moc_alive', Not(Shell('mpc | grep playing'))),
+            status_updater=Or('mplayer_alive', 'moc_alive',
+                              Not(Shell(ToStr('mpc -p 660{} | grep playing',
+                                              Value('mpc_instance'))))),
         )
 
         piano_on = PollingSensor(
