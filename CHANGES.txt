@@ -1,7 +1,8 @@
 0.10.10 (unreleased)
 --------------------
 
-- Nothing changed yet.
+- Fix Python 3 bug (crash) in RpcService
+- Add SimplePollingSensor
 
 
 0.10.9 (2017-06-25)

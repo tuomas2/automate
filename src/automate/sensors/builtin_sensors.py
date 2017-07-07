@@ -361,7 +361,7 @@ class PollingSensor(AbstractPollingSensor):
 class SimplePollingSensor(AbstractPollingSensor):
 
     """
-        Polling sensor calls on_update periodically.
+        Polling sensor that calls on_update periodically.
     """
 
     def update_status(self):
