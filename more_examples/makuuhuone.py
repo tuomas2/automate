@@ -30,6 +30,7 @@ def lirc_filter(line):
     print('Command ', key)
     return key
 
+raspi2host = 'http://raspi2:3031/'
 
 class Makuuhuone(lamps.LampGroupsMixin, System):
     class RpioButtons(Group):
@@ -46,6 +47,9 @@ class Makuuhuone(lamps.LampGroupsMixin, System):
                                                    {'KEY_1': SetStatus('preset1', Not('preset1')),
                                                     'KEY_2': SetStatus('preset2', Not('preset2')),
                                                     'KEY_3': SetStatus('preset3', Not('preset3')),
+                                                    'KEY_MUTE': RemoteFunc(raspi2host, 'set_status', 'pause', 1),
+                                                    'KEY_CHANNELUP': RemoteFunc(raspi2host, 'set_status', 'next', 1),
+                                                    'KEY_CHANNELDOWN': RemoteFunc(raspi2host, 'set_status', 'prev', 1),
                                                     'KEY_POWER': SetStatus('switch_off', Value(True)),
                                                    }
                                                    ),
