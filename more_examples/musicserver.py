@@ -86,7 +86,7 @@ class MusicServer(lamps.LampGroupsMixin, System):
     )
 
     mpc_instance = UserIntSensor(
-        default=0, value_min=0, value_max=4, tags='quick_music,web',
+        default=0, value_min=0, value_max=9, tags='quick_music,web',
         update_condition=Value(True),
         active_condition=Value(True),
         on_update=If('playback_active',
@@ -96,6 +96,11 @@ class MusicServer(lamps.LampGroupsMixin, System):
                          Shell('mpc -p 6602 pause'),
                          Shell('mpc -p 6603 pause'),
                          Shell('mpc -p 6604 pause'),
+                         Shell('mpc -p 6605 pause'),
+                         Shell('mpc -p 6606 pause'),
+                         Shell('mpc -p 6607 pause'),
+                         Shell('mpc -p 6608 pause'),
+                         Shell('mpc -p 6609 pause'),
                          Shell(ToStr('mpc -p 660{} play', Value('mpc_instance'))),
                      )
                      )
@@ -353,6 +358,11 @@ class MusicServer(lamps.LampGroupsMixin, System):
                                    Not(Shell('mpc -p 6602 | grep playing')),
                                    Not(Shell('mpc -p 6603 | grep playing')),
                                    Not(Shell('mpc -p 6604 | grep playing')),
+                                   Not(Shell('mpc -p 6605 | grep playing')),
+                                   Not(Shell('mpc -p 6606 | grep playing')),
+                                   Not(Shell('mpc -p 6607 | grep playing')),
+                                   Not(Shell('mpc -p 6608 | grep playing')),
+                                   Not(Shell('mpc -p 6609 | grep playing')),
                                    )
                                 ),
         )
