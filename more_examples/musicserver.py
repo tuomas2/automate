@@ -224,6 +224,13 @@ class MusicServer(lamps.LampGroupsMixin, System):
             on_activate=Run('reset_mplayer', '_clear'),
         )
 
+        pause = UserEventSensor(
+            tags='quick_music',
+            on_activate=IfElse('mpd_playback_active',
+                               SetStatus('stop', True),
+                               SetStatus('start', True))
+        )
+
         restart_mpd = UserEventSensor(
             on_activate=Shell('service mpd restart'),
         )
@@ -345,14 +352,14 @@ class MusicServer(lamps.LampGroupsMixin, System):
             )
         )
 
-        playback_active = SimplePollingSensor(
+        mpd_playback_active = SimplePollingSensor(
             tags='web',
             interval=basetime,
             triggers={'start', 'stop'},
             active_condition=Value(True),
             update_condition=Value(True),
-            on_update=SetStatus('playback_active',
-                                Or('mplayer_alive', 'moc_alive',
+            on_update=SetStatus('mpd_playback_active',
+                                Or(
                                    Not(Shell('mpc -p 6600 | grep playing')),
                                    Not(Shell('mpc -p 6601 | grep playing')),
                                    Not(Shell('mpc -p 6602 | grep playing')),
@@ -366,6 +373,14 @@ class MusicServer(lamps.LampGroupsMixin, System):
                                    )
                                 ),
         )
+
+        playback_active = BoolActuator(
+            tags='web',
+            active_condition=Value(True),
+            update_condition=Value(True),
+            on_update=SetStatus('playback_active', Or('mplayer_alive', 'moc_alive', 'mpd_playback_active'))
+        )
+
         piano_on = PollingSensor(
             interval = basetime,
             status_updater=Not(Shell('aplaymidi -l | grep RD')),
