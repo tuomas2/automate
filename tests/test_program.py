@@ -213,6 +213,7 @@ class TestProgramFeatures(object):
         #                              https://travis-ci.org/tuomas2/automate/jobs/247160904
         #                            N https://travis-ci.org/tuomas2/automate/jobs/251122776
         #                            N https://travis-ci.org/tuomas2/automate/jobs/251179301
+        #                            N https://travis-ci.org/tuomas2/automate/jobs/251888696
         # TODO: check also similar tests above.
         p = mysys.p
         #add = {p} if isinstance(p, StatusObject) else set()
