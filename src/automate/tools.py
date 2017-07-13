@@ -25,6 +25,7 @@ from __future__ import unicode_literals
 import platform
 from threading import Thread
 
+import time
 from traits.api import CUnicode, Unicode, CInt
 import requests
 
@@ -38,6 +39,8 @@ class PushOver(SystemObject):
 
         Use this as you would use a Callable.
     """
+    MAX_RETRIES = 1000
+    SLEEP_TIME = 5
 
     #: Pushover.net application/API token
     api_key = CUnicode
@@ -69,7 +72,29 @@ class PushOver(SystemObject):
         if self.sound:
             data['sound'] = self.sound
 
-        requests.post('https://api.pushover.net/1/messages.json', data=data)
+        retries = 0
+        while retries < self.MAX_RETRIES:
+            try:
+                response = requests.post('https://api.pushover.net/1/messages.json', data=data)
+                try:
+                    response_json = response.json()
+                except Exception as e:
+                    self.logger.error('Response decoding problem: %s', e)
+                    response_json = {}
+
+                if response.status_code == 200 and response_json.get('status') == 1:
+                    self.logger.info('Message delivered succesfully')
+                    return
+
+            except (requests.ConnectionError, requests.Timeout) as e:
+                pass
+
+            self.logger.warning('Message could not be delivered, trying again after %s seconds',
+                                self.SLEEP_TIME)
+            time.sleep(self.SLEEP_TIME)
+            retries += 1
+
+        self.logger.error('Message delivery failed, and we won\'t try any more!')
 
     def call(self, caller, **kwargs):
         t = Thread(target=threaded(self.send, caller), name='Notification sender thread')
