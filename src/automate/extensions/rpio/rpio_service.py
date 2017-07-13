@@ -49,11 +49,13 @@ class RpioService(AbstractSystemService):
                 import RPIO.PWM
             else:
                 import RPi.GPIO as RPIO
+            self.is_mocked = False
         except (ImportError, SystemError, RuntimeError):
             self.logger.warning('RPIO module could not be imported. Enabling mocked RPIO')
             self.logger.warning("To use Raspberry Pi GPIO ports (sensors / actuators) please install module RPIO")
             import mock
             RPIO = mock.MagicMock()
+            self.is_mocked = True
 
         self._hw = RPIO
 

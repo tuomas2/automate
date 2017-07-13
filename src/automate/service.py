@@ -24,7 +24,7 @@
 from __future__ import unicode_literals
 import logging
 
-from traits.api import HasStrictTraits, Instance
+from traits.api import HasStrictTraits, Instance, CBool
 
 from automate.common import SystemBase
 
@@ -39,7 +39,8 @@ class AbstractService(HasStrictTraits):
     #: in :attr:`automate.system.System.exclude_services`). Overwrite this in subclasses,
     autoload = False
     system = Instance(SystemBase)
-    logger = Instance(logging.Logger)
+    logger = Instance(logging.Logger, transient=True)
+    is_mocked = CBool(False, transient=True)
 
     def setup_system(self, system, name=None):
         self.system = system
