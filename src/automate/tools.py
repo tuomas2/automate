@@ -78,16 +78,16 @@ class PushOver(SystemObject):
                 response = requests.post('https://api.pushover.net/1/messages.json', data=data)
                 try:
                     response_json = response.json()
-                except Exception as e:
-                    self.logger.error('Response decoding problem: %s', e)
+                except Exception:
+                    self.logger.exception('Response decoding problem: %s')
                     response_json = {}
 
                 if response.status_code == 200 and response_json.get('status') == 1:
                     self.logger.info('Message delivered succesfully')
                     return
 
-            except (requests.ConnectionError, requests.Timeout) as e:
-                pass
+            except (requests.ConnectionError, requests.Timeout):
+                self.logger.exception('Network problem')
 
             self.logger.warning('Message could not be delivered, trying again after %s seconds',
                                 self.SLEEP_TIME)
