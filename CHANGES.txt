@@ -1,7 +1,7 @@
 0.10.13 (unreleased)
 --------------------
 
-- Nothing changed yet.
+- Improve PushOver error handling and add some additional attributes
 
 
 0.10.12 (2017-07-13)
