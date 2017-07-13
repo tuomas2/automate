@@ -127,7 +127,8 @@ class MusicServer(lamps.LampGroupsMixin, System):
                             If(Not('out_actual'),
                                SetStatus('launchtime', 1),
                                WaitUntil('soundcard_ready',
-                                   Shell('mplayer click.mp3'),  # initialize sound (soft mixer does not work untill this is done)
+                                   # is this needed still?
+                                   #Shell('mplayer click.mp3'),  # initialize sound (soft mixer does not work untill this is done)
                                    SetStatus('volume', IfElse('piano_on', 'piano_volume', 'normal_volume'), force=True),
                                    SetStatus('launchtime', 0),
                                ),
