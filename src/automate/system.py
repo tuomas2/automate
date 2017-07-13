@@ -254,7 +254,7 @@ class System(SystemBase):
             return
         self.logger.debug('Saving system state to %s', self.filename)
         with open(self.filename, 'wb') as file, self.worker_thread.queue.mutex:
-            pickle.dump((list(self.objects)), file, 2)
+            pickle.dump((list(self.objects)), file, pickle.HIGHEST_PROTOCOL)
 
     @property
     def cmd_namespace(self):
