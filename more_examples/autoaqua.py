@@ -150,7 +150,7 @@ class autoaqua(System):
         lattiasensori_2 = ArduinoDigitalSensor(dev=0, pin=arduino_ports['keski lattiasensori'], change_delay=1,
                                                description='altaan alla oleva lattiasensori')
         ala_varoitus = ArduinoDigitalSensor(dev=0, pin=arduino_ports['ala varoitus'], change_delay=1)
-        co2_stop_sensor = ArduinoDigitalSensor(dev=0, pin=arduino_ports['co2_stop'], safety_delay=800,
+        co2_stop_sensor = ArduinoDigitalSensor(dev=0, pin=arduino_ports['co2_stop'], safety_delay=300,
                                                safety_mode='falling', change_delay=1)
         #analog1 = ArduinoAnalogSensor(dev=0, pin=0, silent=True)
 
