@@ -173,6 +173,9 @@ class SystemObjectForm(BaseForm):
     tags = forms.MultipleChoiceField(required=False)
     new_tags = forms.CharField(required=False, initial='')
 
+    def new(self, name):
+        raise NotImplementedError
+
     def get_object(self, name):
         obj = self.system.namespace.get(name, None)
         self.instance = obj or self.new(self.cleaned_data['name'])
