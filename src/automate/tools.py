@@ -22,9 +22,58 @@
 # http://evankelista.net/automate/
 
 from __future__ import unicode_literals
-from traits.api import CUnicode, Unicode
+import platform
+from threading import Thread
+
+from traits.api import CUnicode, Unicode, CInt
+import requests
+
 from automate.common import threaded
 from automate.systemobject import SystemObject
+
+
+class PushOver(SystemObject):
+    """
+        Send push notifications to android/IOS phones (see http://pushover.net).
+
+        Use this as you would use a Callable.
+    """
+
+    #: Pushover.net application/API token
+    api_key = CUnicode
+    #: Pushover.net user key
+    user_key = CUnicode
+    #: Pushover.net priority
+    priority = CInt(0)
+    #: Device name (empty to send to all devices)
+    device = CUnicode
+    #: Sound name in device
+    sound = CUnicode
+
+    def send(self, caller):
+        try:
+            url = self.system.services_by_name['WebService'][0].server_url
+        except KeyError:
+            url = ''
+
+        data=dict(
+            token=self.api_key,
+            user=self.user_key,
+            message='Automate event triggered on %s' % platform.node(),
+            title=caller.name,
+            url=url,
+            url_title=self.system.name + ' web interface')
+
+        if self.device:
+            data['device'] = self.device
+        if self.sound:
+            data['sound'] = self.sound
+
+        requests.post('https://api.pushover.net/1/messages.json', data=data)
+
+    def call(self, caller, **kwargs):
+        t = Thread(target=threaded(self.send, caller), name='Notification sender thread')
+        t.start()
 
 
 class EmailSender(SystemObject):
@@ -43,7 +92,6 @@ class EmailSender(SystemObject):
         return self.to_email
 
     def call(self, caller, **kwargs):
-        from threading import Thread
         t = Thread(target=threaded(self.send, caller), name='Email sender thread')
         t.start()
 
@@ -52,7 +100,6 @@ class EmailSender(SystemObject):
 
         progname = self.system.name
 
-        import platform
         hostname = platform.node()
         subject = u'Program {progname} at {host} encountered event of "{evname}"! '.format(
             host=hostname, progname=progname, evname=caller.name)

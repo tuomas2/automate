@@ -42,6 +42,7 @@ from automate.statusobject import StatusObject
 from django.core.wsgi import get_wsgi_application
 from automate.extensions.wsgi import TornadoService
 
+
 class WebService(TornadoService):
 
     """
@@ -92,6 +93,9 @@ class WebService(TornadoService):
     #: Show hidden objects in web UI (those prefixed with _)
     show_hidden = CBool(False)
 
+    #: Full exposed url root
+    server_url = Unicode()
+
     _sockets = List
 
     def get_filehandler_class(service):
@@ -131,6 +135,8 @@ class WebService(TornadoService):
             if not 'TIME_ZONE' in self.django_settings:
                 os.environ.pop('TZ')  # Django uses America/Chicago as default timezone. Let's clean this up.
                 time.tzset()
+            if self.server_url:
+                self.django_settings['SERVER_URL'] = self.server_url
             for key, value in self.django_settings.items():
                 setattr(settings, key, value)
 

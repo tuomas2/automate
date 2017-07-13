@@ -36,6 +36,7 @@ setupopts = dict(
         "pyinotify",
         "traits~=4.6.0",
         "mock",
+        "requests",
         ],
     extras_require={
         'web': web_requirements,

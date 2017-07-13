@@ -107,19 +107,15 @@ class MusicServer(lamps.LampGroupsMixin, System):
     )
 
     israspi = IsRaspi()
-    email_sender = EmailSender(to_email=os.getenv('AUTOMATE_EMAIL', 'test@test.com'),
-                               smtp_hostname=os.getenv('AUTOMATE_SMTP_HOSTNAME', '-'),
-                               smtp_username=os.getenv('AUTOMATE_EMAIL', '-'),
-                               smtp_password=os.getenv('AUTOMATE_SMTP_PASSWORD', '-'),
-                               smtp_fromemail=os.getenv('AUTOMATE_EMAIL', '-'),
-                               smtp_fromname="Automate",
-                               )
+    push_sender = PushOver(
+        api_key=os.getenv('PUSHOVER_API_KEY'),
+        user_key=os.getenv('PUSHOVER_USER_KEY'))
 
     raspi1_alive = PollingSensor(
         interval=10 * basetime,
         status_updater=RemoteFunc(raspi1host, 'is_alive'),
         active_condition=Value('raspi1_alive'),
-        on_deactivate=If(israspi, email_sender),
+        on_deactivate=If(israspi, push_sender),
     )
 
     class UrlPlay(Group):
@@ -427,6 +423,7 @@ if __name__ == '__main__':
         'musicserver.dmp',
         services=[
             WebService(
+                server_url=os.getenv('MUSICSERVER_URL', 'http://localhost:8080'),
                 http_port=int(os.getenv('HTTP_PORT', 8080)),
                 http_auth=(os.getenv('AUTOMATE_USERNAME', 'test'),
                            os.getenv('AUTOMATE_PASSWORD', 'test')),

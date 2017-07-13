@@ -100,19 +100,15 @@ class RelayActuator(RpioActuator):
 
 class autoaqua(System):
     israspi = IsRaspi()
-    email_sender = EmailSender(to_email=os.getenv('AUTOMATE_EMAIL', 'test@test.com'),
-                               smtp_hostname=os.getenv('AUTOMATE_SMTP_HOSTNAME', '-'),
-                               smtp_username=os.getenv('AUTOMATE_EMAIL', '-'),
-                               smtp_password=os.getenv('AUTOMATE_SMTP_PASSWORD', '-'),
-                               smtp_fromemail=os.getenv('AUTOMATE_EMAIL', '-'),
-                               smtp_fromname="Automate",
-                               )
+    push_sender = PushOver(
+        api_key=os.getenv('PUSHOVER_API_KEY'),
+        user_key=os.getenv('PUSHOVER_USER_KEY'))
 
     raspi2_alive = PollingSensor(
         interval=10.,
         status_updater=RemoteFunc(raspi2host, 'is_alive'),
         active_condition=Value('raspi2_alive'),
-        on_deactivate=If(israspi, email_sender),
+        on_deactivate=If(israspi, push_sender),
     )
 
     # raspi2_cmd = UserAnySensor(
@@ -138,7 +134,7 @@ class autoaqua(System):
                                                   # keittion_vesivahinko
                                               ),
             Not('testimoodi')),
-            on_activate=Run('email_sender',
+            on_activate=Run('push_sender',
                             SetStatus('alarmtrigger', 1),
                             ),
             priority=4,
@@ -168,7 +164,7 @@ class autoaqua(System):
             max_jump=2.,
             max_errors=7,
             active_condition=Or(Value('aqua_temperature') > water_temp_max, Value('aqua_temperature') < water_temp_min),
-            on_activate=Run('email_sender'),
+            on_activate=Run('push_sender'),
         )
 
         parvekkeen_lampo = TemperatureSensor(addr=ulko, interval=60, default=25.123)
@@ -179,7 +175,7 @@ class autoaqua(System):
             active_condition=Value('cpu_lampo') > 70,
             on_activate=Run(
                 SetStatus('alarmtrigger', 1),
-                Run('email_sender')),
+                Run('push_sender')),
             priority=2
         )
 
@@ -189,7 +185,7 @@ class autoaqua(System):
                                 on_activate=Run(SetStatus('lamppu1', 0), SetStatus('lamppu2', 0), SetStatus('lamppu3', 0),
                                                 Delay(5 * 60,
                                                       Run(SetStatus('pumput', 0), SetStatus('co2', 0))),
-                                                'email_sender'),
+                                                'push_sender'),
                                 priority=4,
                                 )
 
@@ -316,7 +312,7 @@ class autoaqua(System):
         co2_ajastin = CronTimerSensor(timer_on="30 12 * * *",  # oli 5:30 mutta muutan turvallisemmaksi...
                                   timer_off="0 16 * * *")
 
-        co2_ajastin_loma = CronTimerSensor(timer_on="30 17 * * *",
+        co2_ajastin_loma = CronTimerSensor(timer_on="30 15 * * *",
                                        timer_off="0 20 * * *",
                                        tags="holiday")
 
@@ -351,7 +347,7 @@ class autoaqua(System):
         #timer_on="0 10 * * mon-sat; 0 11 * * sun",
         # timer_off="30 20 * * mon-thu; 0 22 * * fri-sat,sun")
 
-        lamput_ajastin_loma = CronTimerSensor(timer_on="0 18 * * *",
+        lamput_ajastin_loma = CronTimerSensor(timer_on="0 16 * * *",
                                           timer_off="0 22 * * *",
                                           tags="holiday")
 
@@ -405,7 +401,7 @@ class autoaqua(System):
                                                       SetStatus('pumput', 0),
                                                       SetStatus('lammitin', 0),
                                                       SetStatus('alarmtrigger', 1),
-                                                      Run('email_sender')),
+                                                      Run('push_sender')),
                                                       priority=5,
         )
 
@@ -436,6 +432,7 @@ import tornado.log
 tornado.log.access_log.setLevel(logging.WARNING)
 
 web = WebService(
+        server_url=os.getenv('AUTOAQUA_URL', 'http://localhost:8080'),
         http_port=8080,
         http_auth=(os.getenv('AUTOMATE_USERNAME', 'test'),
                    os.getenv('AUTOMATE_PASSWORD', 'test'),

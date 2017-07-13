@@ -87,6 +87,7 @@ if __name__ == '__main__':
         'makuuhuone.dmp',
         services=[
             WebService(
+                server_url=os.getenv('MAKUUHUONE_URL', 'http://localhost:8080'),
                 http_port=8080,
                 http_auth=(os.getenv('AUTOMATE_USERNAME', 'test'),
                            os.getenv('AUTOMATE_PASSWORD', 'test')),
