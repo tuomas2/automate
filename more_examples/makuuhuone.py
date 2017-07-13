@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 from automate import *
 from automate.extensions.arduino import ArduinoDigitalActuator
-from automate.extensions.rpio import RpioSensor
+from automate.extensions.rpio import RpioSensor, RpioActuator
 from automate.extensions.webui import WebService
 
 import os
@@ -33,6 +33,7 @@ def lirc_filter(line):
 raspi2host = 'http://raspi2:3031/'
 
 class Makuuhuone(lamps.LampGroupsMixin, System):
+    tmp_lamp_out = RpioActuator(port=2, default=0, active_condition=Value('preset1'), on_activate=SetStatus('tmp_lamp_out', 1))
     class RpioButtons(Group):
         button1 = RpioSensor(port=14, button_type='up', active_condition=Value('button1'), on_activate=Run('_toggler'))
         button2 = RpioSensor(port=15, button_type='up', active_condition=Value('button2'), on_activate=SetStatus('switch_off', 1))
