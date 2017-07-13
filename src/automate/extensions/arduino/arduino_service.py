@@ -128,7 +128,7 @@ class ArduinoService(AbstractSystemService):
                 board._iter = it
                 it.start()
                 self._boards.append(board)
-                self.is_mocked = True
+                self.is_mocked = False
             except (self.FileNotReadableError, OSError) as e:
                 if isinstance(e, self.FileNotReadableError) or e.errno == os.errno.ENOENT:
                     self.logger.warning('Your arduino device %s is not available. Arduino will be mocked.', ard_devs[i])
