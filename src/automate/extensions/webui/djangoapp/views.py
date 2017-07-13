@@ -76,6 +76,9 @@ def common_context(request):
         ('By tags', 'tags_view'),
         ('User editable', 'user_editable_view'),
         ('User defined', 'user_defined_view'),
+        ('System and threads', 'threads'),
+        ('Console', 'console'),
+        ('UML', 'plantuml'),
     ]
     current_view = request.resolver_match.view_name
     views = [(title, reverse(name), name == current_view) for title, name in _views]
