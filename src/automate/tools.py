@@ -46,7 +46,7 @@ class PushOver(SystemObject):
     api_key = CUnicode
     #: Pushover.net user key
     user_key = CUnicode
-    #: Pushover.net priority
+    #: Pushover.net message priority
     priority = CInt(0)
     #: Device name (empty to send to all devices)
     device = CUnicode
@@ -111,7 +111,6 @@ class EmailSender(SystemObject):
 
     """ Send email notification of the current status of the system """
 
-    # Email address where mail is sent
     to_email = CUnicode
     smtp_hostname = Unicode
     smtp_username = Unicode

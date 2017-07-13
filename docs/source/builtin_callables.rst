@@ -12,3 +12,11 @@ Builtin Callable Types
 
 .. automodule:: automate.callables.builtin_callables
    :members:
+
+
+Other Callable-like utilities
+-----------------------------
+
+.. automodule:: automate.tools
+   :members:
+
