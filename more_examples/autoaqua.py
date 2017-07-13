@@ -104,6 +104,12 @@ class autoaqua(System):
         api_key=os.getenv('PUSHOVER_API_KEY'),
         user_key=os.getenv('PUSHOVER_USER_KEY'))
 
+    push_sender_emergency = PushOver(
+        api_key=os.getenv('PUSHOVER_API_KEY'),
+        user_key=os.getenv('PUSHOVER_USER_KEY'),
+        priority=2,
+    )
+
     raspi2_alive = PollingSensor(
         interval=10.,
         status_updater=RemoteFunc(raspi2host, 'is_alive'),
@@ -401,7 +407,7 @@ class autoaqua(System):
                                                       SetStatus('pumput', 0),
                                                       SetStatus('lammitin', 0),
                                                       SetStatus('alarmtrigger', 1),
-                                                      Run('push_sender')),
+                                                      Run('push_sender_emergency')),
                                                       priority=5,
         )
 

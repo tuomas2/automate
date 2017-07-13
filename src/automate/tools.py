@@ -66,6 +66,11 @@ class PushOver(SystemObject):
             title=caller.name,
             url=url,
             url_title=self.system.name + ' web interface')
+        if self.priority:
+            data['priority'] = self.priority
+            if self.priority >= 2:
+                data['retry'] = 30
+                data['expire'] = 3600
 
         if self.device:
             data['device'] = self.device
@@ -78,6 +83,7 @@ class PushOver(SystemObject):
                 response = requests.post('https://api.pushover.net/1/messages.json', data=data)
                 try:
                     response_json = response.json()
+                    self.logger.debug('Response: %s', response_json)
                 except Exception:
                     self.logger.exception('Response decoding problem: %s')
                     response_json = {}
