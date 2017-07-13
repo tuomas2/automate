@@ -111,11 +111,17 @@ class EmailSender(SystemObject):
 
     """ Send email notification of the current status of the system """
 
+    #: Email address where email is to be sent
     to_email = CUnicode
+    #: Smtp server
     smtp_hostname = Unicode
+    #: SMTP username
     smtp_username = Unicode
+    #: SMTP password
     smtp_password = Unicode
+    #: Name that appears in From: field
     smtp_fromname = Unicode
+    #: Email that appears in From: field
     smtp_fromemail = Unicode
 
     def get_status_display(self):
