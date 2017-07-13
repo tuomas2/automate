@@ -57,6 +57,7 @@ urlpatterns = [
     url(r'^toggle/(\w*)$', views.toggle_value, name='toggle_value'),
     url(r'^set/(\w*)/(\w*)$', views.set_value, name='set_value'),
     url(r'^set_ready/(\w*)/(\w*)', views.set_ready, name='set_ready'),
+    url(r'^reload_service/(\d*)$', views.reload_service, name='reload_service'),
     url(r'^edit/(\w*)$', views.edit, name='edit'),
     url(r'^continue_edit/(\w*)/(\w*)$', views.continue_edit, name='continue_edit'),
     url(r'^new/(\w*)$', views.new, name='new'),

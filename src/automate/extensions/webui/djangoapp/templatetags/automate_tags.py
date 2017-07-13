@@ -40,6 +40,11 @@ logger = logging.getLogger('automate.webui')
 register = template.Library()
 
 
+@register.simple_tag(takes_context=True)
+def mocked_services(context):
+    system = context.get('system')
+    return [(service.__class__.__name__, service) for service in system.services if service.is_mocked]
+
 @register.simple_tag
 def program_status(actuator, program):
     try:

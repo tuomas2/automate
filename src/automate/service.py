@@ -42,6 +42,10 @@ class AbstractService(HasStrictTraits):
     logger = Instance(logging.Logger, transient=True)
     is_mocked = CBool(False, transient=True)
 
+    @property
+    def id(self):
+        return id(self)
+
     def setup_system(self, system, name=None):
         self.system = system
         self.logger = self.system.logger.getChild(self.__class__.__name__)

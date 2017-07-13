@@ -25,6 +25,10 @@ body {
     padding-bottom: 20px;
 }
 
+.alarmbox {
+    color: red;
+}
+
 .messages {
     color: red;
 }

@@ -30,7 +30,7 @@ from django.contrib import messages
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, Http404, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.template import Template, RequestContext
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
@@ -404,6 +404,18 @@ def set_status(request):
         return HttpResponseRedirect(reverse(request.GET.get('source', 'main')))
     else:
         raise Http404
+
+
+@require_login
+def reload_service(request, id_):
+    id_ = int(id_)
+    for ser in system.services:
+        if id(ser) == id_:
+            ser.reload()
+            messages.info(request, 'Reloaded service %s (%s)' % (ser.__class__.__name__, ser.id))
+            break
+    system.flush()
+    return redirect(request.META.get('HTTP_REFERER', reverse('main')))
 
 
 def notfound(request):
