@@ -1,6 +1,7 @@
 0.10.11 (unreleased)
 --------------------
 
+- Always use latest pickle format
 - Show alert box about mocked services (if any) in web ui (any view)
 
 
