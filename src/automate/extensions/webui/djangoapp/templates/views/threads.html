@@ -1,10 +1,18 @@
 {% extends 'base.html' %}
+{% load automate_tags %}
 {% block content %}
-  <h2>Threads</h2>
+  <h2>Threads and services</h2>
   <ul>
-    {% for t in threads %}
-      <li>{{ t }}
+    {% for name, t in threads %}
+      {% ident t as t_ident %}
+      {% cancelable_thread t as t_cancelable %}
+      <li>{{ name }} {% if t_cancelable %} <a href="{% url "cancel_thread" t_ident %}">(cancel)</a>{%endif %}
     {% endfor %}
   </ul>
-
+  <h2>Services</h2>
+      <ul>
+        {% for service in system.services %}
+          <li>{{service.name}} <a href="{% url "reload_service" service.id %}">(reload)</a>
+        {% endfor %}
+      </ul>
 {% endblock %}

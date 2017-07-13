@@ -167,7 +167,7 @@ def system_view(request):
 
 @require_login
 def threads(request):
-    threads = [t.name for t in threading.enumerate()]
+    threads = [(t.name, t) for t in threading.enumerate()]
     threads.sort()
     return render(request, 'views/threads.html', {'threads': threads})
 
@@ -409,14 +409,36 @@ def set_status(request):
 @require_login
 def reload_service(request, id_):
     id_ = int(id_)
+    found = False
     for ser in system.services:
         if id(ser) == id_:
             ser.reload()
             messages.info(request, 'Reloaded service %s (%s)' % (ser.__class__.__name__, ser.id))
+            found = True
             break
-    system.flush()
+    if not found:
+        messages.error(request, 'Service was not found')
+
     return redirect(request.META.get('HTTP_REFERER', reverse('main')))
 
+
+@require_login
+def cancel_thread(request, id_):
+    id_ = int(id_)
+    found = False
+    for t in threading.enumerate():
+        if id(t) == id_:
+            found = True
+            try:
+                t.cancel()
+                messages.info(request, 'Canceled thread %s (%s)' % (t, id_))
+            except AttributeError:
+                messages.error(request, 'Could not cancel thread %s (%s)' % (t, id_))
+            break
+    if not found:
+        messages.error(request, 'Thread %s was not found' % id_)
+
+    return redirect(request.META.get('HTTP_REFERER', reverse('main')))
 
 def notfound(request):
     raise Http404

@@ -3,6 +3,8 @@
 
 - Always use latest pickle format
 - Show alert box about mocked services (if any) in web ui (any view)
+- Add services to threads view and rename view to system and threads
+- Add function to cancel timers (and other threads that implement cancel)
 
 
 0.10.10 (2017-07-07)

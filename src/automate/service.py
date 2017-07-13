@@ -46,6 +46,10 @@ class AbstractService(HasStrictTraits):
     def id(self):
         return id(self)
 
+    @property
+    def name(self):
+        return self.__class__.__name__
+
     def setup_system(self, system, name=None):
         self.system = system
         self.logger = self.system.logger.getChild(self.__class__.__name__)

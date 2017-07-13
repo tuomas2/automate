@@ -45,6 +45,17 @@ def mocked_services(context):
     system = context.get('system')
     return [(service.__class__.__name__, service) for service in system.services if service.is_mocked]
 
+
+@register.assignment_tag()
+def ident(arg):
+    return id(arg)
+
+
+@register.assignment_tag()
+def cancelable_thread(arg):
+    return hasattr(arg, 'cancel')
+
+
 @register.simple_tag
 def program_status(actuator, program):
     try:
