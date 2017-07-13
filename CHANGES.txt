@@ -1,4 +1,4 @@
-0.10.11 (unreleased)
+0.10.11 (2017-07-13)
 --------------------
 
 - Always use latest pickle format
