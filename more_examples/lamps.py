@@ -121,12 +121,15 @@ class LampGroupsMixin:
                   )
         )
 
-        _lighter = While(_count < _max,
-                         SetStatus(_count, _count + 1),
-                         SetStatus('warm_lamp_out', Func(calc_val_warm, _count, _max) * Value('warm_preset1')),
-                         SetStatus('cold_lamp_out', Func(calc_val_cold, _count, _max) * Value('cold_preset1')),
-                         Func(time.sleep, fade_in_time / _max),
-                         do_after=SetStatus(['preset1', 'fade_in', '_count'], [1, 0, 0]))
+        _lighter = Run(
+            SetStatus(_count, 0),
+            While(_count < _max,
+                  SetStatus(_count, _count + 1),
+                  SetStatus('warm_lamp_out', Func(calc_val_warm, _count, _max) * Value('warm_preset1')),
+                  SetStatus('cold_lamp_out', Func(calc_val_cold, _count, _max) * Value('cold_preset1')),
+                  Func(time.sleep, fade_in_time / _max),
+                  do_after=SetStatus(['preset1', 'fade_in', '_count'], [1, 0, 0]))
+        )
 
         fade_in = UserBoolSensor(active_condition=Value('fade_in'),
                                  on_activate=Run(
