@@ -43,8 +43,8 @@ for f in [f1, f2, f3]:
 #def calc_val_warm(i, max_i, reverse=False):
 #    return calc_val(2*i, max_i, reverse=reverse)
 
-calc_val_cold = f3
-calc_val_warm = f3
+calc_val_warm = f1
+calc_val_cold = f2
 
 
 def calc_val_reverse(i, max_i):
