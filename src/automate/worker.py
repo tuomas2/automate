@@ -80,7 +80,7 @@ class StatusWorkerThread(threading.Thread):
         self._stop = True
         self.logger.debug('Stop set')
 
-    def __init__(self, *args, system=None, **kwargs):
+    def __init__(self, system=None, *args, **kwargs):
         self.queue = queue.Queue()
         self._stop = False
         self.system = system
