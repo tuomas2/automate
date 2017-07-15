@@ -1,7 +1,7 @@
 0.10.15 (unreleased)
 --------------------
 
-- Nothing changed yet.
+- Fix broken python 2 support
 
 
 0.10.14 (2017-07-15)
