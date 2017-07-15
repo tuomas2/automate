@@ -164,7 +164,7 @@ class LampGroupsMixin:
 
     class AlarmClock(Group):
         tags = 'adj'
-        alarm_clock = CronTimerSensor(timer_on='0 7 * * *', timer_off='0 9 * * *',
+        alarm_clock = CronTimerSensor(timer_on='45 6 * * *', timer_off='0 9 * * *',
                                       active_condition=And('alarm_enabled', Value('alarm_clock')),
                                       on_activate=SetStatus('fade_in', True))
 
