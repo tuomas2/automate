@@ -1,4 +1,4 @@
-0.10.14 (unreleased)
+0.10.14 (2017-07-15)
 --------------------
 
 - Add support for Sentry (http://sentry.io) via raven library
