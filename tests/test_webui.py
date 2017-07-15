@@ -72,13 +72,14 @@ def constants(sys_with_web):
         TAGS = r('tags_view')
         USER1 = r('user_editable_view')
         USER2 = r('user_defined_view')
+        THREADS = r('threads')
         GROUPS = r('tag_view_only_groups')
         CONSOLE = r('console')
         NEW_ACTUATOR = r('new', 'actuator')
         NEW_SENSOR = r('new', 'sensor')
         NEW_PROGRAM = r('new', 'program')
 
-        BASIC_VIEWS = [TAGS, USER1, USER2, GROUPS, CONSOLE, NEW_ACTUATOR, NEW_PROGRAM, NEW_SENSOR]
+        BASIC_VIEWS = [TAGS, USER1, USER2, THREADS, GROUPS, CONSOLE, NEW_ACTUATOR, NEW_PROGRAM, NEW_SENSOR]
 
         LOGOUT = r('logout')
 

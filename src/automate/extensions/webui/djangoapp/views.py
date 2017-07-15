@@ -171,7 +171,7 @@ def system_view(request):
 @require_login
 def threads(request):
     threads = [(t.name, t) for t in threading.enumerate()]
-    threads.sort()
+    threads.sort(key=lambda x: x[0])
     return render(request, 'views/threads.html', {'threads': threads})
 
 
