@@ -460,7 +460,7 @@ class System(SystemBase):
 
         # Initialize Sentry / raven client, if is configured
         if not self.raven_client and self.raven_dsn:
-            self.raven_client = Client(self.raven_dsn, tags={'automate-system': self.name})
+            self.raven_client = raven.Client(self.raven_dsn, tags={'automate-system': self.name})
 
         self._initialize_logging()
         self.logger.info('Initializing services')
