@@ -228,7 +228,7 @@ class CronTimerSensor(AbstractSensor):
 
         delay = next_update_time - now + timedelta(seconds=5)
         self.logger.info('Setting timer to %s, %s seconds, at %s', delay, delay.seconds, now+delay)
-        self._update_timer = threading.Timer(delay.seconds, threaded(self.update_status,))
+        self._update_timer = threading.Timer(delay.seconds, threaded(self.system, self.update_status,))
         self._update_timer.name = ("Timer for TimerSensor %s at %s (%s seconds)" % (self.name, now + delay, delay.seconds))
         self._update_timer.start()
 
@@ -312,7 +312,7 @@ class AbstractPollingSensor(AbstractSensor):
             self._pollthread.cancel()
         if self.poll_active:
             self.update_status()
-            self._pollthread = threading.Timer(self.interval, threaded(self._restart))
+            self._pollthread = threading.Timer(self.interval, threaded(self.system, self._restart))
             time_after_interval = datetime.now() + timedelta(seconds=self.interval)
             self._pollthread.name = "PollingSensor: %s next poll at %s (%.2f sek)" % (self.name, time_after_interval, self.interval)
             self._pollthread.start()

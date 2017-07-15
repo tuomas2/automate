@@ -103,7 +103,7 @@ class PushOver(SystemObject):
         self.logger.error('Message delivery failed, and we won\'t try any more!')
 
     def call(self, caller, **kwargs):
-        t = Thread(target=threaded(self.send, caller), name='Notification sender thread')
+        t = Thread(target=threaded(self.system, self.send, caller), name='Notification sender thread')
         t.start()
 
 
@@ -128,7 +128,7 @@ class EmailSender(SystemObject):
         return self.to_email
 
     def call(self, caller, **kwargs):
-        t = Thread(target=threaded(self.send, caller), name='Email sender thread')
+        t = Thread(target=threaded(self.system, self.send, caller), name='Email sender thread')
         t.start()
 
     def send(self, caller):

@@ -128,7 +128,7 @@ class TornadoService(AbstractUserService):
         global web_thread
         ioloop = tornado.ioloop.IOLoop.instance()
         if not ioloop._running:
-            web_thread = threading.Thread(target=threaded(ioloop.start),
+            web_thread = threading.Thread(target=threaded(self.system, ioloop.start),
                                           name="%s::%s" % (self.system.name, self.__class__.__name__))
             web_thread.start()
 

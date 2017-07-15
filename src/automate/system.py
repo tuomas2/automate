@@ -28,6 +28,8 @@ from past.builtins import basestring
 from collections import defaultdict
 
 from future import standard_library
+from raven import Client
+
 standard_library.install_aliases()
 from builtins import input
 import threading
@@ -93,6 +95,12 @@ class System(SystemBase):
 
     #: Reference to logger instance (read-only)
     logger = Instance(logging.Logger)
+
+    #: Sentry: Raven DSN configuration
+    raven_dsn = Str
+
+    #: Raven client (do not set)
+    raven_client = Instance(Client)
 
     #: Instance to the log handler that writes to stdout
     log_handler = Instance(logging.Handler)
@@ -448,7 +456,11 @@ class System(SystemBase):
         if not self.name:
             self.name = os.path.split(sys.argv[0])[-1].replace('.py', '')
 
-        self.worker_thread = StatusWorkerThread(name="Status worker thread")
+        self.worker_thread = StatusWorkerThread(name="Status worker thread", system=self)
+
+        # Initialize Sentry / raven client, if is configured
+        if not self.raven_client and self.raven_dsn:
+            self.raven_client = Client(self.raven_dsn, tags={'automate-system': self.name})
 
         self._initialize_logging()
         self.logger.info('Initializing services')
@@ -467,7 +479,7 @@ class System(SystemBase):
     def _initialize_logging(self):
         self.logger = logging.getLogger()
         if len(self.logger.handlers) > 0:
-            self.logger.warning('Logging has been setup already')
+            self.logger.info('Logging has been setup already, skipping logger initialization')
             return
 
         self.logger.setLevel(logging.DEBUG)

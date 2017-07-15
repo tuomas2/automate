@@ -137,6 +137,10 @@ class WebService(TornadoService):
                 time.tzset()
             if self.server_url:
                 self.django_settings['SERVER_URL'] = self.server_url
+            installed_apps = self.django_settings.pop('INSTALLED_APPS', None)
+            if installed_apps:
+                settings.INSTALLED_APPS.extend(installed_apps)
+
             for key, value in self.django_settings.items():
                 setattr(settings, key, value)
 

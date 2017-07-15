@@ -37,6 +37,7 @@ setupopts = dict(
         "traits~=4.6.0",
         "mock",
         "requests",
+        "raven",
         ],
     extras_require={
         'web': web_requirements,

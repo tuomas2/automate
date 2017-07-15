@@ -348,7 +348,7 @@ class Shell(AbstractAction):
                 cmd, executable='bash', shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
             self.logger.debug('Shell: cmd "%s", pid %s', cmd, process.pid)
             if self._kwargs.get('no_wait', False):
-                thread_start(lambda: process.communicate(input))
+                thread_start(self.system, lambda: process.communicate(input))
                 return process.pid
             else:
                 out, err = process.communicate(input)
@@ -549,7 +549,7 @@ class Delay(AbstractRunner):
             self.logger.info("Scheduling %s", self)
             delay = self.call_eval(self.delay, caller, **kwargs)
             timer = threading.Timer(delay, None)
-            timer.function = threaded(self._run, caller, timer, **kwargs)
+            timer.function = threaded(self.system, self._run, caller, timer, **kwargs)
             time_after_delay = datetime.datetime.now() + datetime.timedelta(seconds=delay)
             timer.name = "Timer for %s timed at %s (%d sek)" % (self, time_after_delay, delay)
             timer.start()
@@ -1294,7 +1294,7 @@ class While(AbstractRunner):
             state = self.get_state(caller)
             threads = state.get_or_create('threads', [])
             t = threading.Timer(0., None)
-            t.function = threaded(self._run, caller, t, **kwargs)
+            t.function = threaded(self.system, self._run, caller, t, **kwargs)
             t.name = 'Thread for %s' % self
             t._cancel_while = False
             threads.append(t)

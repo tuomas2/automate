@@ -80,9 +80,10 @@ class StatusWorkerThread(threading.Thread):
         self._stop = True
         self.logger.debug('Stop set')
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, system=None, **kwargs):
         self.queue = queue.Queue()
         self._stop = False
+        self.system = system
         self.logger = logging.getLogger('automate.StatusWorkerThread')
         super(StatusWorkerThread, self).__init__(*args, **kwargs)
 
@@ -100,7 +101,9 @@ class StatusWorkerThread(threading.Thread):
         try:
             job.run()
         except Exception as e:
-            self.logger.error('Error occurred when executing job %s: %s', job, e)
+            if self.system.raven_client:
+                self.system.raven_client.captureException()
+            self.logger.exception('Error occurred when executing job %s: %s', job, e)
         self.queue.task_done()
 
     def run(self):

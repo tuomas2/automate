@@ -95,13 +95,15 @@ class NameOrSensorActuatorBaseTrait(TraitType):
         return value
 
 
-def threaded(func, *args, **kwargs):
+def threaded(system, func, *args, **kwargs):
     """ uses thread_init as a decorator-style """
     @wraps(func)
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
         except Exception as e:
+            if system.raven_client:
+                system.raven_client.captureException()
             import traceback
             logging.getLogger('automate.common').error(
                 "Exception occurred in thread: %s\n Traceback: \n %s", e, traceback.format_exc())
@@ -110,8 +112,8 @@ def threaded(func, *args, **kwargs):
     return lambda: wrapper(*args, **kwargs)
 
 
-def thread_start(func, *args, **kwargs):
-    tfunc = threaded(func, *args, **kwargs)
+def thread_start(system, func, *args, **kwargs):
+    tfunc = threaded(system, func, *args, **kwargs)
     t = threading.Thread(target=tfunc, name='thread_start')
     t.start()
     return t
