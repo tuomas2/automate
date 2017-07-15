@@ -28,7 +28,6 @@ from past.builtins import basestring
 from collections import defaultdict
 
 from future import standard_library
-from raven import Client
 
 standard_library.install_aliases()
 from builtins import input
@@ -40,6 +39,7 @@ import logging
 import pickle
 import pkg_resources
 import argparse
+import raven
 
 from traits.api import (CStr, Instance, CBool, CList, Property, CInt, CUnicode, Event, CSet, Str, cached_property,
                         on_trait_change)
@@ -96,11 +96,11 @@ class System(SystemBase):
     #: Reference to logger instance (read-only)
     logger = Instance(logging.Logger)
 
-    #: Sentry: Raven DSN configuration
+    #: Sentry: Raven DSN configuration (see http://sentry.io)
     raven_dsn = Str
 
-    #: Raven client (do not set)
-    raven_client = Instance(Client)
+    #: Raven client (is created automatically if raven_dsn is set and this is left empty)
+    raven_client = Instance(raven.Client, transient=True)
 
     #: Instance to the log handler that writes to stdout
     log_handler = Instance(logging.Handler)
