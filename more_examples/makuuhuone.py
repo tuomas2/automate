@@ -141,7 +141,7 @@ if __name__ == '__main__':
                 'propagate': False,
             },
             'tornado.access': {
-                'handlers': ['console', 'sentry'],
+                'handlers': ['console'],
                 'level': 'WARNING',
                 'propagate': False,
             },
