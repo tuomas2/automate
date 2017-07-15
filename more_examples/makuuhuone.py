@@ -79,10 +79,77 @@ class Makuuhuone(lamps.LampGroupsMixin, System):
             on_activate=ReloadService('ArduinoService'),
         )
 
-import tornado.log
-tornado.log.access_log.setLevel(logging.WARNING)
 
 if __name__ == '__main__':
+    from logging.config import dictConfig
+
+    RAVEN_DSN = os.getenv('RAVEN_DSN', '')
+
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': True,
+        'formatters': {
+            'verbose': {
+                'format': '%(levelname)s %(asctime)s %(module)s %(name)s %(message)s'
+            },
+            'simple': {
+                'format': '%(levelname)s %(message)s'
+            },
+            'colorful': {
+                '()': 'colorlog.ColoredFormatter',
+                'format': '%(asctime)s %(log_color)s%(name)s%(reset)s %(message)s'
+                # 'format': "%(log_color)s%(levelname)-8s%(reset)s %(blue)s%(message)s"
+            }
+        },
+        'handlers': {
+            'mail_admins': {
+                'level': 'ERROR',
+                'class': 'django.utils.log.AdminEmailHandler',
+                'include_html': True,
+            },
+            'sentry': {
+                'level': 'WARNING',
+                'class': 'raven.handlers.logging.SentryHandler',
+                'dsn': RAVEN_DSN,
+                'tags': {'automate-system': 'makuuhuone'}
+            },
+            'console': {
+                'class': 'logging.StreamHandler',
+                # 'formatter': 'verbose',
+                'formatter': 'colorful',
+            },
+        },
+        'loggers': {
+            '': {
+                'handlers': ['console', 'sentry'],
+                'level': 'INFO',
+                'propagate': True,
+            },
+            'automate': {
+                'handlers': ['console', 'sentry'],
+                'level': 'INFO',
+                'propagate': True,
+            },
+            'django.template': {
+                'handlers': ['console', 'sentry'],
+                'level': 'WARNING',
+                'propagate': False,
+            },
+            'django': {
+                'handlers': ['console', 'sentry'],
+                'level': 'INFO',
+                'propagate': False,
+            },
+            'tornado.access': {
+                'handlers': ['console', 'sentry'],
+                'level': 'WARNING',
+                'propagate': False,
+            },
+        },
+    }
+
+    dictConfig(LOGGING)
+
     s = Makuuhuone.load_or_create(
         'makuuhuone.dmp',
         services=[
@@ -97,7 +164,9 @@ if __name__ == '__main__':
                 show_actuator_details=False,
                 django_settings = {'SESSION_FILE_PATH': 'sessions' if is_raspi() else '/tmp',
                                    'SESSION_COOKIE_AGE': 52560000,
-                                   'SECRET_KEY': os.getenv('AUTOMATE_SECRET_KEY', 'unsecure-default')},
+                                   'SECRET_KEY': os.getenv('AUTOMATE_SECRET_KEY', 'unsecure-default'),
+                                   'INSTALLED_APPS': ['raven.contrib.django.raven_compat'],
+                                   },
             ),
             StatusSaverService(),
         ],
@@ -105,4 +174,5 @@ if __name__ == '__main__':
         print_level=logging.INFO,
         log_level=logging.WARNING,
         no_input=not is_raspi(),
+        raven_dsn=RAVEN_DSN,
     )

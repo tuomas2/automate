@@ -427,56 +427,128 @@ class autoaqua(System):
                                )
 
 
-webcam_page = """
-{% extends "base.html" %}
-{%block content %}
-<img class='puml' src="/webcam/webcam.jpeg">
-{%endblock%}
-"""
+if __name__ == '__main__':
+    from logging.config import dictConfig
 
-import tornado.log
-tornado.log.access_log.setLevel(logging.WARNING)
+    RAVEN_DSN = os.getenv('RAVEN_DSN', '')
 
-web = WebService(
-        server_url=os.getenv('AUTOAQUA_URL', 'http://localhost:8080'),
-        http_port=8080,
-        http_auth=(os.getenv('AUTOMATE_USERNAME', 'test'),
-                   os.getenv('AUTOMATE_PASSWORD', 'test'),
-        ),
-        debug = not is_raspi(),
-        user_tags={'web'},
-        read_only = False,
-        default_view = 'tags_view',
-        show_actuator_details = False,
-        static_dirs = {'/webcam/(.*)': 'public_html/webcam/'},
-        custom_pages = {'Webcam': webcam_page},
-        django_settings = {'SESSION_FILE_PATH': 'sessions' if is_raspi() else '/tmp',
-                           'SESSION_COOKIE_AGE': 52560000,
-                           'SECRET_KEY': os.getenv('AUTOMATE_SECRET_KEY', 'unsecure-default')},
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': True,
+        'formatters': {
+            'verbose': {
+                'format': '%(levelname)s %(asctime)s %(module)s %(name)s %(message)s'
+            },
+            'simple': {
+                'format': '%(levelname)s %(message)s'
+            },
+            'colorful': {
+                '()': 'colorlog.ColoredFormatter',
+                'format': '%(asctime)s %(log_color)s%(name)s%(reset)s %(message)s'
+                # 'format': "%(log_color)s%(levelname)-8s%(reset)s %(blue)s%(message)s"
+            }
+        },
+        'handlers': {
+            'mail_admins': {
+                'level': 'ERROR',
+                'class': 'django.utils.log.AdminEmailHandler',
+                'include_html': True,
+            },
+            'sentry': {
+                'level': 'WARNING',
+                'class': 'raven.handlers.logging.SentryHandler',
+                'dsn': RAVEN_DSN,
+                'tags': {'automate-system': 'autoaqua'}
+            },
+            'console': {
+                'class': 'logging.StreamHandler',
+                # 'formatter': 'verbose',
+                'formatter': 'colorful',
+            },
+        },
+        'loggers': {
+            '': {
+                'handlers': ['console', 'sentry'],
+                'level': 'INFO',
+                'propagate': True,
+            },
+            'automate': {
+                'handlers': ['console', 'sentry'],
+                'level': 'INFO',
+                'propagate': True,
+            },
+            'django.template': {
+                'handlers': ['console', 'sentry'],
+                'level': 'WARNING',
+                'propagate': False,
+            },
+            'django': {
+                'handlers': ['console', 'sentry'],
+                'level': 'INFO',
+                'propagate': False,
+            },
+            'tornado.access': {
+                'handlers': ['console', 'sentry'],
+                'level': 'WARNING',
+                'propagate': False,
+            },
+        },
+    }
+
+    dictConfig(LOGGING)
+
+
+
+    webcam_page = """
+    {% extends "base.html" %}
+    {%block content %}
+    <img class='puml' src="/webcam/webcam.jpeg">
+    {%endblock%}
+    """
+
+    web = WebService(
+            server_url=os.getenv('AUTOAQUA_URL', 'http://localhost:8080'),
+            http_port=8080,
+            http_auth=(os.getenv('AUTOMATE_USERNAME', 'test'),
+                       os.getenv('AUTOMATE_PASSWORD', 'test'),
+            ),
+            debug = not is_raspi(),
+            user_tags={'web'},
+            read_only = False,
+            default_view = 'tags_view',
+            show_actuator_details = False,
+            static_dirs = {'/webcam/(.*)': 'public_html/webcam/'},
+            custom_pages = {'Webcam': webcam_page},
+            django_settings = {'SESSION_FILE_PATH': 'sessions' if is_raspi() else '/tmp',
+                               'SESSION_COOKIE_AGE': 52560000,
+                               'SECRET_KEY': os.getenv('AUTOMATE_SECRET_KEY', 'unsecure-default'),
+                               'INSTALLED_APPS': ['raven.contrib.django.raven_compat'],
+                               },
+        )
+
+    ard = ArduinoService(
+            arduino_devs=['/dev/ttyUSB0'],
+            arduino_dev_types=['Arduino'],
+            arduino_dev_sampling=[500],
+        )
+    rpcs = RpcService(
+            http_port=3030,
+            view_tags={'web'},
+        )
+
+
+    s = autoaqua.load_or_create(
+        filename='autoaqua.dmp',
+        services=[
+            web,
+            ard,
+            rpcs,
+            PlantUMLService(url='http://www.plantuml.com/plantuml/svg/'),
+            StatusSaverService(),
+        ],
+        print_level=logging.INFO,
+        log_level=logging.INFO,
+        logfile="autoaqua.log",
+        no_input=not is_raspi(),
+        raven_dsn=RAVEN_DSN,
     )
-
-ard = ArduinoService(
-        arduino_devs=['/dev/ttyUSB0'],
-        arduino_dev_types=['Arduino'],
-        arduino_dev_sampling=[500],
-    )
-rpcs = RpcService(
-        http_port=3030,
-        view_tags={'web'},
-    )
-
-
-s = autoaqua.load_or_create(
-    filename='autoaqua.dmp',
-    services=[
-        web,
-        ard,
-        rpcs,
-        PlantUMLService(url='http://www.plantuml.com/plantuml/svg/'),
-        StatusSaverService(),
-    ],
-    print_level=logging.INFO,
-    log_level=logging.INFO,
-    logfile="autoaqua.log",
-    no_input=not is_raspi(),
-)
