@@ -122,11 +122,16 @@ if __name__ == '__main__':
                 'level': 'INFO',
                 'propagate': True,
             },
-            'automate': {
-                'handlers': ['console', 'sentry'],
-                'level': 'INFO',
-                'propagate': True,
-            },
+#            'automate.makuuhuone.WebService': {
+#                'handlers': ['console', 'sentry'],
+#                'level': 'DEBUG',
+#                'propagate': False,
+#            },
+#            'automate.makuuhuone': {
+#                'handlers': ['console', 'sentry'],
+#                'level': 'INFO',
+#                'propagate': False,
+#            },
             'django.template': {
                 'handlers': ['console', 'sentry'],
                 'level': 'WARNING',
