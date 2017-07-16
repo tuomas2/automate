@@ -24,7 +24,7 @@
 from __future__ import unicode_literals
 from threading import Timer
 
-from traits.api import Unicode, Any, CBool, CFloat
+from traits.api import Any, CBool, CFloat
 
 from automate.service import AbstractUserService
 

@@ -504,9 +504,6 @@ if __name__ == '__main__':
             StatusSaverService(),
             RpcService(http_port=3031, view_tags={'web'}),
         ],
-        logfile='music_server.log' if is_raspi() else '',
-        print_level=logging.INFO if is_raspi() else logging.DEBUG,
-        log_level=logging.WARNING,
         no_input=not is_raspi(),
         raven_dsn=RAVEN_DSN,
     )

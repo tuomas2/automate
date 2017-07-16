@@ -164,9 +164,6 @@ if __name__ == '__main__':
             ),
             StatusSaverService(),
         ],
-        logfile='makuuhuone.log' if is_raspi() else '',
-        print_level=logging.INFO,
-        log_level=logging.WARNING,
         no_input=not is_raspi(),
         raven_dsn=RAVEN_DSN,
     )

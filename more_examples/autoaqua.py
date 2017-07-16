@@ -540,9 +540,6 @@ if __name__ == '__main__':
             PlantUMLService(url='http://www.plantuml.com/plantuml/svg/'),
             StatusSaverService(),
         ],
-        print_level=logging.INFO,
-        log_level=logging.INFO,
-        logfile="autoaqua.log",
         no_input=not is_raspi(),
         raven_dsn=RAVEN_DSN,
     )
