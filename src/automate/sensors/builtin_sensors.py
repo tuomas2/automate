@@ -27,9 +27,7 @@
 from __future__ import unicode_literals
 from future import standard_library
 standard_library.install_aliases()
-from builtins import filter
 
-import time
 import socket
 import logging
 import subprocess
@@ -42,9 +40,9 @@ from copy import deepcopy
 from datetime import datetime, timedelta
 
 from croniter import croniter
-from traits.api import Any, CInt, CFloat, Unicode, CUnicode, List, CBool, Instance, CStr, Int
+from traits.api import Any, CInt, CFloat, Unicode, CUnicode, CBool, Instance, CStr, Int, Property
 
-from automate.common import get_modules_all
+from automate.common import get_modules_all, LogicStr
 from automate.common import threaded, Lock
 from automate.statusobject import AbstractSensor
 from automate.callables import Value
@@ -334,6 +332,10 @@ class PollingSensor(AbstractPollingSensor):
 
     #: Return value of this Callable is used to set the status of the sensor when polling
     status_updater = Instance(AbstractCallable)
+
+    status_updater_str = Property(depends_on="status_updater", trait=LogicStr,
+                                  transient=True, fset=AbstractPollingSensor._str_setter,
+                                  fget=AbstractPollingSensor._str_getter)
 
     #: If set, typeconversion to this is used. Can be any function or type.
     type = Any
