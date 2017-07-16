@@ -195,6 +195,9 @@ class System(SystemBase):
     #: Read-only property that gives list of all object tags
     all_tags = Property(depends_on='objects.tags[]')
 
+    #: Number of state backup files
+    num_state_backups = CInt(5)
+
     @cached_property
     def _get_all_tags(self):
         newset = set([])
@@ -261,6 +264,14 @@ class System(SystemBase):
             self.logger.error('Filename not specified. Could not save state')
             return
         self.logger.debug('Saving system state to %s', self.filename)
+        for i in reversed(range(self.num_state_backups)):
+            fname = self.filename if i == 0 else '%s.%d' % (self.filename, i)
+            new_fname = '%s.%d' % (self.filename, i+1)
+            try:
+                os.rename(fname, new_fname)
+            except FileNotFoundError:
+                pass
+
         with open(self.filename, 'wb') as file, self.worker_thread.queue.mutex:
             pickle.dump((list(self.objects)), file, pickle.HIGHEST_PROTOCOL)
 
