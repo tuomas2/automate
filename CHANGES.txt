@@ -1,4 +1,4 @@
-0.10.16 (unreleased)
+0.10.16 (2017-07-16)
 --------------------
 
 - Improved logging configuration (does not ever define root logger)
