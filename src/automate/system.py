@@ -485,24 +485,29 @@ class System(SystemBase):
         self.post_init_trigger = True
 
     def _initialize_logging(self):
-        self.logger = logging.getLogger()
-        if len(self.logger.handlers) > 0:
-            self.logger.info('Logging has been configured already, '
+        root_logger = logging.getLogger('automate')
+        self.logger = root_logger.getChild(self.name)
+
+        # Check if root level logging has been set up externally.
+
+        if len(root_logger.handlers) > 0:
+            root_logger.info('Logging has been configured already, '
                              'skipping logging configuration')
             return
 
-        self.logger.setLevel(logging.DEBUG)
+        root_logger.propagate = False
+        root_logger.setLevel(logging.DEBUG)
 
         if self.raven_client:
             sentry_handler = SentryHandler(client=self.raven_client, level=logging.ERROR)
-            self.logger.addHandler(sentry_handler)
+            root_logger.addHandler(sentry_handler)
 
         if self.logfile:
             formatter = logging.Formatter(fmt=self.logfile_format)
             log_handler = logging.FileHandler(self.logfile)
             log_handler.setLevel(self.log_level)
             log_handler.setFormatter(formatter)
-            self.logger.addHandler(log_handler)
+            root_logger.addHandler(log_handler)
 
         stream_handler = logging.StreamHandler()
         stream_handler.setLevel(self.print_level)
@@ -512,9 +517,8 @@ class System(SystemBase):
         colors['DEBUG'] = 'purple'
 
         stream_handler.setFormatter(ColoredFormatter(self.log_format, datefmt='%H:%M:%S', log_colors=colors))
-        self.logger.addHandler(stream_handler)
+        root_logger.addHandler(stream_handler)
 
-        self.logger = logging.getLogger(self.name)
         self.logger.info('Logging setup ready')
 
     def _initialize_namespace(self, loadstate=None):

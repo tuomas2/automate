@@ -64,7 +64,6 @@ class LogStoreService(AbstractUserService):
     def html_fix(s):
         return s.replace('<', '&lt;').replace('>', '&gt;')
 
-
     def setup(service):
         html_formatter = ColoredFormatter(service.html_format, datefmt='%H:%M:%S')
 

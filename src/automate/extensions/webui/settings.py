@@ -60,19 +60,22 @@ MIDDLEWARE_CLASSES = [
 
 SESSION_ENGINE = "django.contrib.sessions.backends.file"
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
-LOGGING = {  # set up logging such that log entries go to Automate logging
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'null': {
-            'level': 'DEBUG',
-            'class': 'logging.NullHandler',
-        }
-    },
-    'loggers': {
-        'django': {
-            'level': 'DEBUG',
-            'handlers': ['null'],
-        }
-    }
-}
+
+LOGGING_CONFIG = None
+
+#LOGGING = {  # set up logging such that log entries go to Automate logging
+#    'version': 1,
+#    'disable_existing_loggers': False,
+#    'handlers': {
+#        'null': {
+#            'level': 'DEBUG',
+#            'class': 'logging.NullHandler',
+#        }
+#    },
+#    'loggers': {
+#        'django': {
+#            'level': 'DEBUG',
+#            'handlers': ['null'],
+#        }
+#    }
+#}
