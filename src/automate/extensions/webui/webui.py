@@ -131,15 +131,19 @@ class WebService(TornadoService):
             from django.conf import settings
             settings.DEBUG = self.debug
             if not 'SECRET_KEY' in self.django_settings:
-                self.logger.warning('Insecure settings! Please set proper SECRET_KEY in django_settings!')
+                self.logger.warning('Insecure settings! Please set proper SECRET_KEY in '
+                                    'WebService.django_settings!')
             if not 'TIME_ZONE' in self.django_settings:
                 os.environ.pop('TZ')  # Django uses America/Chicago as default timezone. Let's clean this up.
                 time.tzset()
             if self.server_url:
                 self.django_settings['SERVER_URL'] = self.server_url
+            if self.system.raven_dsn:
+                settings.INSTALLED_APPS.append('raven.contrib.django.raven_compat')
+                settings.RAVEN_CONFIG = {'dsn': self.system.raven_dsn }
             installed_apps = self.django_settings.pop('INSTALLED_APPS', None)
             if installed_apps:
-                settings.INSTALLED_APPS.extend(installed_apps)
+                settings.INSTALLED_APPS.extend(list(installed_apps))
 
             for key, value in self.django_settings.items():
                 setattr(settings, key, value)

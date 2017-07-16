@@ -102,11 +102,6 @@ if __name__ == '__main__':
             }
         },
         'handlers': {
-            'mail_admins': {
-                'level': 'ERROR',
-                'class': 'django.utils.log.AdminEmailHandler',
-                'include_html': True,
-            },
             'sentry': {
                 'level': 'WARNING',
                 'class': 'raven.handlers.logging.SentryHandler',
@@ -165,7 +160,6 @@ if __name__ == '__main__':
                 django_settings = {'SESSION_FILE_PATH': 'sessions' if is_raspi() else '/tmp',
                                    'SESSION_COOKIE_AGE': 52560000,
                                    'SECRET_KEY': os.getenv('AUTOMATE_SECRET_KEY', 'unsecure-default'),
-                                   'INSTALLED_APPS': ['raven.contrib.django.raven_compat'],
                                    },
             ),
             StatusSaverService(),
