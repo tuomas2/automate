@@ -464,7 +464,7 @@ if __name__ == '__main__':
             'automate': {
                 'handlers': ['console', 'sentry'],
                 'level': 'INFO',
-                'propagate': True,
+                'propagate': False,
             },
             'django.template': {
                 'handlers': ['console', 'sentry'],
