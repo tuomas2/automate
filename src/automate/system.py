@@ -104,14 +104,8 @@ class System(SystemBase):
     #: Raven client (is created automatically if raven_dsn is set and this is left empty)
     raven_client = Instance(raven.Client, transient=True)
 
-    #: Instance to the log handler that writes to stdout
-    log_handler = Instance(logging.Handler)
-
     #: Format string of the log handler that writes to stdout
     log_format = Str('%(asctime)s %(log_color)s%(name)s%(reset)s %(message)s')
-
-    #: Instance to the log handler that writes to logfile (read-only)
-    print_handler = Instance(logging.Handler)
 
     #: Format string of the log handler that writes to logfile
     logfile_format = Str('%(process)d:%(threadName)s:%(name)s:%(asctime)s:%(levelname)s:%(message)s')
@@ -498,32 +492,27 @@ class System(SystemBase):
 
         self.logger.setLevel(logging.DEBUG)
 
-        # Why is threre StreamHandler when running gpiotest.py from raspi2?
-        # Reason: RPIO uses logging.error etc directly, which adds handler
-        # to root. .
-
-        formatter = logging.Formatter(fmt=self.logfile_format)
+        if self.raven_client:
+            sentry_handler = SentryHandler(client=self.raven_client, level=logging.ERROR)
+            self.logger.addHandler(sentry_handler)
 
         if self.logfile:
-            self.log_handler = log_handler = logging.FileHandler(self.logfile)
+            formatter = logging.Formatter(fmt=self.logfile_format)
+            log_handler = logging.FileHandler(self.logfile)
             log_handler.setLevel(self.log_level)
             log_handler.setFormatter(formatter)
             self.logger.addHandler(log_handler)
 
-        self.print_handler = streamhandler = logging.StreamHandler()
-        streamhandler.setLevel(self.print_level)
-
-        if self.raven_client:
-            sentry_handler = SentryHandler(client=self.raven_client, level=logging.ERROR)
-            self.logger.addHandler(sentry_handler)
+        stream_handler = logging.StreamHandler()
+        stream_handler.setLevel(self.print_level)
 
         from colorlog import ColoredFormatter, default_log_colors
         colors = default_log_colors.copy()
         colors['DEBUG'] = 'purple'
 
-        streamhandler.setFormatter(ColoredFormatter(self.log_format, datefmt='%H:%M:%S', log_colors=colors))
+        stream_handler.setFormatter(ColoredFormatter(self.log_format, datefmt='%H:%M:%S', log_colors=colors))
+        self.logger.addHandler(stream_handler)
 
-        self.logger.addHandler(streamhandler)
         self.logger = logging.getLogger(self.name)
         self.logger.info('Logging setup ready')
 
