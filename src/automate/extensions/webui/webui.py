@@ -96,7 +96,7 @@ class WebService(TornadoService):
     #: Full exposed url root
     server_url = Unicode()
 
-    _sockets = List
+    _sockets = List(transient=True)
 
     def get_filehandler_class(service):
         class MyFileHandler(tornado.web.StaticFileHandler):
