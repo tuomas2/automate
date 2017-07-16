@@ -450,7 +450,7 @@ if __name__ == '__main__':
         },
         'handlers': {
             'sentry': {
-                'level': 'WARNING',
+                'level': 'ERROR',
                 'class': 'raven.handlers.logging.SentryHandler',
                 'dsn': RAVEN_DSN,
                 'tags': {'automate-system': 'autoaqua'}
