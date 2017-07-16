@@ -25,8 +25,8 @@ from __future__ import unicode_literals
 from past.builtins import basestring
 import re
 from traits.api import cached_property, on_trait_change, CList, Dict, Instance, Set, Event, Property
-from automate.common import CompareMixin, Lock, deep_iterate, Object, is_iterable, AbstractStatusObject, DictObject, SystemNotReady
-from automate.systemobject import SystemObject
+from .common import CompareMixin, Lock, deep_iterate, Object, is_iterable, AbstractStatusObject, DictObject, SystemNotReady
+from .systemobject import SystemObject
 
 import logging
 

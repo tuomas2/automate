@@ -34,10 +34,10 @@ from traits.api import (cached_property, Any, CBool, Instance, Dict, Str, CFloat
                         List, Enum, Bool, Property, Event)
 from traits.trait_errors import TraitError
 
-from automate.common import Lock, AbstractStatusObject, CompareMixin, nomutex
-from automate.worker import StatusWorkerTask, DummyStatusWorkerTask
-from automate.program import ProgrammableSystemObject, DefaultProgram
-from automate.systemobject import SystemObject
+from .common import Lock, AbstractStatusObject, CompareMixin, nomutex
+from .worker import StatusWorkerTask, DummyStatusWorkerTask
+from .program import ProgrammableSystemObject, DefaultProgram
+from .systemobject import SystemObject
 
 if sys.version_info >= (3, 0):
     TimerClass = threading.Timer

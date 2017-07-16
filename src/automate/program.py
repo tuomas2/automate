@@ -27,10 +27,10 @@ import logging
 
 from traits.api import cached_property, on_trait_change, CFloat, Instance, CBool, CSet, Property
 
-from automate.common import (LogicStr, Lock, NameOrSensorActuatorBaseTrait,
-                             AbstractStatusObject)
-from automate.systemobject import SystemObject
-from automate.callable import AbstractCallable
+from .common import (LogicStr, Lock, NameOrSensorActuatorBaseTrait,
+                     AbstractStatusObject)
+from .systemobject import SystemObject
+from .callable import AbstractCallable
 
 
 class ProgrammableSystemObject(SystemObject):

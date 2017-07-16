@@ -22,10 +22,10 @@ from __future__ import unicode_literals
 # If you like Automate, please take a look at this page:
 # http://evankelista.net/automate/
 
-from automate.systemobject import SystemObject
-from automate.common import Group
-from automate.service import AbstractService
-from automate.callable import AbstractCallable
+from .systemobject import SystemObject
+from .common import Group
+from .service import AbstractService
+from .callable import AbstractCallable
 
 
 class Namespace(dict):

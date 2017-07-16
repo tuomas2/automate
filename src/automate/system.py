@@ -28,6 +28,7 @@ from past.builtins import basestring
 from collections import defaultdict
 
 from future import standard_library
+from raven.handlers.logging import SentryHandler
 
 standard_library.install_aliases()
 from builtins import input
@@ -44,13 +45,14 @@ import raven
 from traits.api import (CStr, Instance, CBool, CList, Property, CInt, CUnicode, Event, CSet, Str, cached_property,
                         on_trait_change)
 
-from automate.common import (SystemBase, ExitException, has_baseclass, Object)
-from automate.namespace import Namespace
-from automate.service import AbstractService, AbstractUserService, AbstractSystemService
-from automate.statusobject import AbstractSensor, AbstractActuator
-from automate.systemobject import SystemObject
-from automate.worker import StatusWorkerThread
-from automate.callable import AbstractCallable
+from .common import (SystemBase, ExitException, has_baseclass, Object)
+from .namespace import Namespace
+from .service import AbstractService, AbstractUserService, AbstractSystemService
+from .statusobject import AbstractSensor, AbstractActuator
+from .systemobject import SystemObject
+from .worker import StatusWorkerThread
+from .callable import AbstractCallable
+from . import __version__
 
 import sys
 
@@ -471,7 +473,8 @@ class System(SystemBase):
 
         # Initialize Sentry / raven client, if is configured
         if not self.raven_client and self.raven_dsn:
-            self.raven_client = raven.Client(self.raven_dsn, tags={'automate-system': self.name})
+            self.raven_client = raven.Client(self.raven_dsn, release=__version__,
+                                             tags={'automate-system': self.name})
 
         self._initialize_logging()
         self.logger.info('Initializing services')
@@ -509,6 +512,10 @@ class System(SystemBase):
 
         self.print_handler = streamhandler = logging.StreamHandler()
         streamhandler.setLevel(self.print_level)
+
+        if self.raven_client:
+            sentry_handler = SentryHandler(client=self.raven_client, level=logging.ERROR)
+            self.logger.addHandler(sentry_handler)
 
         from colorlog import ColoredFormatter, default_log_colors
         colors = default_log_colors.copy()

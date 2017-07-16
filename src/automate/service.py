@@ -26,7 +26,7 @@ import logging
 
 from traits.api import HasStrictTraits, Instance, CBool
 
-from automate.common import SystemBase
+from .common import SystemBase
 
 
 class AbstractService(HasStrictTraits):

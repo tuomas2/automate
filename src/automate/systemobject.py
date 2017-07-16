@@ -27,7 +27,7 @@ import logging
 from traits.has_traits import HasStrictTraits, cached_property
 from traits.trait_types import Instance, CUnicode, Tuple, Dict, Event, Unicode, Int, CBool
 from traits.traits import Property
-from automate import SystemBase, TagSet, is_valid_variable_name
+from .common import SystemBase, TagSet, is_valid_variable_name
 
 
 class SystemObject(HasStrictTraits):

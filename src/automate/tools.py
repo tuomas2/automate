@@ -29,8 +29,8 @@ import time
 from traits.api import CUnicode, Unicode, CInt
 import requests
 
-from automate.common import threaded
-from automate.systemobject import SystemObject
+from .common import threaded
+from .systemobject import SystemObject
 
 
 class PushOver(SystemObject):

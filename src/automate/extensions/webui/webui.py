@@ -36,11 +36,12 @@ import tornado.web
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
 
 from traits.api import CBool, Tuple, Int, Str, CSet, List, CInt, Dict, Unicode
+from django.core.wsgi import get_wsgi_application
 
 from automate.extensions.webui.djangoapp.views import set_globals
 from automate.statusobject import StatusObject
-from django.core.wsgi import get_wsgi_application
 from automate.extensions.wsgi import TornadoService
+from automate import __version__
 
 
 class WebService(TornadoService):
@@ -140,7 +141,7 @@ class WebService(TornadoService):
                 self.django_settings['SERVER_URL'] = self.server_url
             if self.system.raven_dsn:
                 settings.INSTALLED_APPS.append('raven.contrib.django.raven_compat')
-                settings.RAVEN_CONFIG = {'dsn': self.system.raven_dsn }
+                settings.RAVEN_CONFIG = {'dsn': self.system.raven_dsn, 'release': __version__}
             installed_apps = self.django_settings.pop('INSTALLED_APPS', None)
             if installed_apps:
                 settings.INSTALLED_APPS.extend(list(installed_apps))
