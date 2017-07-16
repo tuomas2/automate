@@ -487,7 +487,8 @@ class System(SystemBase):
     def _initialize_logging(self):
         self.logger = logging.getLogger()
         if len(self.logger.handlers) > 0:
-            self.logger.info('Logging has been setup already, skipping logger initialization')
+            self.logger.info('Logging has been configured already, '
+                             'skipping logging configuration')
             return
 
         self.logger.setLevel(logging.DEBUG)

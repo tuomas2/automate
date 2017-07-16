@@ -1,5 +1,6 @@
 # encoding:utf-8
 from __future__ import unicode_literals
+import automate
 from automate import *
 from automate.extensions.arduino import ArduinoDigitalActuator
 from automate.extensions.rpio import RpioSensor, RpioActuator
@@ -106,6 +107,7 @@ if __name__ == '__main__':
                 'level': 'ERROR',
                 'class': 'raven.handlers.logging.SentryHandler',
                 'dsn': RAVEN_DSN,
+                'release': automate.__version__,
                 'tags': {'automate-system': 'makuuhuone'}
             },
             'console': {

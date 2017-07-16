@@ -9,6 +9,7 @@ from __future__ import division
 from __future__ import unicode_literals
 from past.utils import old_div
 
+import automate
 from automate import *
 from automate.extensions.arduino import ArduinoService, ArduinoDigitalActuator, \
     ArduinoDigitalSensor
@@ -452,6 +453,7 @@ if __name__ == '__main__':
             'sentry': {
                 'level': 'ERROR',
                 'class': 'raven.handlers.logging.SentryHandler',
+                'release': automate.__version__,
                 'dsn': RAVEN_DSN,
                 'tags': {'automate-system': 'autoaqua'}
             },
