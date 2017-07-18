@@ -164,7 +164,7 @@ class ProgrammableSystemObject(SystemObject):
             c.setup_callable_system(self.system)
         actual_triggers =  (self.triggers | self.update_condition.triggers | self.active_condition.triggers
                             | self.on_update.triggers | self.on_activate.triggers) - self.exclude_triggers
-        self.logger.debug('_get_actual_triggers for %s gives %s', self, actual_triggers
+        self.logger.debug('_get_actual_triggers for %s gives %s', self, actual_triggers)
         return actual_triggers
 
     @cached_property
@@ -172,7 +172,7 @@ class ProgrammableSystemObject(SystemObject):
         for c in [self.on_update, self.on_activate, self.on_deactivate]:
             c.setup_callable_system(self.system)
         actual_targets = self.targets | self.on_update.targets | self.on_activate.targets | self.on_deactivate.targets
-        self.logger.debug('_get_actual_targets for %s gives %s', self, actual_targets
+        self.logger.debug('_get_actual_targets for %s gives %s', self, actual_targets)
         return actual_targets
 
     @on_trait_change('actual_triggers')
