@@ -162,14 +162,18 @@ class ProgrammableSystemObject(SystemObject):
     def _get_actual_triggers(self):
         for c in [self.update_condition, self.active_condition, self.on_update, self.on_activate]:
             c.setup_callable_system(self.system)
-        return (self.triggers | self.update_condition.triggers | self.active_condition.triggers
-                | self.on_update.triggers | self.on_activate.triggers) - self.exclude_triggers
+        actual_triggers =  (self.triggers | self.update_condition.triggers | self.active_condition.triggers
+                            | self.on_update.triggers | self.on_activate.triggers) - self.exclude_triggers
+        self.logger.debug('_get_actual_triggers for %s gives %s', self, actual_triggers
+        return actual_triggers
 
     @cached_property
     def _get_actual_targets(self):
         for c in [self.on_update, self.on_activate, self.on_deactivate]:
             c.setup_callable_system(self.system)
-        return self.targets | self.on_update.targets | self.on_activate.targets | self.on_deactivate.targets
+        actual_targets = self.targets | self.on_update.targets | self.on_activate.targets | self.on_deactivate.targets
+        self.logger.debug('_get_actual_targets for %s gives %s', self, actual_targets
+        return actual_targets
 
     @on_trait_change('actual_triggers')
     def actual_triggers_changed(self, obj, name, old, new):
@@ -276,6 +280,7 @@ class ProgrammableSystemObject(SystemObject):
             setattr(self, key, value)
 
         super(ProgrammableSystemObject, self).setup_system(system, *args, **kwargs)
+        self.logger.debug('setup_system done for %s', self)
 
     def _priority_changed(self):
         self.logger.debug('Priority changed')

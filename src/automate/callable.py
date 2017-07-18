@@ -128,14 +128,18 @@ class AbstractCallable(SystemObject, CompareMixin):
         if not self.system:
             # Raising exception prevents invalid value from being cached when system is in pre-mature state
             raise SystemNotReady('System not ready yet -- this is normal when loading dump.')
-        return self.collect('triggers')
+        triggers = self.collect('triggers')
+        self.logger.debug('Collected triggers for %s: %s', self, triggers)
+        return triggers
 
     @cached_property
     def _get_targets(self):
         if not self.system:
             # Raising exception prevents invalid value from being cached when system is in pre-mature state
             raise SystemNotReady('System not ready yet -- this is normal when loading dump.')
-        return self.collect('targets')
+        targets = self.collect('targets')
+        self.logger.debug('Collected targets for %s: %s', self, targets)
+        return targets
 
     def __getitem__(self, item):
         return self._args[item]
@@ -206,6 +210,7 @@ class AbstractCallable(SystemObject, CompareMixin):
                 elif isinstance(i, SystemObject):
                     i.system = system
             self.on_setup_callable = 1
+        self.logger.debug('setup_callable_system for %s ready.', self)
 
     def call(self, *args, **kwargs):
         """
