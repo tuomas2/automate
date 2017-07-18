@@ -9,5 +9,7 @@ from automate.test_utils import sysloader, check_log
 @pytest.fixture(scope='function')
 def caplog(caplog):
     logger = logging.getLogger('automate')
-    logger.addHandler(CaptureLogHandler())
+    handler = CaptureLogHandler()
+    logger.addHandler(handler)
     yield caplog
+    logger.removeHandler(handler)
