@@ -210,7 +210,7 @@ class AbstractCallable(SystemObject, CompareMixin):
                 elif isinstance(i, SystemObject):
                     i.system = system
             self.on_setup_callable = 1
-        self.logger.debug('setup_callable_system for %s ready.', self)
+            self.logger.debug('setup_callable_system for %s (%s) ready.', self, id(self))
 
     def call(self, *args, **kwargs):
         """
