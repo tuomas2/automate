@@ -169,3 +169,5 @@ if __name__ == '__main__':
         no_input=not is_raspi(),
         raven_dsn=RAVEN_DSN,
     )
+
+#asfd
