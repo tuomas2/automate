@@ -21,54 +21,51 @@
 # If you like Automate, please take a look at this page:
 # http://evankelista.net/automate/
 
-from __future__ import unicode_literals
 import logging
-logger = logging.getLogger('automate')
-import pytest
-import logging
-
-from automate.system import System
+import contextlib
+import py
 
 
-@pytest.fixture(params=[1])
-def sysloader(request, tmpdir):
-    filename = str(tmpdir.join('savefile.dmp'))
-    if request.param:
-        class Loader(object):
+class CaptureLogHandler(logging.StreamHandler):
+    """A logging handler that stores log records and the log text."""
 
-            def new_system(self, sys, *args, **kwargs):
-                kwargs.setdefault('exclude_services', ['TextUIService'])
-                self.sys = sys(*args, **kwargs)
-                self.sys.flush()
-                return self.sys
-    else:
-        class Loader(object):
+    def __init__(self, *args, **kwargs):
+        """Creates a new log handler."""
+        super(CaptureLogHandler, self).__init__(*args, **kwargs)
+        self.reset()
 
-            def new_system(self, sys, *args, **kwargs):
-                kwargs.setdefault('exclude_services', ['TextUIService'])
-                sys1 = sys(*args, **kwargs)
-                sys1.flush()
-                sys1.filename = filename
-                sys1.save_state()
-                sys1.cleanup()
+    def reset(self):
+        self.stream = py.io.TextIO()
+        self.records = []
 
-                self.sys = System.load_or_create(filename, exclude_services=['TextUIService'])
-                self.sys.flush()
-                return self.sys
+    def close(self):
+        """Close this log handler and its underlying stream."""
 
-    loader = Loader()
-    yield loader
-    loader.sys.cleanup()
+        super(CaptureLogHandler, self).close()
+        self.stream.close()
 
+    def emit(self, record):
+        """Keep the log records in a list in addition to the log text."""
 
-@pytest.fixture(autouse=True)
-def check_log(request, caplog):
-    formatter = logging.Formatter(fmt='%(threadName)s:%(asctime)s:%(name)s:%(levelname)s:%(message)s')
-    caplog.handler.setFormatter(formatter)
+        self.records.append(record)
+        super(CaptureLogHandler, self).emit(record)
 
-    logger.info('UNITTEST %s', request)
-    yield None
-    if not getattr(caplog, 'error_ok', False):
-        for i in caplog.records():
-            if i.levelno >= logging.ERROR:
-                raise Exception('Error: %s' % i.getMessage())
+    def text(self):
+        """Returns the log text."""
+
+        return self.stream.getvalue()
+
+    @contextlib.contextmanager
+    def atLevel(self, level, logger=None):
+        """Context manager that sets the level for capturing of logs.
+
+        By default, the level is set on the handler used to capture
+        logs. Specify a logger name to instead set the level of any
+        logger.
+        """
+
+        obj = logger and logging.getLogger(logger) or self
+        old_level = obj.level
+        obj.setLevel(level)
+        yield self
+        obj.setLevel(old_level)
