@@ -1,7 +1,7 @@
 0.10.17 (unreleased)
 --------------------
 
-- Nothing changed yet.
+- Pass action information to callables in kwargs and use information in PushOver.
 
 
 0.10.16 (2017-07-16)
