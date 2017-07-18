@@ -690,7 +690,7 @@ def test_while_actuator_condition(sysloader):
     s = sysloader.new_system(ms)
     s.f.status = 1
     # Flushing system is not sufficient because While is threaded activity.
-    time.sleep(0.5)
+    time.sleep(1.5)
     assert s.f.status == 0
     #assert s.s.program_status(s.f) == 3
     assert s.s.status == 0
@@ -748,7 +748,7 @@ def test_while_akvadimmer(sysloader):
     s = sysloader.new_system(ms)
     s.akvadimmer.status = 1
     # Flushing system is not sufficient because While is threaded activity.
-    time.sleep(1.0)
+    time.sleep(2.0)
     assert len(called) == 8
     assert s.dimmer[0].status == False
     assert s.akvadimmer.status == 0
