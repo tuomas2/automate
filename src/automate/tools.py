@@ -53,7 +53,7 @@ class PushOver(SystemObject):
     #: Sound name in device
     sound = CUnicode
 
-    def send(self, caller):
+    def send(self, caller, trigger=None, action='-', **kwargs):
         try:
             url = self.system.services_by_name['WebService'][0].server_url
         except KeyError:
@@ -63,7 +63,7 @@ class PushOver(SystemObject):
             token=self.api_key,
             user=self.user_key,
             message='Automate event triggered on %s' % platform.node(),
-            title=caller.name,
+            title='%s %s' % (caller.name, action),
             url=url,
             url_title=self.system.name + ' web interface')
         if self.priority:
@@ -103,7 +103,8 @@ class PushOver(SystemObject):
         self.logger.error('Message delivery failed, and we won\'t try any more!')
 
     def call(self, caller, **kwargs):
-        t = Thread(target=threaded(self.system, self.send, caller), name='Notification sender thread')
+        t = Thread(target=threaded(self.system, self.send, caller, **kwargs),
+                   name='Notification sender thread')
         t.start()
 
 
@@ -128,17 +129,17 @@ class EmailSender(SystemObject):
         return self.to_email
 
     def call(self, caller, **kwargs):
-        t = Thread(target=threaded(self.system, self.send, caller), name='Email sender thread')
+        t = Thread(target=threaded(self.system, self.send, caller, **kwargs), name='Email sender thread')
         t.start()
 
-    def send(self, caller):
+    def send(self, caller, action='-', **kwargs):
         self.logger.info("Sending email now")
 
         progname = self.system.name
 
         hostname = platform.node()
-        subject = u'Program {progname} at {host} encountered event of "{evname}"! '.format(
-            host=hostname, progname=progname, evname=caller.name)
+        subject = u'Program {progname} at {host} encountered event of "{evname}" {action}! '.format(
+            host=hostname, progname=progname, evname=caller.name, action=action)
 
         headers = (u"Subject: {subject}\n"
                    "From: {fromaddr}\n"

@@ -215,14 +215,14 @@ class ProgrammableSystemObject(SystemObject):
             for t in self.actual_targets:
                 t.activate_program(self)
             self.on_activate.setup_callable_system(self.system)
-            self.on_activate.call(self, trigger=trigger)
+            self.on_activate.call(self, trigger=trigger, action='activate')
             if bool(self.update_condition.call(self, trigger=trigger)):
                 self.on_update.setup_callable_system(self.system)
                 self.on_update.cancel(self)
-                self.on_update.call(self, trigger=trigger)
+                self.on_update.call(self, trigger=trigger, action='update')
         else:
             self.on_deactivate.setup_callable_system(self.system)
-            self.on_deactivate.call(self, trigger=trigger)
+            self.on_deactivate.call(self, trigger=trigger, action='deactivate')
             self.on_update.cancel(self)
             self.on_activate.cancel(self)
             for t in self.actual_targets:
@@ -238,7 +238,7 @@ class ProgrammableSystemObject(SystemObject):
             if old_active == new_active == True:
                 if bool(self.update_condition.call(self, trigger=obj)):
                     self.on_update.cancel(self)
-                    self.on_update.call(self, trigger=obj)
+                    self.on_update.call(self, trigger=obj, action='update')
         self.logger.debug("Trigger status changing ready")
 
     @on_trait_change("active_condition, on_activate, on_deactivate")
@@ -254,7 +254,7 @@ class ProgrammableSystemObject(SystemObject):
 
         elif name == 'on_activate' and self.active:
             self.on_activate.cancel(self)
-            self.on_activate.call(self)
+            self.on_activate.call(self, action='activate')
 
     @on_trait_change('update_condition, on_update')
     def _update_update_actions(self, name, new):
@@ -263,7 +263,7 @@ class ProgrammableSystemObject(SystemObject):
 
         if self.active and bool(self.update_condition.call(self)):
             self.on_update.cancel(self)
-            self.on_update.call(self)
+            self.on_update.call(self, action='update')
 
     def setup_system(self, system, *args, **kwargs):
         from .callables import Value

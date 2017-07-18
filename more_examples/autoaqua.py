@@ -144,6 +144,7 @@ class autoaqua(System):
             on_activate=Run('push_sender',
                             SetStatus('alarmtrigger', 1),
                             ),
+            on_deactivate=Run('push_sender'),
             priority=4,
         )
 
@@ -172,6 +173,7 @@ class autoaqua(System):
             max_errors=7,
             active_condition=Or(Value('aqua_temperature') > water_temp_max, Value('aqua_temperature') < water_temp_min),
             on_activate=Run('push_sender'),
+            on_deactivate=Run('push_sender'),
         )
 
         parvekkeen_lampo = TemperatureSensor(addr=ulko, interval=60, default=25.123)
@@ -183,6 +185,7 @@ class autoaqua(System):
             on_activate=Run(
                 SetStatus('alarmtrigger', 1),
                 Run('push_sender')),
+            on_deactivate=Run('push_sender'),
             priority=2
         )
 
@@ -193,6 +196,7 @@ class autoaqua(System):
                                                 Delay(5 * 60,
                                                       Run(SetStatus('pumput', 0), SetStatus('co2', 0))),
                                                 'push_sender'),
+                                on_deactivate=Run('push_sender'),
                                 priority=4,
                                 )
 
@@ -409,7 +413,8 @@ class autoaqua(System):
                                                       SetStatus('lammitin', 0),
                                                       SetStatus('alarmtrigger', 1),
                                                       Run('push_sender_emergency')),
-                                                      priority=5,
+                                      on_deactivate=Run('push_sender'),
+                                      priority=5,
         )
 
         alaraja_saavutettu = UserBoolSensor('alaraja_saavutettu', tags='web,quick')
