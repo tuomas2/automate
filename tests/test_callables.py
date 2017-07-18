@@ -842,7 +842,7 @@ def test_while_nested(sysloader):
     s = sysloader.new_system(ms)
     s.f.status = 1
     s.flush()
-    time.sleep(0.5)
+    time.sleep(1.5)
     assert s.s.status == 3
     assert s.s2.status == 3
 
