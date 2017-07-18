@@ -31,14 +31,11 @@ import datetime
 import time
 import os
 
-from django.template.loader import render_to_string
 import tornado.web
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
 
 from traits.api import CBool, Tuple, Int, Str, CSet, List, CInt, Dict, Unicode
-from django.core.wsgi import get_wsgi_application
 
-from automate.extensions.webui.djangoapp.views import set_globals
 from automate.statusobject import StatusObject
 from automate.extensions.wsgi import TornadoService
 from automate import __version__
@@ -149,6 +146,7 @@ class WebService(TornadoService):
             for key, value in self.django_settings.items():
                 setattr(settings, key, value)
 
+            from automate.extensions.webui.djangoapp.views import set_globals
             set_globals(self, self.system)
 
         super(WebService, self).setup()
@@ -276,6 +274,7 @@ class WebService(TornadoService):
                     pass
 
     def update_sockets(self, obj, attribute, old, new):
+        from django.template.loader import render_to_string
         if isinstance(obj, StatusObject):
             self.logger.debug('Update_sockets %s %s %s %s', obj, attribute, old, new)
             for s in self._sockets:
@@ -300,4 +299,5 @@ class WebService(TornadoService):
                                      changing=obj.changing)
 
     def get_wsgi_application(self):
+        from django.core.wsgi import get_wsgi_application
         return get_wsgi_application()

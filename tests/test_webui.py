@@ -16,8 +16,6 @@
 # along with Automate.  If not, see <http://www.gnu.org/licenses/>.
 
 import pytest
-from django.core.urlresolvers import reverse
-from django.test import Client
 from future.backports.urllib.parse import urlparse
 
 from automate import *
@@ -60,6 +58,7 @@ class Http:
 
 
 def r(view_name, *args, **kwargs):
+    from django.core.urlresolvers import reverse
     return reverse(view_name, args=args, kwargs=kwargs)
 
 @pytest.fixture
@@ -88,6 +87,7 @@ def constants(sys_with_web):
 
 @pytest.fixture()
 def logged_client(sys_with_web, constants):
+    from django.test import Client
     client = Client()
     res = client.get('/')
     assert res.status_code == Http.REDIR
