@@ -201,25 +201,25 @@ class autoaqua(System):
                                 )
 
     class Kytkimet(Group):
-        vesivahinko_kytkin = UserBoolSensor(default=0, tags="switch,web",
+        vesivahinko_kytkin = UserBoolSensor(default=0, tags="quick",
                                             active_condition=Value('vesivahinko_kytkin'),
                                             on_deactivate=SetStatus('silence_alarm', 0),
                                            )
         valot_manuaalimoodi = UserBoolSensor(default=1,
-                                             tags="switch,web,quick",
+                                             tags="quick",
                                              active_condition=Value('valot_manuaalimoodi'),
                                              on_update=SetStatus('lamput', 'valot_kytkin'),
                                              priority=3
                                              )
 
         valot_kytkin = UserBoolSensor(default=0, tags='quick')
-        lomamoodi = UserBoolSensor(default=True, tags="switch,web")
+        lomamoodi = UserBoolSensor(default=True, tags="quick")
 
         tstacts_disable = OfType(AbstractActuator, exclude=['alarm', 'alarmtrigger'])
 
         testimoodi = UserBoolSensor(default=0,
                                     hide_in_uml=True,
-                                    tags="switch,web,quick",
+                                    tags="quick",
                                     active_condition=Value('testimoodi'),
                                     on_activate=Run(SetStatus(tstacts_disable, tstacts_disable),
                                                     #muistutuspiippi minuutin välein
@@ -236,7 +236,7 @@ class autoaqua(System):
                                     priority=10,
                                     )
 
-        vedenvaihtomoodi = UserBoolSensor(default=0, tags="switch,web,quick")
+        vedenvaihtomoodi = UserBoolSensor(default=0, tags="quick")
         co2_stop = UserBoolSensor(default=False,
                                   active_condition=Or(Not('pumput'), 'co2_stop', 'co2_stop_sensor'),
                                   priority=5,
@@ -300,15 +300,15 @@ class autoaqua(System):
 
         lamppu1_manual = UserBoolSensor(active_condition=Value('lamppu1_manual'),
                                         on_activate=SetStatus(lamppu1, 1),
-                                        priority=2)
+                                        priority=2, tags='quick')
         lamppu2_manual = UserBoolSensor(active_condition=Value('lamppu2_manual'),
                                         on_activate=SetStatus(lamppu2, 1),
-                                        priority=2, tags={'quick'})
+                                        priority=2, tags='quick')
         lamppu3_manual = UserBoolSensor(active_condition=Value('lamppu3_manual'),
                                         on_activate=SetStatus(lamppu3, 1),
-                                        priority=2)
+                                        priority=2, tags='quick')
 
-        switch_off_delay = UserFloatSensor(description='in minutes', default=15)
+        switch_off_delay = UserFloatSensor(description='in minutes', default=15, tags='quick')
 
         switch_manual_lamps_off = UserBoolSensor(tags={'quick'},
             active_condition=Value('switch_manual_lamps_off'),
@@ -417,7 +417,7 @@ class autoaqua(System):
                                       priority=5,
         )
 
-        alaraja_saavutettu = UserBoolSensor('alaraja_saavutettu', tags='web,quick')
+        alaraja_saavutettu = UserBoolSensor('alaraja_saavutettu', tags='quick')
 
         waterchange1 = Program(
             active_condition=And('vedenvaihtomoodi', Or('alaraja_saavutettu', 'ala_altaat_alaraja')),
@@ -515,7 +515,7 @@ if __name__ == '__main__':
                        os.getenv('AUTOMATE_PASSWORD', 'test'),
             ),
             debug = not is_raspi(),
-            user_tags={'web'},
+            user_tags={'quick'},
             read_only = False,
             default_view = 'tags_view',
             show_actuator_details = False,
@@ -534,7 +534,7 @@ if __name__ == '__main__':
         )
     rpcs = RpcService(
             http_port=3030,
-            view_tags={'web'},
+            view_tags={'quick'},
         )
 
 
