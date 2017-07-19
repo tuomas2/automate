@@ -213,7 +213,7 @@ class autoaqua(System):
                                              )
 
         valot_kytkin = UserBoolSensor(default=0, tags='quick')
-        lomamoodi = UserBoolSensor(default=0, tags="switch,web")
+        lomamoodi = UserBoolSensor(default=True, tags="switch,web")
 
         tstacts_disable = OfType(AbstractActuator, exclude=['alarm', 'alarmtrigger'])
 
