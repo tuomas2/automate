@@ -29,7 +29,6 @@ from future import standard_library
 standard_library.install_aliases()
 
 import socket
-import logging
 import subprocess
 import types
 import pyinotify
@@ -47,8 +46,6 @@ from automate.common import threaded, Lock
 from automate.statusobject import AbstractSensor
 from automate.callables import Value
 from automate.callable import AbstractCallable
-
-logger = logging.getLogger('automate.sensor')
 
 
 class UserAnySensor(AbstractSensor):

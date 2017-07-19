@@ -80,7 +80,7 @@ class WSGIXMLRPCApplication(object):
             response += b'\n'
         except Exception as e: # This should only happen if the module is buggy
             # internal error, report as HTTP server error
-            logger.error('POST handler crashed due to error %s', e)
+            logger.exception('POST handler crashed due to error %s', e)
             start_response("500 Server error", [('Content-Type', 'text/plain')])
             return []
         else:

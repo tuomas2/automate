@@ -118,7 +118,7 @@ class TornadoService(AbstractUserService):
         try:
             self._http_server.listen(self.http_port, self.http_ipaddr)
         except socket.error as e:
-            self.logger.error('Could not start server: %s', e)
+            self.logger.exception('Could not start server: %s', e)
             self._http_server = None
             return
 

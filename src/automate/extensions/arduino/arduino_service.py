@@ -28,7 +28,7 @@ from automate import Lock
 from traits.api import HasTraits, Any, Dict, CList, Str, Int, List
 from automate.service import AbstractSystemService
 
-logger = logging.getLogger('automate.arduino_service')
+logger = logging.getLogger(__name__)
 
 PinTuple = namedtuple('PinTuple', ['type', 'pin'])
 
@@ -63,8 +63,8 @@ def patch_pyfirmata():
             try:
                 super(FixedPyFirmataIterator, iter_self).run()
             except Exception as e:
-                logger.error('Exception %s occurred in Pyfirmata iterator, quitting now', e)
-                logger.error('threads: %s', threading.enumerate())
+                logger.exception('Exception %s occurred in Pyfirmata iterator, quitting now. '
+                                 'Threads: ', e, threading.enumerate())
 
     pyfirmata.util.Iterator.Fixed = FixedPyFirmataIterator
     pyfirmata.patched = True
@@ -174,7 +174,7 @@ class ArduinoService(AbstractSystemService):
             if setup_func:
                 setup_func(dev, pin_nr)
             else:
-                logger.error('Reloading not implemented for type %s (pin %d)', _type, pin_nr)
+                self.logger.error('Reloading not implemented for type %s (pin %d)', _type, pin_nr)
         self.logger.info('Arduino pins are now set up!')
 
     def setup_digital(self, dev, pin_nr):

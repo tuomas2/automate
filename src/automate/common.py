@@ -34,6 +34,7 @@ from functools import wraps
 
 from traits.api import CSet, HasStrictTraits, Unicode, TraitType
 
+logger = logging.getLogger(__name__)
 
 class AbstractStatusObject(object):
 
@@ -104,9 +105,7 @@ def threaded(system, func, *args, **kwargs):
         except Exception as e:
             if system.raven_client:
                 system.raven_client.captureException()
-            import traceback
-            logging.getLogger('automate.common').error(
-                "Exception occurred in thread: %s\n Traceback: \n %s", e, traceback.format_exc())
+            logger.exception('Exception occurred in thread: %s', e)
             return False
 
     return lambda: wrapper(*args, **kwargs)
@@ -136,7 +135,7 @@ class Lock(object):
     context = None
 
     def __init__(self, name="Unnamed lock", silent=False):
-        self.logger = logging.getLogger('automate.lock')
+        self.logger = logging.getLogger('automate.common.Lock')
         self.name = name
         self.lock = threading.Lock()
         self.context_lock = threading.Lock()

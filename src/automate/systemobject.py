@@ -173,6 +173,7 @@ class SystemObject(HasStrictTraits):
         new_name = self.system.get_unique_name(self, name, name_from_system)
         if not self in self.system.reverse:
             self.name = new_name
+        self.logger = self.system.logger.getChild('%s.%s' % (self.__class__.__name__, self.name))
         if name is None and 'name' in traits:  # Only __setstate__ sets name to None. Default is ''.
             del traits['name']
 

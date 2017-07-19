@@ -164,7 +164,7 @@ class Func(AbstractAction):
         try:
             return self.call_eval(self.obj, caller, **kwargs)(*arglist, **_kwargs)
         except Exception as e:
-            self.logger.error('Exception occurred in %s: %s', self, e)
+            self.logger.exception('Exception occurred in %s: %s', self, e)
 
 
 class OnlyTriggers(AbstractCallable):
@@ -358,7 +358,7 @@ class Shell(AbstractAction):
                 else:
                     return retcode
         except Exception as e:
-            self.system.logger.error('Error %s in %s, cmd: %s', e, self, cmd)
+            self.system.logger.exception('Error %s in %s, cmd: %s', e, self, cmd)
         return -1
 
 
@@ -404,10 +404,10 @@ class SetStatus(AbstractAction):
             try:
                 obj.set_status(value, origin=caller, force=force)
             except ValueError as e:
-                self.system.logger.error(
+                self.system.logger.exception(
                     'Trying to set invalid status %s of type %s (by %s). Error: %s', value, type(value), caller, e)
             except AttributeError as e:
-                self.system.logger.error(
+                self.system.logger.exception(
                     'Trying to set status of invalid object %s of type %s, by %s. Error: %s', obj, type(obj), caller, e)
         return True
 
@@ -1176,7 +1176,7 @@ class RemoteFunc(AbstractCallable):
                 self.logger.exception(
                     'Exception occurred in remote function call (%s,%s)(*%s, **%s), error: %s', server, funcname, args, _kwargs, e)
         except (socket.gaierror, IOError, xmlrpc.client.Fault) as e:
-            self.logger.error('Could call remote function, error: %s', e)
+            self.logger.exception('Could not call remote function, error: %s', e)
 
 
 class WaitUntil(AbstractRunner):

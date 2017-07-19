@@ -35,7 +35,7 @@ from automate.program import Program
 
 from ..forms import QUICK_EDITS
 
-logger = logging.getLogger('automate.webui')
+logger = logging.getLogger(__name__)
 
 register = template.Library()
 
@@ -141,6 +141,6 @@ def sensor_form(context, sensor):
         form = QUICK_EDITS[sensor.data_type]({'status': sensor.status, 'name': sensor.name},
                                              source=context.get('source', 'main'), sensor=sensor)
     except Exception as e:
-        logger.error('Error: %s', e)
+        logger.exception('Error: %s', e)
         raise
     return form

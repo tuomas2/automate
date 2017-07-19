@@ -463,7 +463,6 @@ class System(SystemBase):
         if not self.name:
             self.name = os.path.split(sys.argv[0])[-1].replace('.py', '')
 
-        self.worker_thread = StatusWorkerThread(name="Status worker thread", system=self)
 
         # Initialize Sentry / raven client, if is configured
         if not self.raven_client and self.raven_dsn:
@@ -471,6 +470,7 @@ class System(SystemBase):
                                              tags={'automate-system': self.name})
 
         self._initialize_logging()
+        self.worker_thread = StatusWorkerThread(name="Status worker thread", system=self)
         self.logger.info('Initializing services')
         self._initialize_services()
         self.logger.info('Initializing namespace')
@@ -526,10 +526,10 @@ class System(SystemBase):
         self.namespace.set_system(loadstate)
 
         self.logger.info('Setup loggers per object')
-        for k, v in list(self.namespace.items()):
-            if isinstance(v, SystemObject):
-                ctype = v.__class__.__name__
-                v.logger = self.logger.getChild('%s.%s' % (ctype, k))
+        for name, obj in self.namespace.items():
+            if isinstance(obj, SystemObject):
+                ctype = obj.__class__.__name__
+                obj.logger = self.logger.getChild('%s.%s' % (ctype, name))
 
     def _initialize_services(self):
         # Add default_services, if not already

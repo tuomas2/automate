@@ -297,7 +297,6 @@ class DefaultProgram(ProgrammableSystemObject):
     editable = True
 
     def __init__(self, system, name='', **traits):
-        self.logger = logging.getLogger('automate.defaultprogram')
         self._passed_arguments = name, traits
         self.setup_system(system)
         self.setup_callables()

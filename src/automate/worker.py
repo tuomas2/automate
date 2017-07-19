@@ -48,7 +48,7 @@ class StatusWorkerTask(object):
                 try:
                     self.func(*self.args)
                 except Exception as e:
-                    self.object.logger.error('Error running Task: %s', e)
+                    self.object.logger.exception('Error running Task: %s', e)
                 self.object._queued_job = None
             else:
                 self.object.logger.debug('Task %s was not executed (was removed or replaced)', self)
@@ -84,7 +84,7 @@ class StatusWorkerThread(threading.Thread):
         self.queue = queue.Queue()
         self._stop = False
         self.system = system
-        self.logger = logging.getLogger('automate.StatusWorkerThread')
+        self.logger = system.logger.getChild('StatusWorkerThread')
         super(StatusWorkerThread, self).__init__(*args, **kwargs)
 
     def manual_flush(self):

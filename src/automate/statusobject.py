@@ -384,7 +384,6 @@ class AbstractSensor(StatusObject):
 
     def setup_system(self, system, *args, **kwargs):
         name, traits = self._passed_arguments
-        self.logger = logging.getLogger('automate.sensor')
         default = traits.get('default', None)
         super(AbstractSensor, self).setup_system(system, *args, **kwargs)
         if not default is None and not kwargs.get('loadstate', None):
