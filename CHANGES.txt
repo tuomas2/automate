@@ -1,4 +1,4 @@
-0.10.17 (unreleased)
+0.10.17 (2017-07-19)
 --------------------
 
 - Pass action information to callables in kwargs and use information in PushOver.
