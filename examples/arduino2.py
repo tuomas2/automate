@@ -1,6 +1,6 @@
 from automate import *
 from automate.extensions.arduino import ArduinoDigitalSensor, ArduinoDigitalActuator, \
-    ArduinoService, ArduinoVirtualWireActuator
+    ArduinoService, ArduinoVirtualWireActuator, ArduinoVirtualWireSensor
 from automate.extensions.webui import WebService
 from automate.program import Program
 
@@ -10,14 +10,15 @@ class mysys(System):
     # Control servo with analog port a1 through interpolating sensor interp
     ustr = UserStrSensor()
     ubool = UserBoolSensor()
-    d12 = ArduinoDigitalSensor(dev=0, pin=12)
 
     d13 = ArduinoDigitalActuator(dev=0, pin=13)  # LED on Arduino board
 
-    vw = ArduinoVirtualWireActuator(dev=0, pin=10)
+    vwactuator = ArduinoVirtualWireActuator(dev=0, pin=10)
+    #d11 = ArduinoDigitalSensor(dev=0, pin=11)
+    vwsensor = ArduinoVirtualWireSensor(dev=0, pin=11)
 
     prog = Program(
-        on_update=Run(SetStatus(d13, ubool), SetStatus(vw, ustr))
+        on_update=Run(SetStatus(d13, ubool), SetStatus(vwactuator, ustr))
     )
 
 s = mysys(

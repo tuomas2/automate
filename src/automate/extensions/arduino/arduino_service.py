@@ -187,7 +187,7 @@ class ArduinoService(AbstractSystemService):
             data = bytearray(message)
             board.send_sysex(SYSEX_VIRTUALWRITE_MESSAGE, data)
 
-    def setup_virtualwire(self, dev, pin_nr):
+    def setup_virtualwire_output(self, dev, pin_nr):
         import pyfirmata
         if not self._boards[dev]:
             self._act_digital[(dev, pin_nr)] = PinTuple('v', None)
@@ -196,6 +196,28 @@ class ArduinoService(AbstractSystemService):
             board = self._boards[dev]
             board.sp.write(bytearray([pyfirmata.SET_PIN_MODE, pin_nr, PIN_MODE_VIRTUALWIRE_WRITE]))
             self._act_digital[(dev, pin_nr)] = PinTuple('v', None)
+
+    def subscribe_virtualwire(self, dev, pin_nr, sens):
+        import pyfirmata
+
+        def _virtualwire_message_callback(*data):
+            self.logger.debug('pulse %s %s', data, bytearray(data))
+            sens.status = bytes(bytearray(data))
+
+        if not self._boards[dev]:
+            self._sens_digital[(dev, pin_nr)] = PinTuple('v', None)
+            return
+
+        with self._locks[dev]:
+            board = self._boards[dev]
+            board.sp.write(bytearray([pyfirmata.SET_PIN_MODE, pin_nr, PIN_MODE_VIRTUALWIRE_READ]))
+            board.add_cmd_handler(pyfirmata.DIGITAL_PULSE, _virtualwire_message_callback)
+            self._sens_digital[(dev, pin_nr)] = PinTuple('v', None)
+
+    def unsubscribe_virtualwire(self, dev, pin_nr, sens):
+        pin = self._sens_digital.pop((dev, pin_nr), None)
+        if pin:
+            pin[1].remove_trait('value')
 
     def setup_digital(self, dev, pin_nr):
         if not self._boards[dev]:

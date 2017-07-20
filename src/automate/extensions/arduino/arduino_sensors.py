@@ -17,7 +17,7 @@
 # along with automate-arduino.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
-from traits.api import CInt, Instance, CFloat, CBool
+from traits.api import CInt, Instance, CFloat, CBool, CBytes
 from automate.service import AbstractSystemService
 from automate.statusobject import AbstractSensor
 
@@ -56,6 +56,21 @@ class ArduinoAnalogSensor(AbstractArduinoSensor):
 
     def cleanup(self):
         self._arduino.unsubscribe_analog(self.dev, self.pin)
+
+
+class ArduinoVirtualWireSensor(AbstractArduinoSensor):
+
+    """
+        Float-valued sensor object for analog Arduino input pins
+    """
+    _status = CBytes
+
+    def setup(self, *args, **kwargs):
+        super(ArduinoVirtualWireSensor, self).setup(*args, **kwargs)
+        self._arduino.subscribe_virtualwire(self.dev, self.pin, self)
+
+    def cleanup(self):
+        self._arduino.unsubscribe_virtualwire(self.dev, self.pin)
 
 
 class ArduinoDigitalSensor(AbstractArduinoSensor):

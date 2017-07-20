@@ -73,7 +73,7 @@ class ArduinoVirtualWireActuator(AbstractArduinoActuator):
 
     def setup(self, *args, **kwargs):
         super(ArduinoVirtualWireActuator, self).setup(*args, **kwargs)
-        self._arduino.setup_virtualwire(self.dev, self.pin)
+        self._arduino.setup_virtualwire_output(self.dev, self.pin)
 
     def _status_changed(self):
         self._arduino.send_message(self.dev, self._status)

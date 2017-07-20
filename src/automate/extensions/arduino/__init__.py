@@ -21,8 +21,8 @@ from __future__ import unicode_literals
 from .arduino_service import ArduinoService
 from .arduino_actuators import (ArduinoDigitalActuator, ArduinoPWMActuator, ArduinoServoActuator,
                                 AbstractArduinoActuator, ArduinoVirtualWireActuator)
-from .arduino_sensors import ArduinoAnalogSensor, ArduinoDigitalSensor, AbstractArduinoSensor
+from .arduino_sensors import ArduinoAnalogSensor, ArduinoDigitalSensor, AbstractArduinoSensor, ArduinoVirtualWireSensor
 
 extension_classes = (ArduinoService, ArduinoDigitalActuator, ArduinoPWMActuator,
                      ArduinoServoActuator, AbstractArduinoActuator, ArduinoVirtualWireActuator,
-                     ArduinoAnalogSensor, ArduinoDigitalSensor, AbstractArduinoSensor)
+                     ArduinoAnalogSensor, ArduinoDigitalSensor, AbstractArduinoSensor, ArduinoVirtualWireSensor)
