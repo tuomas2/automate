@@ -184,7 +184,7 @@ class ArduinoService(AbstractSystemService):
     def send_message(self, dev, message):
         with self._locks[dev]:
             board = self._boards[dev]
-            data = bytearray(message)
+            data = bytearray(message.encode('utf-8'))
             board.send_sysex(SYSEX_VIRTUALWRITE_MESSAGE, data)
 
     def setup_virtualwire_output(self, dev, pin_nr):
@@ -202,7 +202,7 @@ class ArduinoService(AbstractSystemService):
 
         def _virtualwire_message_callback(*data):
             self.logger.debug('pulse %s %s', data, bytearray(data))
-            sens.status = bytes(bytearray(data))
+            sens.status = bytes(bytearray(data)).decode('utf-8')
 
         if not self._boards[dev]:
             self._sens_digital[(dev, pin_nr)] = PinTuple('v', None)
@@ -214,10 +214,8 @@ class ArduinoService(AbstractSystemService):
             board.add_cmd_handler(pyfirmata.DIGITAL_PULSE, _virtualwire_message_callback)
             self._sens_digital[(dev, pin_nr)] = PinTuple('v', None)
 
-    def unsubscribe_virtualwire(self, dev, pin_nr, sens):
+    def unsubscribe_virtualwire(self, dev, pin_nr):
         pin = self._sens_digital.pop((dev, pin_nr), None)
-        if pin:
-            pin[1].remove_trait('value')
 
     def setup_digital(self, dev, pin_nr):
         if not self._boards[dev]:
