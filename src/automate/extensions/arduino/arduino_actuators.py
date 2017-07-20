@@ -17,7 +17,7 @@
 # along with automate-arduino.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
-from traits.api import CInt, Instance, CBool, CFloat
+from traits.api import CInt, Instance, CBool, CFloat, CBytes
 
 from automate.actuators import FloatActuator
 from automate.service import AbstractSystemService
@@ -62,6 +62,24 @@ class ArduinoDigitalActuator(AbstractArduinoActuator):
 
     def cleanup(self):
         self._arduino.cleanup_digital_actuator(self.dev, self.pin)
+
+
+class ArduinoVirtualWireActuator(AbstractArduinoActuator):
+
+    """
+        Boolean-valued actuator object for digital Arduino output pins
+    """
+    _status = CBytes(transient=True)
+
+    def setup(self, *args, **kwargs):
+        super(ArduinoVirtualWireActuator, self).setup(*args, **kwargs)
+        self._arduino.setup_virtualwire(self.dev, self.pin)
+
+    def _status_changed(self):
+        self._arduino.send_message(self.dev, self._status)
+
+    def cleanup(self):
+        self._arduino.cleanup_virtualwire_actuator(self.dev, self.pin)
 
 
 class ArduinoServoActuator(AbstractArduinoActuator):

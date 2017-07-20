@@ -32,6 +32,10 @@ logger = logging.getLogger(__name__)
 
 PinTuple = namedtuple('PinTuple', ['type', 'pin'])
 
+PIN_MODE_VIRTUALWIRE_WRITE = 0x0C
+PIN_MODE_VIRTUALWIRE_READ = 0x0D
+SYSEX_VIRTUALWRITE_MESSAGE = 0x80
+
 def patch_pyfirmata():
     """ Patch Pin class in pyfirmata to have Traits. Particularly, we need notification
         for value changes in Pins. """
@@ -177,6 +181,22 @@ class ArduinoService(AbstractSystemService):
                 self.logger.error('Reloading not implemented for type %s (pin %d)', _type, pin_nr)
         self.logger.info('Arduino pins are now set up!')
 
+    def send_message(self, dev, message):
+        with self._locks[dev]:
+            board = self._boards[dev]
+            data = bytearray(message)
+            board.send_sysex(SYSEX_VIRTUALWRITE_MESSAGE, data)
+
+    def setup_virtualwire(self, dev, pin_nr):
+        import pyfirmata
+        if not self._boards[dev]:
+            self._act_digital[(dev, pin_nr)] = PinTuple('v', None)
+            return
+        with self._locks[dev]:
+            board = self._boards[dev]
+            board.sp.write(bytearray([pyfirmata.SET_PIN_MODE, pin_nr, PIN_MODE_VIRTUALWIRE_WRITE]))
+            self._act_digital[(dev, pin_nr)] = PinTuple('v', None)
+
     def setup_digital(self, dev, pin_nr):
         if not self._boards[dev]:
             self._act_digital[(dev, pin_nr)] = PinTuple('o', None)
@@ -237,6 +257,9 @@ class ArduinoService(AbstractSystemService):
         pin.on_trait_change(self.handle_analog, "value")
 
     def cleanup_digital_actuator(self, dev, pin_nr):
+        pin = self._act_digital.pop((dev, pin_nr), None)
+
+    def cleanup_virtualwire_actuator(self, dev, pin_nr):
         pin = self._act_digital.pop((dev, pin_nr), None)
 
     def unsubscribe_digital(self, dev, pin_nr):
