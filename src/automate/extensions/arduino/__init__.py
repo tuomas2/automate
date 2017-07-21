@@ -22,7 +22,9 @@ from .arduino_service import ArduinoService
 from .arduino_actuators import (ArduinoDigitalActuator, ArduinoPWMActuator, ArduinoServoActuator,
                                 AbstractArduinoActuator, ArduinoVirtualWireActuator)
 from .arduino_sensors import ArduinoAnalogSensor, ArduinoDigitalSensor, AbstractArduinoSensor, ArduinoVirtualWireSensor
+from .arduino_callables import VirtualWireCommand
 
 extension_classes = (ArduinoService, ArduinoDigitalActuator, ArduinoPWMActuator,
                      ArduinoServoActuator, AbstractArduinoActuator, ArduinoVirtualWireActuator,
-                     ArduinoAnalogSensor, ArduinoDigitalSensor, AbstractArduinoSensor, ArduinoVirtualWireSensor)
+                     ArduinoAnalogSensor, ArduinoDigitalSensor, AbstractArduinoSensor, ArduinoVirtualWireSensor,
+                     VirtualWireCommand)

@@ -70,13 +70,14 @@ class ArduinoVirtualWireActuator(AbstractArduinoActuator):
         String-valued actuator object for VirtualWire transmission (Arduino)
     """ #TODO docstring
     _status = CStr(transient=True)
+    recipient = CInt
 
     def setup(self, *args, **kwargs):
         super(ArduinoVirtualWireActuator, self).setup(*args, **kwargs)
         self._arduino.setup_virtualwire_output(self.dev, self.pin)
 
     def _status_changed(self):
-        self._arduino.send_message(self.dev, self._status)
+        self._arduino.send_virtualwire_message(self.dev, self.recipient, self._status)
 
     def cleanup(self):
         self._arduino.cleanup_virtualwire_actuator(self.dev, self.pin)

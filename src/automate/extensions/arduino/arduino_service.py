@@ -25,7 +25,7 @@ from collections import namedtuple
 from builtins import range
 
 from automate import Lock
-from traits.api import HasTraits, Any, Dict, CList, Str, Int, List
+from traits.api import HasTraits, Any, Dict, CList, Str, Int, List, CInt
 from automate.service import AbstractSystemService
 
 logger = logging.getLogger(__name__)
@@ -35,6 +35,8 @@ PinTuple = namedtuple('PinTuple', ['type', 'pin'])
 PIN_MODE_VIRTUALWIRE_WRITE = 0x0C
 PIN_MODE_VIRTUALWIRE_READ = 0x0D
 SYSEX_VIRTUALWRITE_MESSAGE = 0x80
+CUSTOM_MESSAGE = 0xF1
+
 
 def patch_pyfirmata():
     """ Patch Pin class in pyfirmata to have Traits. Particularly, we need notification
@@ -90,6 +92,12 @@ class ArduinoService(AbstractSystemService):
 
     #: Arduino device sampling rates, as a list (in milliseconds).
     arduino_dev_sampling = CList(Int, [500])
+
+    #: VirtualWire communication protocol home address
+    home_address = CInt
+
+    #: VirtualWire communication protocol device address
+    device_address = CInt
 
     _sens_analog = Dict
     _sens_digital = Dict
@@ -181,10 +189,19 @@ class ArduinoService(AbstractSystemService):
                 self.logger.error('Reloading not implemented for type %s (pin %d)', _type, pin_nr)
         self.logger.info('Arduino pins are now set up!')
 
-    def send_message(self, dev, message):
+    def send_virtualwire_message(self, dev, recipient, message):
         with self._locks[dev]:
             board = self._boards[dev]
-            data = bytearray(message.encode('utf-8'))
+            data = (bytearray([self.home_address, self.device_address, recipient, CUSTOM_MESSAGE]) +
+                    bytearray(message.encode('utf-8')))
+            self.logger.debug('VW: Sending message %s', data)
+            board.send_sysex(SYSEX_VIRTUALWRITE_MESSAGE, data)
+
+    def send_virtualwire_command(self, dev, recipient, command, *args):
+        with self._locks[dev]:
+            board = self._boards[dev]
+            data = bytearray([self.home_address, self.device_address, recipient, command] + list(args))
+            self.logger.debug('VW: Sending command %s', data)
             board.send_sysex(SYSEX_VIRTUALWRITE_MESSAGE, data)
 
     def setup_virtualwire_output(self, dev, pin_nr):
