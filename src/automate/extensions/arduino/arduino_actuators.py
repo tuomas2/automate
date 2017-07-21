@@ -43,7 +43,7 @@ class AbstractArduinoActuator(AbstractActuator):
 
     def setup(self, *args, **kwargs):
         super(AbstractArduinoActuator, self).setup(*args, **kwargs)
-        self._arduino = self.system.request_service('ArduinoService')
+        self._arduino = self.system.request_service('ArduinoService', self.dev)
 
 
 class ArduinoDigitalActuator(AbstractArduinoActuator):
@@ -55,13 +55,13 @@ class ArduinoDigitalActuator(AbstractArduinoActuator):
 
     def setup(self, *args, **kwargs):
         super(ArduinoDigitalActuator, self).setup(*args, **kwargs)
-        self._arduino.setup_digital(self.dev, self.pin)
+        self._arduino.setup_digital(self.pin)
 
     def _status_changed(self):
-        self._arduino.change_digital(self.dev, self.pin, self._status)
+        self._arduino.change_digital(self.pin, self._status)
 
     def cleanup(self):
-        self._arduino.cleanup_digital_actuator(self.dev, self.pin)
+        self._arduino.cleanup_digital_actuator(self.pin)
 
 
 class ArduinoVirtualWireActuator(AbstractArduinoActuator):
@@ -72,15 +72,8 @@ class ArduinoVirtualWireActuator(AbstractArduinoActuator):
     _status = CStr(transient=True)
     recipient = CInt
 
-    def setup(self, *args, **kwargs):
-        super(ArduinoVirtualWireActuator, self).setup(*args, **kwargs)
-        self._arduino.setup_virtualwire_output(self.dev, self.pin)
-
     def _status_changed(self):
-        self._arduino.send_virtualwire_message(self.dev, self.recipient, self._status)
-
-    def cleanup(self):
-        self._arduino.cleanup_virtualwire_actuator(self.dev, self.pin)
+        self._arduino.send_virtualwire_message(self.recipient, self._status)
 
 
 class ArduinoServoActuator(AbstractArduinoActuator):
@@ -110,14 +103,14 @@ class ArduinoServoActuator(AbstractArduinoActuator):
         super(ArduinoServoActuator, self).setup(*args, **kwargs)
         self.logger.debug("setup_servo %s %s %s %s %s %s", self, self.dev, self.pin, self.min_pulse, self.max_pulse,
                           int(round(self._status)))
-        self._arduino.setup_servo(self.dev, self.pin, self.min_pulse, self.max_pulse, int(round(self._status)))
+        self._arduino.setup_servo(self.pin, self.min_pulse, self.max_pulse, int(round(self._status)))
 
     def _status_changed(self):
-        self.logger.debug("change_servo %s %s %s", self.dev, self.pin, int(round(self._status)))
-        self._arduino.change_digital(self.dev, self.pin, int(round(self._status)))
+        self.logger.debug("change_servo %s %s %s", self.pin, int(round(self._status)))
+        self._arduino.change_digital(self.pin, int(round(self._status)))
 
     def cleanup(self):
-        self._arduino.cleanup_digital_actuator(self.dev, self.pin)
+        self._arduino.cleanup_digital_actuator(self.pin)
 
 class ArduinoPWMActuator(FloatActuator, AbstractArduinoActuator):
 
@@ -128,10 +121,10 @@ class ArduinoPWMActuator(FloatActuator, AbstractArduinoActuator):
 
     def setup(self, *args, **kwargs):
         super(ArduinoPWMActuator, self).setup(*args, **kwargs)
-        self._arduino.setup_pwm(self.dev, self.pin)
+        self._arduino.setup_pwm(self.pin)
 
     def _status_changed(self):
-        self._arduino.change_digital(self.dev, self.pin, max(0., min(1., self._status)))
+        self._arduino.change_digital(self.pin, max(0., min(1., self._status)))
 
     def cleanup(self):
-        self._arduino.cleanup_digital_actuator(self.dev, self.pin)
+        self._arduino.cleanup_digital_actuator(self.pin)

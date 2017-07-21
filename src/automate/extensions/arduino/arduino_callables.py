@@ -21,33 +21,22 @@ from automate import AbstractCallable
 
 class VirtualWireCommand(AbstractCallable):
     # TODO docstrings
-    _arduino = Any(transient=True)
-
-    def setup_callable_system(self, system, init=False):
-        rv = super(VirtualWireCommand, self).setup_callable_system(system, init=init)
-        self._arduino = self.system.request_service('ArduinoService')
-        return rv
 
     def call(self, caller, **kwargs):
         if not caller:
             return
-        args = [self.call_eval(i, caller, **kwargs) for i in self._args]
 
-        return self._arduino.send_virtualwire_command(*args)
+        args = [self.call_eval(i, caller, **kwargs) for i in self._args]
+        arduino = self.system.request_service('ArduinoService', args[0])
+
+        return arduino.send_virtualwire_command(*args[1:])
 
 
 class VirtualWireMessage(AbstractCallable):
-    _arduino = Any(transient=True)
-
-    def setup_callable_system(self, system, init=False):
-        rv = super(VirtualWireMessage, self).setup_callable_system(system, init=init)
-        self._arduino = self.system.request_service('ArduinoService')
-        return rv
-
     def call(self, caller, **kwargs):
         if not caller:
             return
         args = [self.call_eval(i, caller, **kwargs) for i in self._args]
-
-        return self._arduino.send_virtualwire_message(*args)
+        arduino = self.system.request_service('ArduinoService', args[0])
+        return arduino.send_virtualwire_message(*args[1:])
 

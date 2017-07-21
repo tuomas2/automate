@@ -1,12 +1,15 @@
 from logging.config import dictConfig
+import pyfirmata
 
-from pyfirmata import SET_PIN_MODE, OUTPUT, DIGITAL_MESSAGE
+from automate.extensions.arduino import arduino_service
 
-SET_DIGITAL_PIN_VALUE = 0xF5
+from automate.extensions.arduino.arduino_sensors import ArduinoVirtualWireAbstractSensor
+
+
 
 from automate import *
 from automate.extensions.arduino import ArduinoDigitalActuator, ArduinoPWMActuator, \
-    ArduinoService, ArduinoVirtualWireActuator, ArduinoVirtualWireSensor
+    ArduinoService, ArduinoVirtualWireActuator, ArduinoVirtualWireMessageSensor
 from automate.extensions.arduino.arduino_callables import VirtualWireCommand, VirtualWireMessage
 from automate.extensions.webui import WebService
 
@@ -71,11 +74,11 @@ class mysys(System):
     ubool = UserBoolSensor()
 
     ubool1 = UserEventSensor(
-        on_activate=VirtualWireCommand(0, 1, SET_PIN_MODE, 13, OUTPUT)
+        on_activate=VirtualWireCommand(0, 1, pyfirmata.SET_PIN_MODE, 13, pyfirmata.OUTPUT)
     )
 
     ubool2 = UserBoolSensor(
-        on_update=VirtualWireCommand(0, 1, DIGITAL_MESSAGE, 13, 'ubool2')
+        on_update=VirtualWireCommand(0, 1, pyfirmata.DIGITAL_MESSAGE, 13, 'ubool2')
     )
 
     ufloat1 = UserFloatSensor(value_min=0, value_max=1)
@@ -85,12 +88,12 @@ class mysys(System):
     d13_1 = ArduinoDigitalActuator(dev=1, pin=13,
                                    on_update=SetStatus('d13_1', 'ubool'))
 
-    vwsensor0 = ArduinoVirtualWireSensor(dev=0, pin=10)
+    vwsensor0 = ArduinoVirtualWireMessageSensor(dev=0, pin=10)
     vwactuator0 = ArduinoVirtualWireActuator(dev=0, pin=11,
         on_update=SetStatus('vwactuator0', ustr0)
     )
 
-    vwsensor1 = ArduinoVirtualWireSensor(dev=1, pin=10)
+    vwsensor1 = ArduinoVirtualWireMessageSensor(dev=1, pin=10)
     vwactuator1 = ArduinoVirtualWireActuator(dev=1, pin=11,
         on_update=SetStatus('vwactuator1', ustr1)
     )
@@ -110,9 +113,20 @@ class mysys2(System):
     event1 = UserEventSensor(
         on_activate=VirtualWireMessage(0, 1, 'test test')
     )
+    event2 = UserEventSensor(
+        on_activate=VirtualWireCommand(0, 1, arduino_service.SET_VIRTUAL_PIN_VALUE, 1, arduino_service.TYPE_INT, 5)
+    )
+
+    event3 = UserEventSensor(
+        on_activate=VirtualWireCommand(0, 1, arduino_service.SET_VIRTUAL_PIN_VALUE, 1, arduino_service.TYPE_STR, "test")
+    )
+
+    event4 = UserEventSensor(
+        on_activate=VirtualWireCommand(0, 1, arduino_service.SET_VIRTUAL_PIN_VALUE, 1, arduino_service.TYPE_FLOAT, arduino_service.float_to_bytes(0.5))
+    )
 
     ubool2 = UserBoolSensor(
-        on_update=VirtualWireCommand(0, 1, SET_DIGITAL_PIN_VALUE, 13, 'ubool2')
+        on_update=VirtualWireCommand(0, 1, arduino_service.SET_DIGITAL_PIN_VALUE, 13, 'ubool2')
     )
 
     #ufloat1 = UserFloatSensor(value_min=0, value_max=1)
@@ -122,27 +136,41 @@ class mysys2(System):
 #    d13_1 = ArduinoDigitalActuator(dev=1, pin=13,
 #                                   on_update=SetStatus('d13_1', 'ubool'))
 
-#    vwsensor0 = ArduinoVirtualWireSensor(dev=0, pin=10)
-    vwactuator0 = ArduinoVirtualWireActuator(dev=0, pin=11,
+#    vwsensor0 = ArduinoVirtualWireMessageSensor(dev=0, pin=10)
+    vwactuator0 = ArduinoVirtualWireActuator(dev=0,
         recipient=1,
         # TODO these settings shoudl be per device
         on_update=SetStatus('vwactuator0', ustr0),
     )
 
-    vwsensor1 = ArduinoVirtualWireSensor(dev=1, pin=10)
+    vwsensor1a = ArduinoVirtualWireMessageSensor(dev=1)
+    vwsensor1b = ArduinoVirtualWireMessageSensor(dev=1)
+
+    vwsensor_vpin1 = ArduinoVirtualWireAbstractSensor(dev=1, virtual_pin=1)
+    vwsensor_vpin2 = ArduinoVirtualWireAbstractSensor(dev=1, virtual_pin=2)
 #    vwactuator1 = ArduinoVirtualWireActuator(dev=1, pin=11,
 #        on_update=SetStatus('vwactuator1', ustr1)
 #    )
 
 
 s = mysys2(
-    services=[ArduinoService(
-        arduino_devs=["/dev/ttyUSB0", "/dev/ttyUSB1"], # TODO should be 1 device per Service, and multiple Services
-        arduino_dev_types=["Arduino", 'Arduino'],
-        arduino_dev_sampling=[500, 500],
-        home_address=1,
-        device_address=1, # TODO this should be a list (per actual arduino device)...
-    ),
+    services=[
+        ArduinoService(
+            device="/dev/ttyUSB0",
+            sample_rate=500,
+            home_address=1,
+            device_address=1,
+            virtualwire_tx_pin=11,
+            virtualwire_rx_pin=10,
+        ),
+        ArduinoService(
+            device="/dev/ttyUSB1",
+            sample_rate=500,
+            home_address=1,
+            device_address=2,
+            virtualwire_tx_pin=11,
+            virtualwire_rx_pin=10,
+        ),
         TextUIService(),
         WebService(read_only=False),
     ],
