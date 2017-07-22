@@ -42,9 +42,20 @@ SYSEX_VIRTUALWRITE_MESSAGE = 0x01
 SYSEX_SET_IDENTIFICATION = 0x02
 
 # Custom message command bytes (Firmata commands)
-CUSTOM_MESSAGE = 0xF1
-SET_VIRTUAL_PIN_VALUE = 0xF2
-SET_DIGITAL_PIN_VALUE = 0xF5
+#CUSTOM_MESSAGE = 0xF1
+#SET_VIRTUAL_PIN_VALUE = 0xF2
+#SET_DIGITAL_PIN_VALUE = 0xF5
+
+# Virtualwire command bytes
+VIRTUALWIRE_SET_PIN_MODE = 0x01
+VIRTUALWIRE_ANALOG_MESSAGE = 0x02
+VIRTUALWIRE_DIGITAL_MESSAGE = 0x03
+VIRTUALWIRE_START_SYSEX = 0x04
+VIRTUALWIRE_SET_DIGITAL_PIN_VALUE = 0x05
+VIRTUALWIRE_SET_VIRTUAL_PIN_VALUE = 0x06
+VIRTUALWIRE_CUSTOM_MESSAGE = 0x07
+VIRTUALWIRE_SUBSCRIBE_PIN = 0x08
+VIRTUALWIRE_RESET_SUBSCRIPTIONS = 0x09
 
 
 # Our custom command codes, from arduino to here.
@@ -235,7 +246,7 @@ class ArduinoService(AbstractSystemService):
             return
         with self._lock:
             board = self._board
-            data = (bytearray([self.home_address, self.device_address, recipient, CUSTOM_MESSAGE]) +
+            data = (bytearray([self.home_address, self.device_address, recipient, VIRTUALWIRE_CUSTOM_MESSAGE]) +
                     bytearray(message.encode('utf-8')))
             self.logger.debug('VW: Sending message %s', data)
             board.send_sysex(SYSEX_VIRTUALWRITE_MESSAGE, data)
@@ -272,11 +283,11 @@ class ArduinoService(AbstractSystemService):
     def _virtualwire_message_callback(self, command, *data):
         from pyfirmata.util import from_two_bytes
         self.logger.debug('pulse %s %s', data, bytearray(data))
-        if command == CUSTOM_MESSAGE:
+        if command == VIRTUALWIRE_CUSTOM_MESSAGE:
             self.logger.debug('Custom message')
             for sensor in self._sens_virtual_message_sensors:
                 sensor.status = bytes(bytearray(data)).decode('utf-8')
-        elif command == SET_VIRTUAL_PIN_VALUE:
+        elif command == VIRTUALWIRE_SET_DIGITAL_PIN_VALUE:
             pin_nr = int(data[0])
             type_id = int(data[1])
             converted_data = None

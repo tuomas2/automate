@@ -91,13 +91,13 @@ class ArduinoRemoteDigitalActuator(AbstractArduinoActuator):
     def setup(self, *args, **kwargs):
         super(ArduinoRemoteDigitalActuator, self).setup(*args, **kwargs)
         self._arduino.send_virtualwire_command(self.target_device,
-                                               pyfirmata.SET_PIN_MODE,
+                                               arduino_service.VIRTUALWIRE_SET_PIN_MODE,
                                                self.target_pin,
                                                pyfirmata.OUTPUT)
 
     def _status_changed(self):
         self._arduino.send_virtualwire_command(self.target_device,
-                                               arduino_service.SET_DIGITAL_PIN_VALUE,
+                                               arduino_service.VIRTUALWIRE_SET_DIGITAL_PIN_VALUE,
                                                self.target_pin,
                                                self.status)
 
@@ -115,14 +115,14 @@ class ArduinoRemotePWMActuator(AbstractArduinoActuator):
     def setup(self, *args, **kwargs):
         super(ArduinoRemotePWMActuator, self).setup(*args, **kwargs)
         self._arduino.send_virtualwire_command(self.target_device,
-                                               pyfirmata.SET_PIN_MODE,
+                                               arduino_service.VIRTUALWIRE_SET_PIN_MODE,
                                                self.target_pin,
                                                pyfirmata.PWM)
 
     def _status_changed(self):
         value = int(round(self.status * 255))
         self._arduino.send_virtualwire_command(self.target_device,
-                                               pyfirmata.EXTENDED_ANALOG,
+                                               arduino_service.VIRTUALWIRE_ANALOG_MESSAGE,
                                                self.target_pin,
                                                value)
 
