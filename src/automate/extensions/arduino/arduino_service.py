@@ -39,6 +39,7 @@ PIN_MODE_PULLUP = 0x0B
 
 # Sysex to arduino
 SYSEX_VIRTUALWRITE_MESSAGE = 0x01
+SYSEX_SET_IDENTIFICATION = 0x02
 
 # Custom message command bytes (Firmata commands)
 CUSTOM_MESSAGE = 0xF1
@@ -181,12 +182,16 @@ class ArduinoService(AbstractSystemService):
             else:
                 raise
         self._lock = Lock()
+        if self._board:
+            if self.virtualwire_tx_pin:
+                self.setup_virtualwire_output()
+            if self.virtualwire_rx_pin:
+                self.setup_virtualwire_input()
+            self.setup_identification()
 
-        if self.virtualwire_tx_pin:
-            self.setup_virtualwire_output()
-        if self.virtualwire_rx_pin:
-            self.setup_virtualwire_input()
-
+    def setup_identification(self):
+        self.logger.debug('Setting home %s and device %s', self.home_address, self.device_address)
+        self._board.send_sysex(SYSEX_SET_IDENTIFICATION, bytearray([self.home_address, self.device_address]))
 
     def cleanup(self):
         self.logger.debug("Cleaning up Arduino subsystem. ")
@@ -379,4 +384,5 @@ class ArduinoService(AbstractSystemService):
         if not self._board:
             return
         with self._lock:
-            self._board.sp.write(bytearray([pyfirmata.SET_PIN_MODE, self.pin_number, mode]))
+            self.logger.debug('Setting pin mode for pin %s to %s', pin_number, mode)
+            self._board.sp.write(bytearray([pyfirmata.SET_PIN_MODE, pin_number, mode]))
