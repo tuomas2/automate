@@ -32,17 +32,19 @@ logger = logging.getLogger(__name__)
 
 PinTuple = namedtuple('PinTuple', ['type', 'pin'])
 
+# Pin modes
 PIN_MODE_VIRTUALWIRE_WRITE = 0x0C
 PIN_MODE_VIRTUALWIRE_READ = 0x0D
-SYSEX_VIRTUALWRITE_MESSAGE = 0x80
+PIN_MODE_PULLUP = 0x0B
+
+# Sysex to arduino
+SYSEX_VIRTUALWRITE_MESSAGE = 0x01
 
 # Custom message command bytes (Firmata commands)
 CUSTOM_MESSAGE = 0xF1
 SET_VIRTUAL_PIN_VALUE = 0xF2
 SET_DIGITAL_PIN_VALUE = 0xF5
 
-# Pin modes
-PIN_MODE_PULLUP = 0x0B
 
 # Our custom command codes, from arduino to here.
 #CMD_CUSTOM_MESSAGE = 0x01
@@ -248,19 +250,13 @@ class ArduinoService(AbstractSystemService):
             board.send_sysex(SYSEX_VIRTUALWRITE_MESSAGE, data)
 
     def setup_virtualwire_output(self):
-        if not self._board:
-            return
-        with self._lock:
-            board = self._board
-            board.sp.write(bytearray([pyfirmata.SET_PIN_MODE, self.virtualwire_tx_pin, PIN_MODE_VIRTUALWIRE_WRITE]))
+        self.set_pin_mode(self.virtualwire_tx_pin, PIN_MODE_VIRTUALWIRE_WRITE)
 
     def setup_virtualwire_input(self):
         if not self._board:
             return
-        with self._lock:
-            board = self._board
-            board.sp.write(bytearray([pyfirmata.SET_PIN_MODE, self.virtualwire_rx_pin, PIN_MODE_VIRTUALWIRE_READ]))
-            self._board.add_cmd_handler(pyfirmata.DIGITAL_PULSE, self._virtualwire_message_callback)
+        self.set_pin_mode(self.virtualwire_rx_pin, PIN_MODE_VIRTUALWIRE_READ)
+        self._board.add_cmd_handler(pyfirmata.DIGITAL_PULSE, self._virtualwire_message_callback)
 
     def subscribe_virtualwire_virtual_pin(self, sens, virtual_pin):
         self._sens_virtual[virtual_pin] = sens
@@ -380,5 +376,7 @@ class ArduinoService(AbstractSystemService):
         pin.on_trait_change(self.handle_digital, "value")
 
     def set_pin_mode(self, pin_number, mode):
-        self._board.sp.write(bytearray([pyfirmata.SET_PIN_MODE, self.pin_number, mode]))
-
+        if not self._board:
+            return
+        with self._lock:
+            self._board.sp.write(bytearray([pyfirmata.SET_PIN_MODE, self.pin_number, mode]))
