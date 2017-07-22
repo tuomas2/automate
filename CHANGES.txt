@@ -5,6 +5,7 @@
   use many devices. For usage see examples/arduino2.py. Only ArduinoService attributes
   were changed, see the documentation.
 - VirtualWire support in Arduino.
+- Add support to builtin pull up resistors in Arduino digital input pins
 
 
 0.10.18 (2017-07-19)

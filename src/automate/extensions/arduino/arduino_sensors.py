@@ -17,10 +17,10 @@
 # along with automate-arduino.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
-from traits.api import CInt, Instance, CFloat, CBool, CStr, Int, Any
+from traits.api import CInt, Instance, CFloat, CBool, CStr, Int, Any, Enum
 from automate.service import AbstractSystemService
 from automate.statusobject import AbstractSensor
-
+from . import arduino_service
 
 class AbstractArduinoSensor(AbstractSensor):
 
@@ -91,6 +91,7 @@ class ArduinoVirtualWireAbstractSensor(AbstractArduinoSensor):
     def cleanup(self):
         self._arduino.unsubscribe_virtualwire_virtual_pin(self.virtual_pin)
 
+
 class ArduinoDigitalSensor(AbstractArduinoSensor):
 
     """
@@ -98,10 +99,13 @@ class ArduinoDigitalSensor(AbstractArduinoSensor):
     """
 
     _status = CBool
+    pull_up_resistor = CBool(False)
 
     def setup(self, *args, **kwargs):
         super(ArduinoDigitalSensor, self).setup(*args, **kwargs)
         self._arduino.subscribe_digital(self.pin, self)
+        if self.pull_up_resistor:
+            self._arduino.set_pin_mode(self.pin, arduino_service.PIN_MODE_PULLUP)
 
     def cleanup(self):
         self._arduino.unsubscribe_digital(self.pin)
