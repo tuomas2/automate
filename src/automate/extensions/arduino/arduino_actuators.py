@@ -19,10 +19,12 @@
 from __future__ import unicode_literals
 from traits.api import CInt, Instance, CBool, CFloat, CStr
 
+import pyfirmata
+
 from automate.actuators import FloatActuator
 from automate.service import AbstractSystemService
 from automate.statusobject import AbstractActuator
-
+from . import arduino_service
 
 class AbstractArduinoActuator(AbstractActuator):
 
@@ -64,7 +66,7 @@ class ArduinoDigitalActuator(AbstractArduinoActuator):
         self._arduino.cleanup_digital_actuator(self.pin)
 
 
-class ArduinoVirtualWireActuator(AbstractArduinoActuator):
+class ArduinoVirtualWireMessageActuator(AbstractArduinoActuator):
 
     """
         String-valued actuator object for VirtualWire transmission (Arduino)
@@ -74,6 +76,55 @@ class ArduinoVirtualWireActuator(AbstractArduinoActuator):
 
     def _status_changed(self):
         self._arduino.send_virtualwire_message(self.recipient, self._status)
+
+
+class ArduinoRemoteDigitalActuator(AbstractArduinoActuator):
+
+    """
+        Set remote 
+    """ #TODO docstring
+
+    _status = CBool(transient=True)
+    target_device = CInt
+    target_pin = CInt
+
+    def setup(self, *args, **kwargs):
+        super(ArduinoRemoteDigitalActuator, self).setup(*args, **kwargs)
+        self._arduino.send_virtualwire_command(self.target_device,
+                                               pyfirmata.SET_PIN_MODE,
+                                               self.target_pin,
+                                               pyfirmata.OUTPUT)
+
+    def _status_changed(self):
+        self._arduino.send_virtualwire_command(self.target_device,
+                                               arduino_service.SET_DIGITAL_PIN_VALUE,
+                                               self.target_pin,
+                                               self.status)
+
+
+class ArduinoRemotePWMActuator(AbstractArduinoActuator):
+
+    """
+        Set remote 
+    """ #TODO docstring
+
+    _status = CFloat(transient=True)
+    target_device = CInt
+    target_pin = CInt
+
+    def setup(self, *args, **kwargs):
+        super(ArduinoRemotePWMActuator, self).setup(*args, **kwargs)
+        self._arduino.send_virtualwire_command(self.target_device,
+                                               pyfirmata.SET_PIN_MODE,
+                                               self.target_pin,
+                                               pyfirmata.PWM)
+
+    def _status_changed(self):
+        value = int(round(self.status * 255))
+        self._arduino.send_virtualwire_command(self.target_device,
+                                               pyfirmata.EXTENDED_ANALOG,
+                                               self.target_pin,
+                                               value)
 
 
 class ArduinoServoActuator(AbstractArduinoActuator):

@@ -2,6 +2,8 @@ from logging.config import dictConfig
 import pyfirmata
 
 from automate.extensions.arduino import arduino_service
+from automate.extensions.arduino.arduino_actuators import ArduinoRemoteDigitalActuator, \
+    ArduinoRemotePWMActuator
 
 from automate.extensions.arduino.arduino_sensors import ArduinoVirtualWireAbstractSensor
 
@@ -9,7 +11,7 @@ from automate.extensions.arduino.arduino_sensors import ArduinoVirtualWireAbstra
 
 from automate import *
 from automate.extensions.arduino import ArduinoDigitalActuator, ArduinoPWMActuator, \
-    ArduinoService, ArduinoVirtualWireActuator, ArduinoVirtualWireMessageSensor
+    ArduinoService, ArduinoVirtualWireMessageActuator, ArduinoVirtualWireMessageSensor
 from automate.extensions.arduino.arduino_callables import VirtualWireCommand, VirtualWireMessage
 from automate.extensions.webui import WebService
 
@@ -89,14 +91,14 @@ class mysys(System):
                                    on_update=SetStatus('d13_1', 'ubool'))
 
     vwsensor0 = ArduinoVirtualWireMessageSensor(dev=0, pin=10)
-    vwactuator0 = ArduinoVirtualWireActuator(dev=0, pin=11,
-        on_update=SetStatus('vwactuator0', ustr0)
-    )
+    vwactuator0 = ArduinoVirtualWireMessageActuator(dev=0, pin=11,
+                                                    on_update=SetStatus('vwactuator0', ustr0)
+                                                    )
 
     vwsensor1 = ArduinoVirtualWireMessageSensor(dev=1, pin=10)
-    vwactuator1 = ArduinoVirtualWireActuator(dev=1, pin=11,
-        on_update=SetStatus('vwactuator1', ustr1)
-    )
+    vwactuator1 = ArduinoVirtualWireMessageActuator(dev=1, pin=11,
+                                                    on_update=SetStatus('vwactuator1', ustr1)
+                                                    )
 
     # Using PWM on pins 9/10 will break VirtualWire.
     # pwmactuator1 = ArduinoPWMActuator(dev=0, pin=9,
@@ -131,7 +133,11 @@ class mysys2(System):
         on_update=VirtualWireCommand(0, target_dev, arduino_service.SET_DIGITAL_PIN_VALUE, 13, 'ubool2')
     )
 
-    #ufloat1 = UserFloatSensor(value_min=0, value_max=1)
+    ufloat1 = UserFloatSensor(value_min=0, value_max=1)
+    ufloat2 = UserFloatSensor(value_min=0, value_max=1)
+
+    local_pwm = ArduinoPWMActuator(dev=0, pin=5, on_update=SetStatus('local_pwm', 'ufloat2'))
+
 
 #    d13_0 = ArduinoDigitalActuator(dev=0, pin=13,
 #                                   on_update=SetStatus('d13_0', 'ubool'))
@@ -139,18 +145,25 @@ class mysys2(System):
 #                                   on_update=SetStatus('d13_1', 'ubool'))
 
 #    vwsensor0 = ArduinoVirtualWireMessageSensor(dev=0, pin=10)
-    vwactuator0 = ArduinoVirtualWireActuator(dev=0,
-        recipient=target_dev,
-        # TODO these settings shoudl be per device
+
+    remote_actuator = ArduinoRemoteDigitalActuator(dev=0, target_device=target_dev, target_pin=12,
+                    on_update=SetStatus('remote_actuator', 'ubool'))
+
+    remote_pwm = ArduinoRemotePWMActuator(dev=0, target_device=target_dev, target_pin=5,
+                                          on_update=SetStatus('remote_pwm', 'ufloat1'))
+
+    vwactuator0 = ArduinoVirtualWireMessageActuator(dev=0,
+                                                    recipient=target_dev,
+                                                    # TODO these settings shoudl be per device
         on_update=SetStatus('vwactuator0', ustr0),
-    )
+                                                    )
 
     vwsensor1a = ArduinoVirtualWireMessageSensor(dev=1)
     vwsensor1b = ArduinoVirtualWireMessageSensor(dev=1)
 
     vwsensor_vpin1 = ArduinoVirtualWireAbstractSensor(dev=1, virtual_pin=1)
     vwsensor_vpin2 = ArduinoVirtualWireAbstractSensor(dev=1, virtual_pin=2)
-#    vwactuator1 = ArduinoVirtualWireActuator(dev=1, pin=11,
+#    vwactuator1 = ArduinoVirtualWireMessageActuator(dev=1, pin=11,
 #        on_update=SetStatus('vwactuator1', ustr1)
 #    )
 
