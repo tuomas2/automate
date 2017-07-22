@@ -22,9 +22,7 @@ import struct
 import threading
 import logging
 from collections import namedtuple
-
-from builtins import range
-
+import pyfirmata
 
 from automate import Lock
 from traits.api import HasTraits, Any, Dict, CList, Str, Int, List, CInt, CStr
@@ -42,6 +40,9 @@ SYSEX_VIRTUALWRITE_MESSAGE = 0x80
 CUSTOM_MESSAGE = 0xF1
 SET_VIRTUAL_PIN_VALUE = 0xF2
 SET_DIGITAL_PIN_VALUE = 0xF5
+
+# Pin modes
+PIN_MODE_PULLUP = 0x0B
 
 # Our custom command codes, from arduino to here.
 #CMD_CUSTOM_MESSAGE = 0x01
@@ -73,7 +74,6 @@ def twobytes_to_float(lsb, msb):
 def patch_pyfirmata():
     """ Patch Pin class in pyfirmata to have Traits. Particularly, we need notification
         for value changes in Pins. """
-
     import pyfirmata
     if getattr(pyfirmata, 'patched', False):
         return
@@ -152,11 +152,6 @@ class ArduinoService(AbstractSystemService):
 
     def setup(self):
         self.logger.debug("Initializing Arduino subsystem")
-        try:
-            import pyfirmata
-        except ImportError:
-            self.logger.error("Please install pyfirmata if you want to use Arduino interface")
-            return
 
         patch_pyfirmata()
         from pyfirmata.util import Iterator, to_two_bytes
@@ -229,6 +224,8 @@ class ArduinoService(AbstractSystemService):
         self.logger.info('Arduino pins are now set up!')
 
     def send_virtualwire_message(self, recipient, message):
+        if not self._board:
+            return
         with self._lock:
             board = self._board
             data = (bytearray([self.home_address, self.device_address, recipient, CUSTOM_MESSAGE]) +
@@ -251,7 +248,6 @@ class ArduinoService(AbstractSystemService):
             board.send_sysex(SYSEX_VIRTUALWRITE_MESSAGE, data)
 
     def setup_virtualwire_output(self):
-        import pyfirmata
         if not self._board:
             return
         with self._lock:
@@ -259,7 +255,8 @@ class ArduinoService(AbstractSystemService):
             board.sp.write(bytearray([pyfirmata.SET_PIN_MODE, self.virtualwire_tx_pin, PIN_MODE_VIRTUALWIRE_WRITE]))
 
     def setup_virtualwire_input(self):
-        import pyfirmata
+        if not self._board:
+            return
         with self._lock:
             board = self._board
             board.sp.write(bytearray([pyfirmata.SET_PIN_MODE, self.virtualwire_rx_pin, PIN_MODE_VIRTUALWIRE_READ]))
@@ -381,3 +378,7 @@ class ArduinoService(AbstractSystemService):
         if s is not None:
             sens.set_status(s)
         pin.on_trait_change(self.handle_digital, "value")
+
+    def set_pin_mode(self, pin_number, mode):
+        self._board.sp.write(bytearray([pyfirmata.SET_PIN_MODE, self.pin_number, mode]))
+
