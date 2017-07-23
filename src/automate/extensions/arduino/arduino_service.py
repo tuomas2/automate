@@ -209,6 +209,7 @@ class ArduinoService(AbstractSystemService):
                 raise
         self._lock = Lock()
         if self._board:
+            #self._board.sp.write(pyfirmata.SYSTEM_RESET)
             if self.virtualwire_tx_pin:
                 self.setup_virtualwire_output()
             if self.virtualwire_rx_pin:
@@ -325,9 +326,17 @@ class ArduinoService(AbstractSystemService):
         elif command == VIRTUALWIRE_ANALOG_BROADCAST:
             pin = data[0]
             value = int(data[1]) / 255.
+            self.logger.debug('Analog data: %s %s', pin, value)
             for s in self._sens_virtualwire_analog[sender_address]:
                 if s.pin == pin:
                     s.status = value
+
+    def write(self, data):
+        if not self._board:
+            return
+        with self._lock:
+            self.logger.debug('Writing %s', data)
+            self._board.sp.write(data)
 
     def subscribe_virtualwire_digital_broadcast(self, sensor, source_device):
         self._sens_virtualwire_digital[source_device].append(sensor)
@@ -434,6 +443,5 @@ class ArduinoService(AbstractSystemService):
     def set_pin_mode(self, pin_number, mode):
         if not self._board:
             return
-        with self._lock:
-            self.logger.debug('Setting pin mode for pin %s to %s', pin_number, mode)
-            self._board.sp.write(bytearray([pyfirmata.SET_PIN_MODE, pin_number, mode]))
+        self.logger.debug('Setting pin mode for pin %s to %s', pin_number, mode)
+        self.write(bytearray([pyfirmata.SET_PIN_MODE, pin_number, mode]))

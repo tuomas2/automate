@@ -163,6 +163,7 @@ class ArduinoServoActuator(AbstractArduinoActuator):
     def cleanup(self):
         self._arduino.cleanup_digital_actuator(self.pin)
 
+
 class ArduinoPWMActuator(FloatActuator, AbstractArduinoActuator):
 
     """

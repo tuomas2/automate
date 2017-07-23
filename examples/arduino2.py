@@ -5,14 +5,15 @@ from automate.extensions.arduino import arduino_service
 from automate.extensions.arduino.arduino_actuators import ArduinoRemoteDigitalActuator, \
     ArduinoRemotePWMActuator
 
-from automate.extensions.arduino.arduino_sensors import ArduinoVirtualWireAbstractSensor, \
-    ArduinoVirtualWireDigitalSensor, ArduinoDigitalSensor, ArduinoAnalogSensor, \
-    ArduinoVirtualWireAnalogSensor
+from automate.extensions.arduino.arduino_sensors import ArduinoVirtualPinSensor, \
+    ArduinoBroadcastDigitalSensor, ArduinoDigitalSensor, ArduinoAnalogSensor, \
+    ArduinoBroadcastAnalogSensor
 
 from automate import *
 from automate.extensions.arduino import ArduinoDigitalActuator, ArduinoPWMActuator, \
     ArduinoService, ArduinoVirtualWireMessageActuator, ArduinoVirtualWireMessageSensor
-from automate.extensions.arduino.arduino_callables import VirtualWireCommand, VirtualWireMessage
+from automate.extensions.arduino.arduino_callables import VirtualWireCommand, VirtualWireMessage, \
+    FirmataCommand
 from automate.extensions.webui import WebService
 
 
@@ -129,6 +130,14 @@ class mysys2(System):
         on_activate=VirtualWireCommand(0, target_dev, arduino_service.VIRTUALWIRE_SET_DIGITAL_PIN_VALUE, 1, arduino_service.TYPE_FLOAT, arduino_service.float_to_bytes(0.5))
     )
 
+
+    reset1 = UserEventSensor(
+        on_activate=FirmataCommand(0, pyfirmata.SYSTEM_RESET)
+    )
+    reset2 = UserEventSensor(
+        on_activate=FirmataCommand(1, pyfirmata.SYSTEM_RESET)
+    )
+
     ubool2 = UserBoolSensor(
         on_update=VirtualWireCommand(0, target_dev, arduino_service.VIRTUALWIRE_SET_DIGITAL_PIN_VALUE, 13, 'ubool2')
     )
@@ -153,10 +162,10 @@ class mysys2(System):
                                           on_update=SetStatus('remote_pwm', 'ufloat1'))
 
     source_sens1 = ArduinoDigitalSensor(dev=0, pull_up_resistor=True, pin=2) # Makes subscription
-    source_sens2 = ArduinoAnalogSensor(dev=0, pin=0) # Makes subscription
+    #source_sens2 = ArduinoAnalogSensor(dev=0, pin=0) # Makes subscription
 
-    awds1 = ArduinoVirtualWireDigitalSensor(dev=1, source_device=source_dev, pin=2) # receives via VW
-    awds2 = ArduinoVirtualWireAnalogSensor(dev=1, source_device=source_dev, pin=0) # receives via VW
+    awds1 = ArduinoBroadcastDigitalSensor(dev=1, source_device=source_dev, pin=2) # receives via VW
+    awds2 = ArduinoBroadcastAnalogSensor(dev=1, source_device=source_dev, pin=0) # receives via VW
 
     vwactuator0 = ArduinoVirtualWireMessageActuator(dev=0,
                                                     recipient=target_dev,
@@ -167,8 +176,8 @@ class mysys2(System):
     vwsensor1a = ArduinoVirtualWireMessageSensor(dev=1)
     vwsensor1b = ArduinoVirtualWireMessageSensor(dev=1)
 
-    vwsensor_vpin1 = ArduinoVirtualWireAbstractSensor(dev=1, virtual_pin=1)
-    vwsensor_vpin2 = ArduinoVirtualWireAbstractSensor(dev=1, virtual_pin=2)
+    vwsensor_vpin1 = ArduinoVirtualPinSensor(dev=1, virtual_pin=1)
+    vwsensor_vpin2 = ArduinoVirtualPinSensor(dev=1, virtual_pin=2)
 #    vwactuator1 = ArduinoVirtualWireMessageActuator(dev=1, pin=11,
 #        on_update=SetStatus('vwactuator1', ustr1)
 #    )

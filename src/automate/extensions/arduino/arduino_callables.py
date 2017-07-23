@@ -40,3 +40,12 @@ class VirtualWireMessage(AbstractCallable):
         arduino = self.system.request_service('ArduinoService', args[0])
         return arduino.send_virtualwire_message(*args[1:])
 
+
+class FirmataCommand(AbstractCallable):
+    def call(self, caller, **kwargs):
+        if not caller:
+            return
+        args = [self.call_eval(i, caller, **kwargs) for i in self._args]
+        arduino = self.system.request_service('ArduinoService', args[0])
+        arduino.write(bytearray(args[1:]))
+

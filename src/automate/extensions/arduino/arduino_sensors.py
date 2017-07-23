@@ -43,6 +43,25 @@ class AbstractArduinoSensor(AbstractSensor):
         self._arduino = self.system.request_service('ArduinoService', self.dev)
 
 
+class ArduinoDigitalSensor(AbstractArduinoSensor):
+
+    """
+        Boolean-valued sensor object for digital Arduino input pins
+    """
+
+    _status = CBool
+    pull_up_resistor = CBool(False)
+
+    def setup(self, *args, **kwargs):
+        super(ArduinoDigitalSensor, self).setup(*args, **kwargs)
+        self._arduino.subscribe_digital(self.pin, self)
+        if self.pull_up_resistor:
+            self._arduino.set_pin_mode(self.pin, arduino_service.PIN_MODE_PULLUP)
+
+    def cleanup(self):
+        self._arduino.unsubscribe_digital(self.pin)
+
+
 class ArduinoAnalogSensor(AbstractArduinoSensor):
 
     """
@@ -74,7 +93,7 @@ class ArduinoVirtualWireMessageSensor(AbstractArduinoSensor):
         self._arduino.unsubscribe_virtual_messages(self)
 
 
-class ArduinoVirtualWireAbstractSensor(AbstractArduinoSensor):
+class ArduinoVirtualPinSensor(AbstractArduinoSensor):
 
     """
         String valued sensor object for analog Arduino VirtualWire virtual input 
@@ -85,14 +104,14 @@ class ArduinoVirtualWireAbstractSensor(AbstractArduinoSensor):
     _status = Any
 
     def setup(self, *args, **kwargs):
-        super(ArduinoVirtualWireAbstractSensor, self).setup(*args, **kwargs)
+        super(ArduinoVirtualPinSensor, self).setup(*args, **kwargs)
         self._arduino.subscribe_virtualwire_virtual_pin(self, self.virtual_pin)
 
     def cleanup(self):
         self._arduino.unsubscribe_virtualwire_virtual_pin(self.virtual_pin)
 
 
-class ArduinoVirtualWireDigitalSensor(AbstractArduinoSensor):
+class ArduinoBroadcastDigitalSensor(AbstractArduinoSensor):
 
     """
         String valued sensor object for analog Arduino VirtualWire virtual input 
@@ -102,14 +121,14 @@ class ArduinoVirtualWireDigitalSensor(AbstractArduinoSensor):
     source_device = CInt
 
     def setup(self, *args, **kwargs):
-        super(ArduinoVirtualWireDigitalSensor, self).setup(*args, **kwargs)
+        super(ArduinoBroadcastDigitalSensor, self).setup(*args, **kwargs)
         self._arduino.subscribe_virtualwire_digital_broadcast(self, self.source_device)
 
     def cleanup(self):
         self._arduino.unsubscribe_virtualwire_digital_broadcast(self)
 
 
-class ArduinoVirtualWireAnalogSensor(AbstractArduinoSensor):
+class ArduinoBroadcastAnalogSensor(AbstractArduinoSensor):
 
     """
         String valued sensor object for analog Arduino VirtualWire virtual input 
@@ -119,27 +138,10 @@ class ArduinoVirtualWireAnalogSensor(AbstractArduinoSensor):
     source_device = CInt
 
     def setup(self, *args, **kwargs):
-        super(ArduinoVirtualWireAnalogSensor, self).setup(*args, **kwargs)
+        super(ArduinoBroadcastAnalogSensor, self).setup(*args, **kwargs)
         self._arduino.subscribe_virtualwire_analog_broadcast(self, self.source_device)
 
     def cleanup(self):
         self._arduino.unsubscribe_virtualwire_analog_broadcast(self)
 
 
-class ArduinoDigitalSensor(AbstractArduinoSensor):
-
-    """
-        Boolean-valued sensor object for digital Arduino input pins
-    """
-
-    _status = CBool
-    pull_up_resistor = CBool(False)
-
-    def setup(self, *args, **kwargs):
-        super(ArduinoDigitalSensor, self).setup(*args, **kwargs)
-        self._arduino.subscribe_digital(self.pin, self)
-        if self.pull_up_resistor:
-            self._arduino.set_pin_mode(self.pin, arduino_service.PIN_MODE_PULLUP)
-
-    def cleanup(self):
-        self._arduino.unsubscribe_digital(self.pin)
