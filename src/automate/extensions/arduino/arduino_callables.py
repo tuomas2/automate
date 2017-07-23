@@ -32,6 +32,23 @@ class VirtualWireCommand(AbstractCallable):
         return arduino.send_virtualwire_command(*args[1:])
 
 
+class SetVirtualPin(AbstractCallable):
+    # TODO docstrings
+
+    def call(self, caller, **kwargs):
+        if not caller:
+            return
+
+        args = [self.call_eval(i, caller, **kwargs) for i in self._args]
+
+        arduino = self.system.request_service('ArduinoService', args[0])
+        target_device = args[1]
+        target_pin = args[2]
+        value = args[3]
+
+        return arduino.set_virtual_pin(target_device, target_pin, value)
+
+
 class VirtualWireMessage(AbstractCallable):
     def call(self, caller, **kwargs):
         if not caller:

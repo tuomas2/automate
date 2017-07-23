@@ -296,13 +296,18 @@ class ArduinoService(AbstractSystemService):
     def unsubscribe_virtualwire_virtual_pin(self, virtual_pin):
         self._sens_virtual.pop(virtual_pin)
 
+    def set_virtual_pin(self, target_device, target_pin, value):
+        value_type = {float: TYPE_FLOAT, int: TYPE_INT, str: TYPE_STR}[type(value)]
+        self.send_virtualwire_command(target_device, VIRTUALWIRE_SET_VIRTUAL_PIN_VALUE,
+                                      target_pin, value_type, value)
+
     def _virtualwire_message_callback(self, sender_address, command, *data):
         self.logger.debug('pulse %s %s %s', int(sender_address), hex(command), bytearray(data))
         if command == VIRTUALWIRE_CUSTOM_MESSAGE:
             self.logger.debug('Custom message')
             for sensor in self._sens_virtual_message_sensors:
                 sensor.status = bytes(bytearray(data)).decode('utf-8')
-        elif command == VIRTUALWIRE_SET_DIGITAL_PIN_VALUE:
+        elif command == VIRTUALWIRE_SET_VIRTUAL_PIN_VALUE:
             pin_nr = int(data[0])
             type_id = int(data[1])
             converted_data = None

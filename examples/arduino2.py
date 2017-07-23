@@ -13,7 +13,7 @@ from automate import *
 from automate.extensions.arduino import ArduinoDigitalActuator, ArduinoPWMActuator, \
     ArduinoService, ArduinoVirtualWireMessageActuator, ArduinoVirtualWireMessageSensor
 from automate.extensions.arduino.arduino_callables import VirtualWireCommand, VirtualWireMessage, \
-    FirmataCommand
+    FirmataCommand, SetVirtualPin
 from automate.extensions.webui import WebService
 
 
@@ -119,15 +119,15 @@ class mysys2(System):
         on_activate=VirtualWireMessage(0, target_dev, 'test test')
     )
     event2 = UserEventSensor(
-        on_activate=VirtualWireCommand(0, target_dev, arduino_service.VIRTUALWIRE_SET_DIGITAL_PIN_VALUE, 1, arduino_service.TYPE_INT, 5)
+        on_activate=SetVirtualPin(0, target_dev, 1, 5)
     )
 
     event3 = UserEventSensor(
-        on_activate=VirtualWireCommand(0, target_dev, arduino_service.VIRTUALWIRE_SET_DIGITAL_PIN_VALUE, 1, arduino_service.TYPE_STR, "test")
+        on_activate=VirtualWireCommand(0, target_dev, arduino_service.VIRTUALWIRE_SET_VIRTUAL_PIN_VALUE, 1, arduino_service.TYPE_STR, "test")
     )
 
     event4 = UserEventSensor(
-        on_activate=VirtualWireCommand(0, target_dev, arduino_service.VIRTUALWIRE_SET_DIGITAL_PIN_VALUE, 1, arduino_service.TYPE_FLOAT, arduino_service.float_to_bytes(0.5))
+        on_activate=VirtualWireCommand(0, target_dev, arduino_service.VIRTUALWIRE_SET_VIRTUAL_PIN_VALUE, 1, arduino_service.TYPE_FLOAT, arduino_service.float_to_bytes(0.5))
     )
 
 
