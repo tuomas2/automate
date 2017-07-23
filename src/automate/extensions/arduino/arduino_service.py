@@ -22,10 +22,13 @@ import struct
 import threading
 import logging
 from collections import namedtuple, defaultdict
+
 import pyfirmata
+import pyfirmata.pyfirmata
+import pyfirmata.util
+from traits.api import HasTraits, Any, Str, Int, CInt
 
 from automate import Lock
-from traits.api import HasTraits, Any, Dict, CList, Str, Int, List, CInt, CStr
 from automate.service import AbstractSystemService
 
 logger = logging.getLogger(__name__)
@@ -84,13 +87,14 @@ def float_to_twobytes(value):
 def twobytes_to_float(lsb, msb):
     return round(float((msb << 7) + lsb) / 1023, 4)
 
-
 def patch_pyfirmata():
-    """ Patch Pin class in pyfirmata to have Traits. Particularly, we need notification
-        for value changes in Pins. """
-    import pyfirmata
+    # Make necessary fixes to pyfirmata library
+
     if getattr(pyfirmata, 'patched', False):
         return
+
+    # Patch Pin class in pyfirmata to have Traits. Particularly, we need notification
+    # for value changes in Pins. """
 
     PinOld = pyfirmata.Pin
 
@@ -102,13 +106,23 @@ def patch_pyfirmata():
             self.add_trait("value", Any)
             PinOld.__init__(self, *args, **kwargs)
 
-    import pyfirmata.pyfirmata
-
     pyfirmata.Pin = Pin
     pyfirmata.pyfirmata.Pin = Pin
 
-    from pyfirmata.util import Iterator as OldIterator
+    # Fix bug in Board class (global dictionary & list) # TODO fix upstream...
 
+    OldBoard = pyfirmata.Board
+    class FixedBoard(OldBoard):
+        def __init__(self, *args, **kwargs):
+            self._command_handlers = {}
+            self._stored_data = []
+            super(FixedBoard, self).__init__(*args, **kwargs)
+
+    pyfirmata.Board = FixedBoard
+    pyfirmata.pyfirmata.Board = FixedBoard
+
+    # Add proper exception handler to Iterator
+    OldIterator = pyfirmata.util.Iterator
     class FixedPyFirmataIterator(OldIterator):
 
         def run(iter_self):
@@ -135,7 +149,7 @@ class ArduinoService(AbstractSystemService):
 
     #: Arduino device board types, as a list of strings. Choices are defined by pyFirmata board
     #: class names, i.e. allowed values are "Arduino", "ArduinoMega", "ArduinoDue".
-    device_type = Str('Arduino')
+    device_type = Str('arduino')
 
     #: Arduino device sampling rates, as a list (in milliseconds).
     sample_rate = Int(500)
@@ -172,18 +186,14 @@ class ArduinoService(AbstractSystemService):
     def setup(self):
         self.logger.debug("Initializing Arduino subsystem")
 
-        patch_pyfirmata()
-        from pyfirmata.util import Iterator, to_two_bytes
-
         # Initialize configured self.boards
 
         try:
             if not os.access(self.device, os.R_OK):
                 raise self.FileNotReadableError
-            cls = getattr(pyfirmata, self.device_type)
-            board = cls(self.device)
-            board.send_sysex(pyfirmata.SAMPLING_INTERVAL, to_two_bytes(self.sample_rate))
-            self._iterator_thread = it = Iterator.Fixed(board)
+            board = pyfirmata.Board(self.device, layout=pyfirmata.BOARDS[self.device_type])
+            board.send_sysex(pyfirmata.SAMPLING_INTERVAL, pyfirmata.util.to_two_bytes(self.sample_rate))
+            self._iterator_thread = it = pyfirmata.util.Iterator.Fixed(board)
             it.daemon = True
             it.name = "PyFirmata thread for {dev}".format(dev=self.device)
             board._iter = it

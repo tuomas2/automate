@@ -125,6 +125,7 @@ class ArduinoVirtualWireAnalogSensor(AbstractArduinoSensor):
     def cleanup(self):
         self._arduino.unsubscribe_virtualwire_analog_broadcast(self)
 
+
 class ArduinoDigitalSensor(AbstractArduinoSensor):
 
     """
