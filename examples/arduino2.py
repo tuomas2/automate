@@ -5,9 +5,9 @@ from automate.extensions.arduino import arduino_service
 from automate.extensions.arduino.arduino_actuators import ArduinoRemoteDigitalActuator, \
     ArduinoRemotePWMActuator
 
-from automate.extensions.arduino.arduino_sensors import ArduinoVirtualWireAbstractSensor
-
-
+from automate.extensions.arduino.arduino_sensors import ArduinoVirtualWireAbstractSensor, \
+    ArduinoVirtualWireDigitalSensor, ArduinoDigitalSensor, ArduinoAnalogSensor, \
+    ArduinoVirtualWireAnalogSensor
 
 from automate import *
 from automate.extensions.arduino import ArduinoDigitalActuator, ArduinoPWMActuator, \
@@ -118,19 +118,19 @@ class mysys2(System):
         on_activate=VirtualWireMessage(0, target_dev, 'test test')
     )
     event2 = UserEventSensor(
-        on_activate=VirtualWireCommand(0, target_dev, arduino_service.SET_VIRTUAL_PIN_VALUE, 1, arduino_service.TYPE_INT, 5)
+        on_activate=VirtualWireCommand(0, target_dev, arduino_service.VIRTUALWIRE_SET_DIGITAL_PIN_VALUE, 1, arduino_service.TYPE_INT, 5)
     )
 
     event3 = UserEventSensor(
-        on_activate=VirtualWireCommand(0, target_dev, arduino_service.SET_VIRTUAL_PIN_VALUE, 1, arduino_service.TYPE_STR, "test")
+        on_activate=VirtualWireCommand(0, target_dev, arduino_service.VIRTUALWIRE_SET_DIGITAL_PIN_VALUE, 1, arduino_service.TYPE_STR, "test")
     )
 
     event4 = UserEventSensor(
-        on_activate=VirtualWireCommand(0, target_dev, arduino_service.SET_VIRTUAL_PIN_VALUE, 1, arduino_service.TYPE_FLOAT, arduino_service.float_to_bytes(0.5))
+        on_activate=VirtualWireCommand(0, target_dev, arduino_service.VIRTUALWIRE_SET_DIGITAL_PIN_VALUE, 1, arduino_service.TYPE_FLOAT, arduino_service.float_to_bytes(0.5))
     )
 
     ubool2 = UserBoolSensor(
-        on_update=VirtualWireCommand(0, target_dev, arduino_service.SET_DIGITAL_PIN_VALUE, 13, 'ubool2')
+        on_update=VirtualWireCommand(0, target_dev, arduino_service.VIRTUALWIRE_SET_DIGITAL_PIN_VALUE, 13, 'ubool2')
     )
 
     ufloat1 = UserFloatSensor(value_min=0, value_max=1)
@@ -152,6 +152,12 @@ class mysys2(System):
     remote_pwm = ArduinoRemotePWMActuator(dev=0, target_device=target_dev, target_pin=5,
                                           on_update=SetStatus('remote_pwm', 'ufloat1'))
 
+    source_sens1 = ArduinoDigitalSensor(dev=0, pull_up_resistor=True, pin=2) # Makes subscription
+    source_sens2 = ArduinoAnalogSensor(dev=0, pin=0) # Makes subscription
+
+    awds1 = ArduinoVirtualWireDigitalSensor(dev=1, source_device=source_dev, pin=2) # receives via VW
+    awds2 = ArduinoVirtualWireAnalogSensor(dev=1, source_device=source_dev, pin=0) # receives via VW
+
     vwactuator0 = ArduinoVirtualWireMessageActuator(dev=0,
                                                     recipient=target_dev,
                                                     # TODO these settings shoudl be per device
@@ -172,7 +178,7 @@ s = mysys2(
     services=[
         ArduinoService(
             device="/dev/ttyUSB0",
-            sample_rate=500,
+            sample_rate=1500,
             home_address=source_home,
             device_address=source_dev,
             virtualwire_tx_pin=11,
@@ -180,7 +186,7 @@ s = mysys2(
         ),
         ArduinoService(
             device="/dev/ttyUSB1",
-            sample_rate=500,
+            sample_rate=1500,
             home_address=target_home,
             device_address=target_dev,
             virtualwire_tx_pin=11,

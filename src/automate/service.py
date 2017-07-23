@@ -24,12 +24,12 @@
 from __future__ import unicode_literals
 import logging
 
-from traits.api import HasStrictTraits, Instance, CBool
+from traits.api import HasTraits, HasStrictTraits, Instance, CBool
 
 from .common import SystemBase
 
 
-class AbstractService(HasStrictTraits):
+class AbstractService(HasTraits):
 
     """
         Base class for System and UserServices

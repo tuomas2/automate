@@ -77,7 +77,7 @@ class ArduinoVirtualWireMessageSensor(AbstractArduinoSensor):
 class ArduinoVirtualWireAbstractSensor(AbstractArduinoSensor):
 
     """
-        String valued sensor object for analog Arduino VirtualWire input 
+        String valued sensor object for analog Arduino VirtualWire virtual input 
     """ # TODO docstring
 
     virtual_pin = Int
@@ -91,6 +91,39 @@ class ArduinoVirtualWireAbstractSensor(AbstractArduinoSensor):
     def cleanup(self):
         self._arduino.unsubscribe_virtualwire_virtual_pin(self.virtual_pin)
 
+
+class ArduinoVirtualWireDigitalSensor(AbstractArduinoSensor):
+
+    """
+        String valued sensor object for analog Arduino VirtualWire virtual input 
+    """ # TODO docstring
+
+    _status = CBool
+    source_device = CInt
+
+    def setup(self, *args, **kwargs):
+        super(ArduinoVirtualWireDigitalSensor, self).setup(*args, **kwargs)
+        self._arduino.subscribe_virtualwire_digital_broadcast(self, self.source_device)
+
+    def cleanup(self):
+        self._arduino.unsubscribe_virtualwire_digital_broadcast(self)
+
+
+class ArduinoVirtualWireAnalogSensor(AbstractArduinoSensor):
+
+    """
+        String valued sensor object for analog Arduino VirtualWire virtual input 
+    """ # TODO docstring
+
+    _status = CFloat
+    source_device = CInt
+
+    def setup(self, *args, **kwargs):
+        super(ArduinoVirtualWireAnalogSensor, self).setup(*args, **kwargs)
+        self._arduino.subscribe_virtualwire_analog_broadcast(self, self.source_device)
+
+    def cleanup(self):
+        self._arduino.unsubscribe_virtualwire_analog_broadcast(self)
 
 class ArduinoDigitalSensor(AbstractArduinoSensor):
 

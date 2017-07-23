@@ -21,7 +21,7 @@ import os
 import struct
 import threading
 import logging
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 import pyfirmata
 
 from automate import Lock
@@ -54,9 +54,9 @@ VIRTUALWIRE_START_SYSEX = 0x04
 VIRTUALWIRE_SET_DIGITAL_PIN_VALUE = 0x05
 VIRTUALWIRE_SET_VIRTUAL_PIN_VALUE = 0x06
 VIRTUALWIRE_CUSTOM_MESSAGE = 0x07
-VIRTUALWIRE_SUBSCRIBE_PIN = 0x08
-VIRTUALWIRE_RESET_SUBSCRIPTIONS = 0x09
 
+VIRTUALWIRE_DIGITAL_BROADCAST = 0x08
+VIRTUALWIRE_ANALOG_BROADCAST = 0x09
 
 # Our custom command codes, from arduino to here.
 #CMD_CUSTOM_MESSAGE = 0x01
@@ -121,6 +121,7 @@ def patch_pyfirmata():
     pyfirmata.util.Iterator.Fixed = FixedPyFirmataIterator
     pyfirmata.patched = True
 
+patch_pyfirmata()
 
 class ArduinoService(AbstractSystemService):
 
@@ -151,15 +152,19 @@ class ArduinoService(AbstractSystemService):
     #: VirtualWire receiver pin
     virtualwire_rx_pin = CInt(0)
 
-    _sens_analog = Dict
-    _sens_digital = Dict
-    _sens_virtual = Dict
-    _sens_virtual_message_sensors = List
+    def __init__(self, *args, **kwargs):
+        super(ArduinoService, self).__init__(*args, **kwargs)
 
-    _act_digital = Dict
-    _board = Any
-    _lock = Any
-    _iterator_thread = Any
+        self._sens_analog = {}
+        self._sens_digital = {}
+        self._sens_virtual = {}
+        self._sens_virtual_message_sensors = []
+        self._sens_virtualwire_digital = defaultdict(list) # source device -> list of sensors
+        self._sens_virtualwire_analog = defaultdict(list) # source device -> list of sensors
+        self._act_digital = {}
+        self._board = None
+        self._lock = None
+        self._iterator_thread = None
 
     class FileNotReadableError(Exception):
         pass
@@ -280,9 +285,8 @@ class ArduinoService(AbstractSystemService):
     def unsubscribe_virtualwire_virtual_pin(self, virtual_pin):
         self._sens_virtual.pop(virtual_pin)
 
-    def _virtualwire_message_callback(self, command, *data):
-        from pyfirmata.util import from_two_bytes
-        self.logger.debug('pulse %s %s', data, bytearray(data))
+    def _virtualwire_message_callback(self, sender_address, command, *data):
+        self.logger.debug('pulse %s %s %s', int(sender_address), hex(command), bytearray(data))
         if command == VIRTUALWIRE_CUSTOM_MESSAGE:
             self.logger.debug('Custom message')
             for sensor in self._sens_virtual_message_sensors:
@@ -300,6 +304,32 @@ class ArduinoService(AbstractSystemService):
 
             self.logger.debug('Virtual pin value %s %s %s', pin_nr, type_id, converted_data)
             self._sens_virtual[pin_nr].status = converted_data
+        elif command == VIRTUALWIRE_DIGITAL_BROADCAST:
+            port_nr = data[0]
+            value = data[1]
+            for s in self._sens_virtualwire_digital[sender_address]:
+                port = s.pin // 8
+                pin_in_port = s.pin % 8
+                if port_nr == port:
+                    s.status = bool(value & 1 << pin_in_port)
+        elif command == VIRTUALWIRE_ANALOG_BROADCAST:
+            pin = data[0]
+            value = int(data[1]) / 255.
+            for s in self._sens_virtualwire_analog[sender_address]:
+                if s.pin == pin:
+                    s.status = value
+
+    def subscribe_virtualwire_digital_broadcast(self, sensor, source_device):
+        self._sens_virtualwire_digital[source_device].append(sensor)
+
+    def unsubscribe_virtualwire_digital_broadcast(self, sensor, source_device):
+        self._sens_virtualwire_digital[source_device].remove(sensor)
+
+    def subscribe_virtualwire_analog_broadcast(self, sensor, source_device):
+        self._sens_virtualwire_analog[source_device].append(sensor)
+
+    def unsubscribe_virtualwire_analog_broadcast(self, sensor, source_device):
+        self._sens_virtualwire_analog[source_device].remove(sensor)
 
     def subscribe_virtualwire_messages(self, sens):
         self._sens_virtual_message_sensors.append(sens)
