@@ -30,6 +30,7 @@ from traits.api import HasTraits, Any, Str, Int, CInt
 
 from automate import Lock
 from automate.service import AbstractSystemService
+from automate.common import threaded
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +44,7 @@ PIN_MODE_PULLUP = 0x0B
 # Sysex to arduino
 SYSEX_VIRTUALWRITE_MESSAGE = 0x01
 SYSEX_SET_IDENTIFICATION = 0x02
+SYSEX_KEEP_ALIVE = 0x03
 
 # Custom message command bytes (Firmata commands)
 #CUSTOM_MESSAGE = 0xF1
@@ -192,6 +194,7 @@ class ArduinoService(AbstractSystemService):
             if not os.access(self.device, os.R_OK):
                 raise self.FileNotReadableError
             board = pyfirmata.Board(self.device, layout=pyfirmata.BOARDS[self.device_type])
+            board.add_cmd_handler(pyfirmata.STRING_DATA, self._string_data_handler)
             board.send_sysex(pyfirmata.SAMPLING_INTERVAL, pyfirmata.util.to_two_bytes(self.sample_rate))
             self._iterator_thread = it = pyfirmata.util.Iterator.Fixed(board)
             it.daemon = True
@@ -215,6 +218,19 @@ class ArduinoService(AbstractSystemService):
             if self.virtualwire_rx_pin:
                 self.setup_virtualwire_input()
             self.setup_identification()
+            self._keep_alive()
+
+
+    def _keep_alive(self):
+        self._board.send_sysex(SYSEX_KEEP_ALIVE, [0])
+        interval = 60
+        self._keepalive_thread = threading.Timer(interval, threaded(self.system, self._keep_alive))
+        self._keepalive_thread.name = "Arduino keepalive (60s)"
+        self._keepalive_thread.start()
+
+
+    def _string_data_handler(self, *data):
+        self.logger.debug('String data: %s', bytearray(data[::2]).decode('ascii'))
 
     def setup_identification(self):
         self.logger.debug('Setting home %s and device %s', self.home_address, self.device_address)

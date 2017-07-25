@@ -162,7 +162,7 @@ class mysys2(System):
                                           on_update=SetStatus('remote_pwm', 'ufloat1'))
 
     source_sens1 = ArduinoDigitalSensor(dev=0, pull_up_resistor=True, pin=2) # Makes subscription
-    #source_sens2 = ArduinoAnalogSensor(dev=0, pin=0) # Makes subscription
+    source_sens2 = ArduinoAnalogSensor(dev=0, pin=0) # Makes subscription
 
     awds1 = ArduinoBroadcastDigitalSensor(dev=1, source_device=source_dev, pin=2) # receives via VW
     awds2 = ArduinoBroadcastAnalogSensor(dev=1, source_device=source_dev, pin=0) # receives via VW
