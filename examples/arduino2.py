@@ -167,11 +167,12 @@ class mysys2(System):
     awds1 = ArduinoBroadcastDigitalSensor(dev=1, source_device=source_dev, pin=2) # receives via VW
     awds2 = ArduinoBroadcastAnalogSensor(dev=1, source_device=source_dev, pin=0) # receives via VW
 
-    vwactuator0 = ArduinoVirtualWireMessageActuator(dev=0,
-                                                    recipient=target_dev,
-                                                    # TODO these settings shoudl be per device
+    vwactuator0 = ArduinoVirtualWireMessageActuator(
+        dev=0,
+        recipient=target_dev,
+        # TODO these settings shoudl be per device
         on_update=SetStatus('vwactuator0', ustr0),
-                                                    )
+    )
 
     vwsensor1a = ArduinoVirtualWireMessageSensor(dev=1)
     vwsensor1b = ArduinoVirtualWireMessageSensor(dev=1)
@@ -187,7 +188,7 @@ s = mysys2(
     services=[
         ArduinoService(
             device="/dev/ttyUSB0",
-            sample_rate=15000,
+            sample_rate=1500,
             home_address=source_home,
             device_address=source_dev,
             virtualwire_tx_pin=11,

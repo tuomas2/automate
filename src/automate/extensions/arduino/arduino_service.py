@@ -187,7 +187,6 @@ class ArduinoService(AbstractSystemService):
                 raise self.FileNotReadableError
             board = pyfirmata.Board(self.device, layout=pyfirmata.BOARDS[self.device_type])
             board.add_cmd_handler(pyfirmata.STRING_DATA, self._string_data_handler)
-            board.send_sysex(pyfirmata.SAMPLING_INTERVAL, pyfirmata.util.to_two_bytes(self.sample_rate))
             self._iterator_thread = it = pyfirmata.util.Iterator.Fixed(board)
             it.daemon = True
             it.name = "PyFirmata thread for {dev}".format(dev=self.device)
@@ -204,7 +203,9 @@ class ArduinoService(AbstractSystemService):
                 raise
         self._lock = Lock()
         if self._board:
-            #self._board.sp.write(pyfirmata.SYSTEM_RESET)
+            self.write(pyfirmata.SYSTEM_RESET)
+            self._board.send_sysex(pyfirmata.SAMPLING_INTERVAL,
+                                   pyfirmata.util.to_two_bytes(self.sample_rate))
             if self.virtualwire_tx_pin:
                 self.setup_virtualwire_output()
             if self.virtualwire_rx_pin:
