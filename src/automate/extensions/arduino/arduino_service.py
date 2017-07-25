@@ -290,7 +290,10 @@ class ArduinoService(AbstractSystemService):
                     s.status = bool(value & 1 << pin_in_port)
         elif command == VIRTUALWIRE_ANALOG_BROADCAST:
             pin = data[0]
-            value = int(data[1]) / 255.
+            msb = data[1]
+            lsb = data[2]
+            value = (msb << 8) + lsb
+            value = value/1023.  # Arduino gives 10 bit resolution
             self.logger.debug('Analog data: %s %s', pin, value)
             for s in self._sens_virtualwire_analog[sender_address]:
                 if s.pin == pin:
