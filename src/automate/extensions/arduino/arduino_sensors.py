@@ -80,8 +80,8 @@ class ArduinoAnalogSensor(AbstractArduinoSensor):
 class ArduinoVirtualWireMessageSensor(AbstractArduinoSensor):
 
     """
-        String valued sensor object for analog Arduino VirtualWire input 
-    """ # TODO docstring
+        Receives all the messages sent via VirtualWire
+    """
 
     _status = CStr
 
@@ -93,18 +93,19 @@ class ArduinoVirtualWireMessageSensor(AbstractArduinoSensor):
         self._arduino.unsubscribe_virtual_messages(self)
 
 
-class ArduinoVirtualPinSensor(AbstractArduinoSensor):
+class VirtualPinSensor(AbstractArduinoSensor):
 
     """
-        String valued sensor object for analog Arduino VirtualWire virtual input 
-    """ # TODO docstring
+        Virtual pin, which has value that can be changed remotely with SetVirtualPin callable
+    """
 
+    #: Virtual pin number
     virtual_pin = Int
 
     _status = Any
 
     def setup(self, *args, **kwargs):
-        super(ArduinoVirtualPinSensor, self).setup(*args, **kwargs)
+        super(VirtualPinSensor, self).setup(*args, **kwargs)
         self._arduino.subscribe_virtualwire_virtual_pin(self, self.virtual_pin)
 
     def cleanup(self):
@@ -114,10 +115,12 @@ class ArduinoVirtualPinSensor(AbstractArduinoSensor):
 class ArduinoBroadcastDigitalSensor(AbstractArduinoSensor):
 
     """
-        String valued sensor object for analog Arduino VirtualWire virtual input 
-    """ # TODO docstring
+        Sensor which listens to status changes of remote digital input pin
+    """
 
     _status = CBool
+
+    #: Source device number
     source_device = CInt
 
     def setup(self, *args, **kwargs):
@@ -131,10 +134,12 @@ class ArduinoBroadcastDigitalSensor(AbstractArduinoSensor):
 class ArduinoBroadcastAnalogSensor(AbstractArduinoSensor):
 
     """
-        String valued sensor object for analog Arduino VirtualWire virtual input 
-    """ # TODO docstring
+        Sensor which listens to status changes of remote analog input pin
+    """
 
     _status = CFloat
+
+    #: Source device number
     source_device = CInt
 
     def setup(self, *args, **kwargs):

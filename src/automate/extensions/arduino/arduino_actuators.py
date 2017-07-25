@@ -69,9 +69,11 @@ class ArduinoDigitalActuator(AbstractArduinoActuator):
 class ArduinoVirtualWireMessageActuator(AbstractArduinoActuator):
 
     """
-        String-valued actuator object for VirtualWire transmission (Arduino)
-    """ #TODO docstring
+        Actuator that passes status changes via VirtualWire messages
+    """
     _status = CStr(transient=True)
+
+    #: Recipient device number
     recipient = CInt
 
     def _status_changed(self):
@@ -81,11 +83,15 @@ class ArduinoVirtualWireMessageActuator(AbstractArduinoActuator):
 class ArduinoRemoteDigitalActuator(AbstractArduinoActuator):
 
     """
-        Set remote 
-    """ #TODO docstring
+        Actuator that sends target device digital output pin status change requests
+    """
 
     _status = CBool(transient=True)
+
+    #: Target device number
     target_device = CInt
+
+    #: Target device pin number
     target_pin = CInt
 
     def setup(self, *args, **kwargs):
@@ -105,11 +111,15 @@ class ArduinoRemoteDigitalActuator(AbstractArduinoActuator):
 class ArduinoRemotePWMActuator(AbstractArduinoActuator):
 
     """
-        Set remote 
-    """ #TODO docstring
+        Actuator that sends target device analog (PWM) output pin status change requests
+    """
 
     _status = CFloat(transient=True)
+
+    #: Target device number
     target_device = CInt
+
+    #: Target device pin number
     target_pin = CInt
 
     def setup(self, *args, **kwargs):

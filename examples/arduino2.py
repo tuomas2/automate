@@ -5,7 +5,7 @@ from automate.extensions.arduino import arduino_service
 from automate.extensions.arduino.arduino_actuators import ArduinoRemoteDigitalActuator, \
     ArduinoRemotePWMActuator
 
-from automate.extensions.arduino.arduino_sensors import ArduinoVirtualPinSensor, \
+from automate.extensions.arduino.arduino_sensors import VirtualPinSensor, \
     ArduinoBroadcastDigitalSensor, ArduinoDigitalSensor, ArduinoAnalogSensor, \
     ArduinoBroadcastAnalogSensor
 
@@ -145,7 +145,7 @@ class mysys2(System):
     ufloat1 = UserFloatSensor(value_min=0, value_max=1)
     ufloat2 = UserFloatSensor(value_min=0, value_max=1)
 
-    local_pwm = ArduinoPWMActuator(dev=0, pin=5, on_update=SetStatus('local_pwm', 'ufloat2'))
+    local_pwm = ArduinoPWMActuator(dev=0, pin=3, on_update=SetStatus('local_pwm', 'ufloat2'))
 
 
 #    d13_0 = ArduinoDigitalActuator(dev=0, pin=13,
@@ -176,8 +176,8 @@ class mysys2(System):
     vwsensor1a = ArduinoVirtualWireMessageSensor(dev=1)
     vwsensor1b = ArduinoVirtualWireMessageSensor(dev=1)
 
-    vwsensor_vpin1 = ArduinoVirtualPinSensor(dev=1, virtual_pin=1)
-    vwsensor_vpin2 = ArduinoVirtualPinSensor(dev=1, virtual_pin=2)
+    vwsensor_vpin1 = VirtualPinSensor(dev=1, virtual_pin=1)
+    vwsensor_vpin2 = VirtualPinSensor(dev=1, virtual_pin=2)
 #    vwactuator1 = ArduinoVirtualWireMessageActuator(dev=1, pin=11,
 #        on_update=SetStatus('vwactuator1', ustr1)
 #    )
@@ -187,7 +187,7 @@ s = mysys2(
     services=[
         ArduinoService(
             device="/dev/ttyUSB0",
-            sample_rate=1500,
+            sample_rate=15000,
             home_address=source_home,
             device_address=source_dev,
             virtualwire_tx_pin=11,

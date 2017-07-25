@@ -20,7 +20,14 @@ from automate import AbstractCallable
 
 
 class VirtualWireCommand(AbstractCallable):
-    # TODO docstrings
+    """
+        Send VirtualWire command. Positional Arguments::
+
+          - Arduino service number
+          - Recipient device number
+          - VirtualWire command byte (see arduino_service.VIRTUALWIRE_*)
+          - Command arguments...
+    """
 
     def call(self, caller, **kwargs):
         if not caller:
@@ -33,7 +40,15 @@ class VirtualWireCommand(AbstractCallable):
 
 
 class SetVirtualPin(AbstractCallable):
-    # TODO docstrings
+    """
+    Set VirtualPin status. Positional arguments::
+
+     - Arduino service number
+     - target device number
+     - target device pin number
+     - new status
+
+    """
 
     def call(self, caller, **kwargs):
         if not caller:
@@ -50,6 +65,13 @@ class SetVirtualPin(AbstractCallable):
 
 
 class VirtualWireMessage(AbstractCallable):
+    """
+    Send VirtualWire message. Positional arguments::
+
+     - Arduino service number
+     - Message
+
+    """
     def call(self, caller, **kwargs):
         if not caller:
             return
@@ -59,6 +81,11 @@ class VirtualWireMessage(AbstractCallable):
 
 
 class FirmataCommand(AbstractCallable):
+    """
+    Send custom Firmata command to Arduino. Positional arguments::
+     - Firmata command byte
+     - Arguments...
+    """
     def call(self, caller, **kwargs):
         if not caller:
             return
