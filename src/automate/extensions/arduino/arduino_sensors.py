@@ -95,7 +95,7 @@ class ArduinoRemoteDigitalSensor(AbstractArduinoSensor):
         self._arduino.subscribe_virtualwire_digital_broadcast(self, self.source_device)
 
     def cleanup(self):
-        self._arduino.unsubscribe_virtualwire_digital_broadcast(self)
+        self._arduino.unsubscribe_virtualwire_digital_broadcast(self, self.source_device)
 
 
 class ArduinoRemoteAnalogSensor(AbstractArduinoSensor):
@@ -115,6 +115,6 @@ class ArduinoRemoteAnalogSensor(AbstractArduinoSensor):
         self._arduino.subscribe_virtualwire_analog_broadcast(self, self.source_device)
 
     def cleanup(self):
-        self._arduino.unsubscribe_virtualwire_analog_broadcast(self)
+        self._arduino.unsubscribe_virtualwire_analog_broadcast(self, self.source_device)
 
 

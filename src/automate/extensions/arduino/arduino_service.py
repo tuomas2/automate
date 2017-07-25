@@ -26,6 +26,7 @@ from collections import namedtuple, defaultdict
 import pyfirmata
 import pyfirmata.pyfirmata
 import pyfirmata.util
+import time
 from traits.api import HasTraits, Any, Str, Int, CInt
 
 from automate import Lock
@@ -105,22 +106,20 @@ def patch_pyfirmata():
 
     pyfirmata.Board = FixedBoard
     pyfirmata.pyfirmata.Board = FixedBoard
-
-    # Add proper exception handler to Iterator
-    OldIterator = pyfirmata.util.Iterator
-    class FixedPyFirmataIterator(OldIterator):
-
-        def run(iter_self):
-            try:
-                super(FixedPyFirmataIterator, iter_self).run()
-            except Exception as e:
-                logger.exception('Exception %s occurred in Pyfirmata iterator, quitting now. '
-                                 'Threads: ', e, threading.enumerate())
-
-    pyfirmata.util.Iterator.Fixed = FixedPyFirmataIterator
     pyfirmata.patched = True
 
 patch_pyfirmata()
+
+
+def iterate_serial(board):
+    while True:
+        while board.bytes_available():
+            try:
+                board.iterate()
+            except Exception as e:
+                logger.exception('Exception in board.iterate: %s', e)
+        time.sleep(0.01)
+
 
 class ArduinoService(AbstractSystemService):
 
@@ -175,23 +174,25 @@ class ArduinoService(AbstractSystemService):
             if not os.access(self.device, os.R_OK):
                 raise self.FileNotReadableError
             board = pyfirmata.Board(self.device, layout=pyfirmata.BOARDS[self.device_type])
-            board.add_cmd_handler(pyfirmata.STRING_DATA, self._string_data_handler)
-            self._iterator_thread = it = pyfirmata.util.Iterator.Fixed(board)
-            it.daemon = True
-            it.name = "PyFirmata thread for {dev}".format(dev=self.device)
-            board._iter = it
-            it.start()
             self._board = board
             self.is_mocked = False
         except (self.FileNotReadableError, OSError) as e:
             if isinstance(e, self.FileNotReadableError) or e.errno == os.errno.ENOENT:
-                self.logger.warning('Your arduino device %s is not available. Arduino will be mocked.', self.device)
+                self.logger.warning('Your arduino device %s is not available. Arduino will be mocked.',
+                                    self.device)
                 self._board = None
                 self.is_mocked = True
             else:
                 raise
         self._lock = Lock()
         if self._board:
+            self._board.add_cmd_handler(pyfirmata.STRING_DATA, self._string_data_handler)
+            self._iterator_thread = it = threading.Thread(target=threaded(self.system, iterate_serial,
+                                                                          self._board))
+            it.daemon = True
+            it.name = "PyFirmata thread for {dev}".format(dev=self.device)
+            it.start()
+
             self.write(pyfirmata.SYSTEM_RESET)
             self._board.send_sysex(pyfirmata.SAMPLING_INTERVAL,
                                    pyfirmata.util.to_two_bytes(self.sample_rate))
@@ -224,9 +225,7 @@ class ArduinoService(AbstractSystemService):
         if self._board:
              self._board.exit()
         if self._iterator_thread and self._iterator_thread.is_alive():
-            self._iterator_thread.board = None
             self._iterator_thread.join()
-            self._iterator_thread = None
 
     def reload(self):
         digital_sensors = list(self._sens_digital.items())
@@ -282,17 +281,20 @@ class ArduinoService(AbstractSystemService):
     def _virtualwire_message_callback(self, sender_address, command, *data):
         self.logger.debug('pulse %s %s %s', int(sender_address), hex(command), bytearray(data))
         if command == VIRTUALWIRE_DIGITAL_BROADCAST:
-            port_nr = data[0]
-            value = data[1]
+            if len(data) != 2:
+                self.logger.error('Broken digital data: %s %s %s', sender_address, command, data)
+                return
+            port_nr, value = data
             for s in self._sens_virtualwire_digital[sender_address]:
                 port = s.pin // 8
                 pin_in_port = s.pin % 8
                 if port_nr == port:
                     s.status = bool(value & 1 << pin_in_port)
         elif command == VIRTUALWIRE_ANALOG_BROADCAST:
-            pin = data[0]
-            msb = data[1]
-            lsb = data[2]
+            if len(data) != 3:
+                self.logger.error('Broken analog data: %s %s %s', sender_address, command, data)
+                return
+            pin, msb, lsb = data
             value = (msb << 8) + lsb
             value = value/1023.  # Arduino gives 10 bit resolution
             self.logger.debug('Analog data: %s %s', pin, value)
