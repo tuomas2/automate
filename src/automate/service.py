@@ -50,9 +50,9 @@ class AbstractService(HasTraits):
     def name(self):
         return self.__class__.__name__
 
-    def setup_system(self, system, name=None):
+    def setup_system(self, system, name=None, id=None):
         self.system = system
-        self.logger = self.system.logger.getChild(self.__class__.__name__)
+        self.logger = self.system.logger.getChild('%s.%s' % (self.__class__.__name__, id))
         self.logger.info('Setup')
         self.system.register_service(self)
         self.setup()
