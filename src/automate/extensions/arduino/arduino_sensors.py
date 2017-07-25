@@ -22,8 +22,8 @@ from automate.service import AbstractSystemService
 from automate.statusobject import AbstractSensor
 from . import arduino_service
 
-class AbstractArduinoSensor(AbstractSensor):
 
+class AbstractArduinoSensor(AbstractSensor):
     """
         Abstract base class for Arduino sensors
     """
@@ -44,12 +44,13 @@ class AbstractArduinoSensor(AbstractSensor):
 
 
 class ArduinoDigitalSensor(AbstractArduinoSensor):
-
     """
         Boolean-valued sensor object for digital Arduino input pins
     """
 
     _status = CBool
+
+    #: Enable built-in pull-up resistor
     pull_up_resistor = CBool(False)
 
     def setup(self, *args, **kwargs):
@@ -77,45 +78,11 @@ class ArduinoAnalogSensor(AbstractArduinoSensor):
         self._arduino.unsubscribe_analog(self.pin)
 
 
-class ArduinoVirtualWireMessageSensor(AbstractArduinoSensor):
-
-    """
-        Receives all the messages sent via VirtualWire
-    """
-
-    _status = CStr
-
-    def setup(self, *args, **kwargs):
-        super(ArduinoVirtualWireMessageSensor, self).setup(*args, **kwargs)
-        self._arduino.subscribe_virtualwire_messages(self)
-
-    def cleanup(self):
-        self._arduino.unsubscribe_virtual_messages(self)
-
-
-class VirtualPinSensor(AbstractArduinoSensor):
-
-    """
-        Virtual pin, which has value that can be changed remotely with SetVirtualPin callable
-    """
-
-    #: Virtual pin number
-    virtual_pin = Int
-
-    _status = Any
-
-    def setup(self, *args, **kwargs):
-        super(VirtualPinSensor, self).setup(*args, **kwargs)
-        self._arduino.subscribe_virtualwire_virtual_pin(self, self.virtual_pin)
-
-    def cleanup(self):
-        self._arduino.unsubscribe_virtualwire_virtual_pin(self.virtual_pin)
-
-
-class ArduinoBroadcastDigitalSensor(AbstractArduinoSensor):
+class ArduinoRemoteDigitalSensor(AbstractArduinoSensor):
 
     """
         Sensor which listens to status changes of remote digital input pin
+        (transmission via VirtualWire)
     """
 
     _status = CBool
@@ -124,17 +91,18 @@ class ArduinoBroadcastDigitalSensor(AbstractArduinoSensor):
     source_device = CInt
 
     def setup(self, *args, **kwargs):
-        super(ArduinoBroadcastDigitalSensor, self).setup(*args, **kwargs)
+        super(ArduinoRemoteDigitalSensor, self).setup(*args, **kwargs)
         self._arduino.subscribe_virtualwire_digital_broadcast(self, self.source_device)
 
     def cleanup(self):
         self._arduino.unsubscribe_virtualwire_digital_broadcast(self)
 
 
-class ArduinoBroadcastAnalogSensor(AbstractArduinoSensor):
+class ArduinoRemoteAnalogSensor(AbstractArduinoSensor):
 
     """
         Sensor which listens to status changes of remote analog input pin
+        (transmission via VirtualWire)
     """
 
     _status = CFloat
@@ -143,7 +111,7 @@ class ArduinoBroadcastAnalogSensor(AbstractArduinoSensor):
     source_device = CInt
 
     def setup(self, *args, **kwargs):
-        super(ArduinoBroadcastAnalogSensor, self).setup(*args, **kwargs)
+        super(ArduinoRemoteAnalogSensor, self).setup(*args, **kwargs)
         self._arduino.subscribe_virtualwire_analog_broadcast(self, self.source_device)
 
     def cleanup(self):

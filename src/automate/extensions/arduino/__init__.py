@@ -20,11 +20,13 @@ from __future__ import unicode_literals
 
 from .arduino_service import ArduinoService
 from .arduino_actuators import (ArduinoDigitalActuator, ArduinoPWMActuator, ArduinoServoActuator,
-                                AbstractArduinoActuator, ArduinoVirtualWireMessageActuator)
-from .arduino_sensors import ArduinoAnalogSensor, ArduinoDigitalSensor, AbstractArduinoSensor, ArduinoVirtualWireMessageSensor
-from .arduino_callables import VirtualWireCommand
+                                AbstractArduinoActuator)
+from .arduino_sensors import (ArduinoAnalogSensor, ArduinoDigitalSensor, AbstractArduinoSensor,
+                              ArduinoRemoteAnalogSensor, ArduinoRemoteDigitalSensor)
+from .arduino_callables import VirtualWireCommand, FirmataCommand
 
 extension_classes = (ArduinoService, ArduinoDigitalActuator, ArduinoPWMActuator,
-                     ArduinoServoActuator, AbstractArduinoActuator, ArduinoVirtualWireMessageActuator,
-                     ArduinoAnalogSensor, ArduinoDigitalSensor, AbstractArduinoSensor, ArduinoVirtualWireMessageSensor,
-                     VirtualWireCommand)
+                     ArduinoServoActuator, AbstractArduinoActuator,
+                     ArduinoAnalogSensor, ArduinoDigitalSensor, AbstractArduinoSensor,
+                     VirtualWireCommand, ArduinoRemoteDigitalSensor, ArduinoRemoteAnalogSensor,
+                     FirmataCommand)

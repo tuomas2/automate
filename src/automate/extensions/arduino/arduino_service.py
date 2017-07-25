@@ -46,22 +46,13 @@ SYSEX_VIRTUALWRITE_MESSAGE = 0x01
 SYSEX_SET_IDENTIFICATION = 0x02
 SYSEX_KEEP_ALIVE = 0x03
 
-# Virtualwire command bytes
 VIRTUALWIRE_SET_PIN_MODE = 0x01
 VIRTUALWIRE_ANALOG_MESSAGE = 0x02
 VIRTUALWIRE_DIGITAL_MESSAGE = 0x03
 VIRTUALWIRE_START_SYSEX = 0x04
 VIRTUALWIRE_SET_DIGITAL_PIN_VALUE = 0x05
-VIRTUALWIRE_SET_VIRTUAL_PIN_VALUE = 0x06
-VIRTUALWIRE_CUSTOM_MESSAGE = 0x07
-
-VIRTUALWIRE_DIGITAL_BROADCAST = 0x08
-VIRTUALWIRE_ANALOG_BROADCAST = 0x09
-
-# VirtualPin value types
-TYPE_INT = 0x01
-TYPE_FLOAT = 0x02
-TYPE_STR = 0x03
+VIRTUALWIRE_DIGITAL_BROADCAST = 0x06
+VIRTUALWIRE_ANALOG_BROADCAST = 0x07
 
 
 def float_to_bytes(value):
@@ -165,8 +156,6 @@ class ArduinoService(AbstractSystemService):
 
         self._sens_analog = {}
         self._sens_digital = {}
-        self._sens_virtual = {}
-        self._sens_virtual_message_sensors = []
         self._sens_virtualwire_digital = defaultdict(list) # source device -> list of sensors
         self._sens_virtualwire_analog = defaultdict(list) # source device -> list of sensors
         self._act_digital = {}
@@ -266,16 +255,6 @@ class ArduinoService(AbstractSystemService):
                 self.logger.error('Reloading not implemented for type %s (pin %d)', _type, pin_nr)
         self.logger.info('Arduino pins are now set up!')
 
-    def send_virtualwire_message(self, recipient, message):
-        if not self._board:
-            return
-        with self._lock:
-            board = self._board
-            data = (bytearray([self.home_address, self.device_address, recipient, VIRTUALWIRE_CUSTOM_MESSAGE]) +
-                    bytearray(message.encode('utf-8')))
-            self.logger.debug('VW: Sending message %s', data)
-            board.send_sysex(SYSEX_VIRTUALWRITE_MESSAGE, data)
-
     def send_virtualwire_command(self, recipient, command, *args):
         with self._lock:
             board = self._board
@@ -299,37 +278,9 @@ class ArduinoService(AbstractSystemService):
         self.set_pin_mode(self.virtualwire_rx_pin, PIN_MODE_VIRTUALWIRE_READ)
         self._board.add_cmd_handler(pyfirmata.DIGITAL_PULSE, self._virtualwire_message_callback)
 
-    def subscribe_virtualwire_virtual_pin(self, sens, virtual_pin):
-        self._sens_virtual[virtual_pin] = sens
-
-    def unsubscribe_virtualwire_virtual_pin(self, virtual_pin):
-        self._sens_virtual.pop(virtual_pin)
-
-    def set_virtual_pin(self, target_device, target_pin, value):
-        value_type = {float: TYPE_FLOAT, int: TYPE_INT, str: TYPE_STR}[type(value)]
-        self.send_virtualwire_command(target_device, VIRTUALWIRE_SET_VIRTUAL_PIN_VALUE,
-                                      target_pin, value_type, value)
-
     def _virtualwire_message_callback(self, sender_address, command, *data):
         self.logger.debug('pulse %s %s %s', int(sender_address), hex(command), bytearray(data))
-        if command == VIRTUALWIRE_CUSTOM_MESSAGE:
-            self.logger.debug('Custom message')
-            for sensor in self._sens_virtual_message_sensors:
-                sensor.status = bytes(bytearray(data)).decode('utf-8')
-        elif command == VIRTUALWIRE_SET_VIRTUAL_PIN_VALUE:
-            pin_nr = int(data[0])
-            type_id = int(data[1])
-            converted_data = None
-            if type_id == TYPE_INT:
-               converted_data = int(data[2])
-            elif type_id == TYPE_FLOAT:
-               converted_data = bytes_to_float(bytearray(data[2:]))
-            elif type_id == TYPE_STR:
-               converted_data = bytes(bytearray(data[2:])).decode('utf-8')
-
-            self.logger.debug('Virtual pin value %s %s %s', pin_nr, type_id, converted_data)
-            self._sens_virtual[pin_nr].status = converted_data
-        elif command == VIRTUALWIRE_DIGITAL_BROADCAST:
+        if command == VIRTUALWIRE_DIGITAL_BROADCAST:
             port_nr = data[0]
             value = data[1]
             for s in self._sens_virtualwire_digital[sender_address]:
@@ -363,13 +314,6 @@ class ArduinoService(AbstractSystemService):
 
     def unsubscribe_virtualwire_analog_broadcast(self, sensor, source_device):
         self._sens_virtualwire_analog[source_device].remove(sensor)
-
-    def subscribe_virtualwire_messages(self, sens):
-        self._sens_virtual_message_sensors.append(sens)
-
-    def unsubscribe_virtual_messages(self, sens):
-        self._sens_virtual_message_sensors.remove(sens)
-
 
     def setup_digital(self, pin_nr):
         if not self._board:

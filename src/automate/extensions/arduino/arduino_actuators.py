@@ -26,8 +26,8 @@ from automate.service import AbstractSystemService
 from automate.statusobject import AbstractActuator
 from . import arduino_service
 
-class AbstractArduinoActuator(AbstractActuator):
 
+class AbstractArduinoActuator(AbstractActuator):
     """
         Abstract base class for Arduino actuators
     """
@@ -49,7 +49,6 @@ class AbstractArduinoActuator(AbstractActuator):
 
 
 class ArduinoDigitalActuator(AbstractArduinoActuator):
-
     """
         Boolean-valued actuator object for digital Arduino output pins
     """
@@ -66,22 +65,7 @@ class ArduinoDigitalActuator(AbstractArduinoActuator):
         self._arduino.cleanup_digital_actuator(self.pin)
 
 
-class ArduinoVirtualWireMessageActuator(AbstractArduinoActuator):
-
-    """
-        Actuator that passes status changes via VirtualWire messages
-    """
-    _status = CStr(transient=True)
-
-    #: Recipient device number
-    recipient = CInt
-
-    def _status_changed(self):
-        self._arduino.send_virtualwire_message(self.recipient, self._status)
-
-
 class ArduinoRemoteDigitalActuator(AbstractArduinoActuator):
-
     """
         Actuator that sends target device digital output pin status change requests
     """
@@ -109,7 +93,6 @@ class ArduinoRemoteDigitalActuator(AbstractArduinoActuator):
 
 
 class ArduinoRemotePWMActuator(AbstractArduinoActuator):
-
     """
         Actuator that sends target device analog (PWM) output pin status change requests
     """

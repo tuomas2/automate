@@ -39,47 +39,6 @@ class VirtualWireCommand(AbstractCallable):
         return arduino.send_virtualwire_command(*args[1:])
 
 
-class SetVirtualPin(AbstractCallable):
-    """
-    Set VirtualPin status. Positional arguments::
-
-     - Arduino service number
-     - target device number
-     - target device pin number
-     - new status
-
-    """
-
-    def call(self, caller, **kwargs):
-        if not caller:
-            return
-
-        args = [self.call_eval(i, caller, **kwargs) for i in self._args]
-
-        arduino = self.system.request_service('ArduinoService', args[0])
-        target_device = args[1]
-        target_pin = args[2]
-        value = args[3]
-
-        return arduino.set_virtual_pin(target_device, target_pin, value)
-
-
-class VirtualWireMessage(AbstractCallable):
-    """
-    Send VirtualWire message. Positional arguments::
-
-     - Arduino service number
-     - Message
-
-    """
-    def call(self, caller, **kwargs):
-        if not caller:
-            return
-        args = [self.call_eval(i, caller, **kwargs) for i in self._args]
-        arduino = self.system.request_service('ArduinoService', args[0])
-        return arduino.send_virtualwire_message(*args[1:])
-
-
 class FirmataCommand(AbstractCallable):
     """
     Send custom Firmata command to Arduino. Positional arguments::
