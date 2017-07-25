@@ -50,5 +50,5 @@ class FirmataCommand(AbstractCallable):
             return
         args = [self.call_eval(i, caller, **kwargs) for i in self._args]
         arduino = self.system.request_service('ArduinoService', args[0])
-        arduino.write(bytearray(args[1:]))
+        arduino.write(args[1:])
 

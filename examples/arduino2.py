@@ -98,8 +98,10 @@ class ArduinoSystem(System):
     class Local(Group):
         local_pwm = ArduinoPWMActuator(dev=0, pin=3, on_update=SetStatus('local_pwm', 'ufloat2'))
 
-        remote_actuator = ArduinoRemoteDigitalActuator(dev=0, target_device=target_dev, target_pin=12,
-                        on_update=SetStatus('remote_actuator', 'ubool'))
+        remote_actuator = ArduinoRemoteDigitalActuator(
+            dev=0, target_device=target_dev,
+            target_pin=12,
+            on_update=SetStatus('remote_actuator', 'ubool'))
 
         remote_pwm = ArduinoRemotePWMActuator(dev=0, target_device=target_dev, target_pin=5,
                                               on_update=SetStatus('remote_pwm', 'ufloat1'))

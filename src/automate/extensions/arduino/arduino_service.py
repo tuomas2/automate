@@ -204,6 +204,7 @@ class ArduinoService(AbstractSystemService):
 
 
     def _keep_alive(self):
+        self.logger.debug('Sending keep-alive message to Arduino')
         self._board.send_sysex(SYSEX_KEEP_ALIVE, [0])
         interval = 60
         self._keepalive_thread = threading.Timer(interval, threaded(self.system, self._keep_alive))
@@ -299,7 +300,8 @@ class ArduinoService(AbstractSystemService):
                 if s.pin == pin:
                     s.status = value
 
-    def write(self, data):
+    def write(self, *data):
+        data = bytearray(data)
         if not self._board:
             return
         with self._lock:
@@ -405,4 +407,4 @@ class ArduinoService(AbstractSystemService):
         if not self._board:
             return
         self.logger.debug('Setting pin mode for pin %s to %s', pin_number, mode)
-        self.write(bytearray([pyfirmata.SET_PIN_MODE, pin_number, mode]))
+        self.write(pyfirmata.SET_PIN_MODE, pin_number, mode)
