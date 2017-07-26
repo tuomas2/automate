@@ -123,6 +123,7 @@ s = ArduinoSystem(
             home_address=source_home,
             device_address=source_dev,
             virtualwire_tx_pin=11,
+            keep_alive=False,
             #virtualwire_rx_pin=10,
         ),
         ArduinoService(

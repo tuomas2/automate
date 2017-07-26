@@ -27,7 +27,7 @@ import pyfirmata
 import pyfirmata.pyfirmata
 import pyfirmata.util
 import time
-from traits.api import HasTraits, Any, Str, Int, CInt
+from traits.api import HasTraits, Any, Str, Int, CInt, CBool
 
 from automate import Lock
 from automate.service import AbstractSystemService
@@ -150,6 +150,9 @@ class ArduinoService(AbstractSystemService):
     #: VirtualWire receiver pin
     virtualwire_rx_pin = CInt(0)
 
+    #: Send keep-alive messages periodically
+    keep_alive = CBool(True)
+
     def __init__(self, *args, **kwargs):
         super(ArduinoService, self).__init__(*args, **kwargs)
 
@@ -205,8 +208,9 @@ class ArduinoService(AbstractSystemService):
 
 
     def _keep_alive(self):
-        self.logger.debug('Sending keep-alive message to Arduino')
-        self._board.send_sysex(SYSEX_KEEP_ALIVE, [0])
+        if self.keep_alive:
+            self.logger.debug('Sending keep-alive message to Arduino')
+            self._board.send_sysex(SYSEX_KEEP_ALIVE, [0])
         interval = 60
         self._keepalive_thread = threading.Timer(interval, threaded(self.system, self._keep_alive))
         self._keepalive_thread.name = "Arduino keepalive (60s)"
