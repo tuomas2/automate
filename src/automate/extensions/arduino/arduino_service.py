@@ -106,6 +106,8 @@ def patch_pyfirmata():
 
     pyfirmata.Board = FixedBoard
     pyfirmata.pyfirmata.Board = FixedBoard
+    pyfirmata.BOARD_SETUP_WAIT_TIME = 0
+    pyfirmata.pyfirmata.BOARD_SETUP_WAIT_TIME = 0
     pyfirmata.patched = True
 
 patch_pyfirmata()
