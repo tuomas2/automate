@@ -2,8 +2,7 @@ from automate import *
 from automate.program import Program
 
 
-class mysys(System):
-    #config = Config(print_level = logging.DEBUG)
+class ArduinoSystem(System):
     # Control servo with analog port a1 through interpolating sensor interp
     a1 = ArduinoAnalogSensor(dev=0, pin=0)
     d12 = ArduinoDigitalSensor(dev=0, pin=12)
@@ -19,13 +18,11 @@ class mysys(System):
         on_update=Run(Log("Value: %s", Value(a1)), SetStatus(d13, d12), SetStatus(interp, Value(180) * Value(a1)))
     )
 
-s = mysys(services=[ArduinoService(
-    arduino_devs=["/dev/ttyUSB0"],
-    arduino_dev_types=["Arduino"],
-    arduino_dev_sampling=[500],
+s = ArduinoSystem(services=[ArduinoService(
+    device="/dev/ttyUSB0",
+    device_type="arduino",
+    sample_rate=500,
 ),
     TextUIService(),
-    GuiService(),
 ],
-    #print_level= logging.DEBUG,
 )
