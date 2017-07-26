@@ -262,6 +262,8 @@ class ArduinoService(AbstractSystemService):
         self.logger.info('Arduino pins are now set up!')
 
     def send_virtualwire_command(self, recipient, command, *args):
+        if not self._board:
+            return
         with self._lock:
             board = self._board
             data = bytearray([self.home_address, self.device_address, recipient, command])

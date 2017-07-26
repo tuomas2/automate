@@ -46,7 +46,7 @@ LOGGING = {
         },
         'automate.arduino2.ArduinoService': {
             'handlers': ['console'],
-            'level': 'DEBUG',
+            'level': 'INFO', #'DEBUG',
             'propagate': False,
         },
         'django.template': {
@@ -119,7 +119,7 @@ s = ArduinoSystem(
     services=[
         ArduinoService(
             device="/dev/ttyUSB0",
-            sample_rate=1500,
+            sample_rate=2000,
             home_address=source_home,
             device_address=source_dev,
             virtualwire_tx_pin=11,
@@ -128,7 +128,7 @@ s = ArduinoSystem(
         ),
         ArduinoService(
             device="/dev/ttyUSB1",
-            sample_rate=1500,
+            sample_rate=2000,
             home_address=target_home,
             device_address=target_dev,
             #virtualwire_tx_pin=11,
