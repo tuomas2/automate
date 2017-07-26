@@ -41,6 +41,7 @@ class AbstractService(HasTraits):
     system = Instance(SystemBase)
     logger = Instance(logging.Logger, transient=True)
     is_mocked = CBool(False, transient=True)
+    _id = 0
 
     @property
     def id(self):
@@ -48,11 +49,16 @@ class AbstractService(HasTraits):
 
     @property
     def name(self):
-        return self.__class__.__name__
+        return '%s.%s' % (self.__class__.__name__, self._id)
 
-    def setup_system(self, system, name=None, id=None):
+    @property
+    def initialized(self):
+        return bool(self.system)
+
+    def setup_system(self, system, name=None, id=0):
         self.system = system
-        self.logger = self.system.logger.getChild('%s.%s' % (self.__class__.__name__, id))
+        self._id = id
+        self.logger = self.system.logger.getChild(self.name)
         self.logger.info('Setup')
         self.system.register_service(self)
         self.setup()

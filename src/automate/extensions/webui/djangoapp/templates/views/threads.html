@@ -12,7 +12,9 @@
   <h2>Services</h2>
       <ul>
         {% for service in system.services %}
+          {% if service.initialized %}
           <li>{{service.name}} <a href="{% url "reload_service" service.id %}">(reload)</a>
+          {%endif %}
         {% endfor %}
       </ul>
 {% endblock %}

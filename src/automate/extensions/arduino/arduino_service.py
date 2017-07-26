@@ -208,7 +208,6 @@ class ArduinoService(AbstractSystemService):
             self.setup_identification()
             self._keep_alive()
 
-
     def _keep_alive(self):
         if self.keep_alive:
             self.logger.debug('Sending keep-alive message to Arduino')
@@ -232,11 +231,15 @@ class ArduinoService(AbstractSystemService):
              self._board.exit()
         if self._iterator_thread and self._iterator_thread.is_alive():
             self._iterator_thread.join()
+        if self._keepalive_thread:
+            self._keepalive_thread.cancel()
 
     def reload(self):
         digital_sensors = list(self._sens_digital.items())
         analog_sensors = list(self._sens_analog.items())
         digital_actuators = list(self._act_digital.items())
+        #virt_analog = list(self._sens_virtualwire_analog.items())
+        #virt_digital = list(self._sens_virtualwire_digital.items())
 
         for pin_nr, (_type, pin) in digital_actuators:
             self.cleanup_digital_actuator(pin_nr)
