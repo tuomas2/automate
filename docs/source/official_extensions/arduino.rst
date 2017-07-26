@@ -22,8 +22,8 @@ within given time interval.
 
 .. literalinclude:: arduino_example.py
 
-VirtualWire remote control
---------------------------
+VirtualWire wireless communication
+----------------------------------
 
 VirtualWire enables communication between two Arduinos with very cheap radio frequency (RF)
 transmitters&receivers. For more information about VirtaualWire, see for example
