@@ -151,7 +151,7 @@ class ArduinoService(AbstractSystemService):
     #: VirtualWire receiver pin
     virtualwire_rx_pin = CInt(0)
 
-    #: VirtualWire PTT (push to transmit) pin
+    #: VirtualWire PTT (push to talk) pin
     virtualwire_ptt_pin = CInt(0)
 
     #: Send keep-alive messages periodically over serial port to prevent Arduino device from
