@@ -4,8 +4,9 @@
 - Arduino service instance now serves only 1 device. Use multiple services if you want to
   use many devices. For usage see examples/arduino2.py. Only ArduinoService attributes
   were changed, see the documentation.
-- VirtualWire support in Arduino.
-- Add support to builtin pull up resistors in Arduino digital input pins
+- VirtualWire support in Arduino. This allows wireless communication to remote Arduinos using
+  very cheap RF circuits. See documentation!
+- Add support to builtin pull up resistors in Arduino digital input pins.
 
 
 0.10.18 (2017-07-19)
