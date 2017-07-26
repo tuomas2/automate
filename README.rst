@@ -42,9 +42,9 @@ Highlights:
 * Supported hardware:
 
   * Raspberry Pi GPIO input/output ports
-  * Arduino analog and digital input/output ports
-    (via `pyFirmata <https://github.com/tino/pyFirmata>`_ library) and VirtualWire
-    wireless networking with `AutomateFirmata <https://github.com/tuomas2/AutomateFirmata>`_.
+  * `Arduino support <http://python-automate.readthedocs.io/en/latest/official_extensions/arduino.html>`_
+    for analog and digital input/output ports and VirtualWire wireless networking
+    with `AutomateFirmata <https://github.com/tuomas2/AutomateFirmata>`_.
   * Easy to write extensions to support other hardware
 
 * System state saving and restoring via serialization
@@ -57,7 +57,8 @@ Highlights:
   * Versatile function/callable library to write state program logic
 
 * RPC and Websocket interfaces to connect between other applications or other Automate systems.
-* Comprehensive and customizable Web User Interface
+* Comprehensive and customizable
+  `Web User Interface <http://python-automate.readthedocs.io/en/latest/official_extensions/webui.html>`_
 * UML graphs can be drawn automaticlaly of the system (as can be seen in the examples
   of this documentation)
 
