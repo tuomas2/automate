@@ -380,7 +380,7 @@ class System(SystemBase):
         ser = srvs[id]
 
         if not ser.system:
-            ser.setup_system(self)
+            ser.setup_system(self, id=id)
         return ser
 
     def cleanup(self):

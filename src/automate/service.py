@@ -24,12 +24,12 @@
 from __future__ import unicode_literals
 import logging
 
-from traits.api import HasStrictTraits, Instance, CBool
+from traits.api import HasTraits, HasStrictTraits, Instance, CBool
 
 from .common import SystemBase
 
 
-class AbstractService(HasStrictTraits):
+class AbstractService(HasTraits):
 
     """
         Base class for System and UserServices
@@ -41,6 +41,7 @@ class AbstractService(HasStrictTraits):
     system = Instance(SystemBase)
     logger = Instance(logging.Logger, transient=True)
     is_mocked = CBool(False, transient=True)
+    _id = 0
 
     @property
     def id(self):
@@ -48,11 +49,16 @@ class AbstractService(HasStrictTraits):
 
     @property
     def name(self):
-        return self.__class__.__name__
+        return '%s.%s' % (self.__class__.__name__, self._id)
 
-    def setup_system(self, system, name=None):
+    @property
+    def initialized(self):
+        return bool(self.system)
+
+    def setup_system(self, system, name=None, id=0):
         self.system = system
-        self.logger = self.system.logger.getChild(self.__class__.__name__)
+        self._id = id
+        self.logger = self.system.logger.getChild(self.name)
         self.logger.info('Setup')
         self.system.register_service(self)
         self.setup()

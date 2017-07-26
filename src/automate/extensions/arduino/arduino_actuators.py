@@ -17,15 +17,17 @@
 # along with automate-arduino.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
-from traits.api import CInt, Instance, CBool, CFloat
+from traits.api import CInt, Instance, CBool, CFloat, CStr
+
+import pyfirmata
 
 from automate.actuators import FloatActuator
 from automate.service import AbstractSystemService
 from automate.statusobject import AbstractActuator
+from . import arduino_service
 
 
 class AbstractArduinoActuator(AbstractActuator):
-
     """
         Abstract base class for Arduino actuators
     """
@@ -43,11 +45,10 @@ class AbstractArduinoActuator(AbstractActuator):
 
     def setup(self, *args, **kwargs):
         super(AbstractArduinoActuator, self).setup(*args, **kwargs)
-        self._arduino = self.system.request_service('ArduinoService')
+        self._arduino = self.system.request_service('ArduinoService', self.dev)
 
 
 class ArduinoDigitalActuator(AbstractArduinoActuator):
-
     """
         Boolean-valued actuator object for digital Arduino output pins
     """
@@ -55,13 +56,72 @@ class ArduinoDigitalActuator(AbstractArduinoActuator):
 
     def setup(self, *args, **kwargs):
         super(ArduinoDigitalActuator, self).setup(*args, **kwargs)
-        self._arduino.setup_digital(self.dev, self.pin)
+        self._arduino.setup_digital(self.pin)
 
     def _status_changed(self):
-        self._arduino.change_digital(self.dev, self.pin, self._status)
+        self._arduino.change_digital(self.pin, self._status)
 
     def cleanup(self):
-        self._arduino.cleanup_digital_actuator(self.dev, self.pin)
+        self._arduino.cleanup_digital_actuator(self.pin)
+
+
+class ArduinoRemoteDigitalActuator(AbstractArduinoActuator):
+    """
+        Actuator that sends target device digital output pin status change requests
+
+        Needs `AutomateFirmata <https://github.com/tuomas2/AutomateFirmata>`_
+    """
+
+    _status = CBool(transient=True)
+
+    #: Target device number
+    target_device = CInt
+
+    #: Target device pin number
+    target_pin = CInt
+
+    def setup(self, *args, **kwargs):
+        super(ArduinoRemoteDigitalActuator, self).setup(*args, **kwargs)
+        self._arduino.send_virtualwire_command(self.target_device,
+                                               arduino_service.VIRTUALWIRE_SET_PIN_MODE,
+                                               self.target_pin,
+                                               pyfirmata.OUTPUT)
+
+    def _status_changed(self):
+        self._arduino.send_virtualwire_command(self.target_device,
+                                               arduino_service.VIRTUALWIRE_SET_DIGITAL_PIN_VALUE,
+                                               self.target_pin,
+                                               self.status)
+
+
+class ArduinoRemotePWMActuator(AbstractArduinoActuator):
+    """
+        Actuator that sends target device analog (PWM) output pin status change requests
+
+        Needs `AutomateFirmata <https://github.com/tuomas2/AutomateFirmata>`_
+    """
+
+    _status = CFloat(transient=True)
+
+    #: Target device number
+    target_device = CInt
+
+    #: Target device pin number
+    target_pin = CInt
+
+    def setup(self, *args, **kwargs):
+        super(ArduinoRemotePWMActuator, self).setup(*args, **kwargs)
+        self._arduino.send_virtualwire_command(self.target_device,
+                                               arduino_service.VIRTUALWIRE_SET_PIN_MODE,
+                                               self.target_pin,
+                                               pyfirmata.PWM)
+
+    def _status_changed(self):
+        value = int(round(self.status * 255))
+        self._arduino.send_virtualwire_command(self.target_device,
+                                               arduino_service.VIRTUALWIRE_ANALOG_MESSAGE,
+                                               self.target_pin,
+                                               value)
 
 
 class ArduinoServoActuator(AbstractArduinoActuator):
@@ -91,14 +151,15 @@ class ArduinoServoActuator(AbstractArduinoActuator):
         super(ArduinoServoActuator, self).setup(*args, **kwargs)
         self.logger.debug("setup_servo %s %s %s %s %s %s", self, self.dev, self.pin, self.min_pulse, self.max_pulse,
                           int(round(self._status)))
-        self._arduino.setup_servo(self.dev, self.pin, self.min_pulse, self.max_pulse, int(round(self._status)))
+        self._arduino.setup_servo(self.pin, self.min_pulse, self.max_pulse, int(round(self._status)))
 
     def _status_changed(self):
-        self.logger.debug("change_servo %s %s %s", self.dev, self.pin, int(round(self._status)))
-        self._arduino.change_digital(self.dev, self.pin, int(round(self._status)))
+        self.logger.debug("change_servo %s %s %s", self.pin, int(round(self._status)))
+        self._arduino.change_digital(self.pin, int(round(self._status)))
 
     def cleanup(self):
-        self._arduino.cleanup_digital_actuator(self.dev, self.pin)
+        self._arduino.cleanup_digital_actuator(self.pin)
+
 
 class ArduinoPWMActuator(FloatActuator, AbstractArduinoActuator):
 
@@ -109,10 +170,10 @@ class ArduinoPWMActuator(FloatActuator, AbstractArduinoActuator):
 
     def setup(self, *args, **kwargs):
         super(ArduinoPWMActuator, self).setup(*args, **kwargs)
-        self._arduino.setup_pwm(self.dev, self.pin)
+        self._arduino.setup_pwm(self.pin)
 
     def _status_changed(self):
-        self._arduino.change_digital(self.dev, self.pin, max(0., min(1., self._status)))
+        self._arduino.change_digital(self.pin, max(0., min(1., self._status)))
 
     def cleanup(self):
-        self._arduino.cleanup_digital_actuator(self.dev, self.pin)
+        self._arduino.cleanup_digital_actuator(self.pin)

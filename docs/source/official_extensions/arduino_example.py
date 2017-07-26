@@ -2,10 +2,13 @@ from automate import *
 
 
 class MySystem(System):
+    ufloat = UserFloatSensor(value_min=0, value_max=1)
+
     a1 = ArduinoAnalogSensor(dev=0, pin=0)
     d12 = ArduinoDigitalSensor(dev=0, pin=12)
 
     d13 = ArduinoDigitalActuator(dev=0, pin=13)  # LED on Arduino board
+    pwm = ArduinoPWMActuator(dev=0, pin=4, on_update=SetStatus('pwm', 'ufloat'))
     servo = ArduinoServoActuator(min_pulse=200,
                                  max_pulse=8000,
                                  dev=0,
@@ -24,8 +27,8 @@ class MySystem(System):
     )
 
 my_arduino = ArduinoService(
-    arduino_devs=["/dev/ttyUSB0"],
-    arduino_dev_types=["Arduino"],
-    arduino_dev_sampling=[500])
+    device="/dev/ttyUSB0",
+    sample_rate=500,
+)
 
 s = MySystem(services=[my_arduino, WebService()])

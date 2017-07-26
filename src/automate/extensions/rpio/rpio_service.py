@@ -24,6 +24,7 @@ from traits.api import CBool, Any
 from automate.service import AbstractSystemService
 import signal
 
+
 class RpioService(AbstractSystemService):
 
     """
@@ -68,7 +69,6 @@ class RpioService(AbstractSystemService):
         self.logger.info("RPIO initialized")
 
     def cleanup(self):
-
         if self.rpio:
             self._hw.stop_waiting_for_interrupts()
             self._hw.cleanup_interrupts()

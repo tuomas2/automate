@@ -16,7 +16,7 @@ web_requirements = [
 
 gpio_requirements = ['RPi.GPIO']
 rpio_requirements = ['RPIO']
-arduino_requirements = ['pyfirmata']
+arduino_requirements = []
 
 all_extras_requirements = web_requirements + gpio_requirements + arduino_requirements
 
@@ -38,6 +38,7 @@ setupopts = dict(
         "mock",
         "requests",
         "raven",
+        "pyfirmata",
         ],
     extras_require={
         'web': web_requirements,

@@ -527,11 +527,6 @@ if __name__ == '__main__':
                                },
         )
 
-    ard = ArduinoService(
-            arduino_devs=['/dev/ttyUSB0'],
-            arduino_dev_types=['Arduino'],
-            arduino_dev_sampling=[500],
-        )
     rpcs = RpcService(
             http_port=3030,
             view_tags={'quick'},

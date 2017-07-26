@@ -428,9 +428,6 @@ class SetAttr(AbstractAction):
             # performs setattr(obj, attr, value) and setattr(obj, attr2, value2).
     """
 
-    def __init__(self, obj, **kwargs):
-        super(SetAttr, self).__init__(obj, **kwargs)
-
     def call(self, caller, **kwargs):
         if not caller:
             return
