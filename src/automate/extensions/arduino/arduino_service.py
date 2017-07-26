@@ -133,17 +133,17 @@ class ArduinoService(AbstractSystemService):
     #: Arduino devices to use, as a list
     device = Str("/dev/ttyUSB0")
 
-    #: Arduino device board types, as a list of strings. Choices are defined by pyFirmata board
-    #: class names, i.e. allowed values are "Arduino", "ArduinoMega", "ArduinoDue".
+    #: Arduino device board type, choices: 'arduino', 'arduino_mega', 'arduino_due'.
     device_type = Str('arduino')
 
-    #: Arduino device sampling rates, as a list (in milliseconds).
+    #: Arduino sample rate in milliseconds (i.e. how often to send data to host)
     sample_rate = Int(500)
 
-    #: VirtualWire communication protocol home address
+    #: Device home address (integer) in VirtualWire network. This should be same for all
+    #: devices in a network.
     home_address = CInt(0)
 
-    #: VirtualWire communication protocol device address
+    #: Device address (integer) in VirtualWire network. Unique for each device.
     device_address = CInt(0)
 
     #: VirtualWire transfer pin
@@ -152,7 +152,8 @@ class ArduinoService(AbstractSystemService):
     #: VirtualWire receiver pin
     virtualwire_rx_pin = CInt(0)
 
-    #: Send keep-alive messages periodically
+    #: Send keep-alive messages periodically to prevent arduino transmitter device from
+    #: falling to power save mode.
     keep_alive = CBool(True)
 
     def __init__(self, *args, **kwargs):
