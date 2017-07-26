@@ -42,7 +42,9 @@ Highlights:
 * Supported hardware:
 
   * Raspberry Pi GPIO input/output ports
-  * Arduino analog and digital input/output ports (via `pyFirmata <https://github.com/tino/pyFirmata>`_ library)
+  * Arduino analog and digital input/output ports
+    (via `pyFirmata <https://github.com/tino/pyFirmata>`_ library) and VirtualWire
+    wireless networking with `AutomateFirmata <https://github.com/tuomas2/AutomateFirmata>`_.
   * Easy to write extensions to support other hardware
 
 * System state saving and restoring via serialization
@@ -54,10 +56,10 @@ Highlights:
   * `IPython <http://ipython.org>`_ console to monitor, modify and control system on-the-fly
   * Versatile function/callable library to write state program logic
 
-* RPC and Websocket interfaces to connect
-  between other applications or other Automate systems.
+* RPC and Websocket interfaces to connect between other applications or other Automate systems.
 * Comprehensive and customizable Web User Interface
-* UML graphs can be drawn automaticlaly of the system (as can be seen in the examples of this documentation)
+* UML graphs can be drawn automaticlaly of the system (as can be seen in the examples
+  of this documentation)
 
 .. _hello-world:
 

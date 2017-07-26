@@ -152,7 +152,7 @@ class ArduinoService(AbstractSystemService):
     #: VirtualWire receiver pin
     virtualwire_rx_pin = CInt(0)
 
-    #: Send keep-alive messages periodically to prevent arduino transmitter device from
+    #: Send keep-alive messages periodically over serial port to prevent Arduino device from
     #: falling to power save mode.
     keep_alive = CBool(True)
 
