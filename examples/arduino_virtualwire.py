@@ -86,6 +86,9 @@ class ArduinoSystem(System):
         reset2 = UserEventSensor(
             on_activate=FirmataCommand(1, pyfirmata.SYSTEM_RESET)
         )
+        #inputmode = UserEventSensor(
+        #    on_activate=FirmataCommand(1, pyfirmata.SET_PIN_MODE, 10, pyfirmata.INPUT)
+        #)
 
         ubool2 = UserBoolSensor(
             on_update=VirtualWireCommand(0, target_dev,
@@ -123,16 +126,15 @@ s = ArduinoSystem(
             sample_rate=2000,
             home_address=source_home,
             device_address=source_dev,
+            virtualwire_ptt_pin=9,
             virtualwire_tx_pin=11,
             keep_alive=False,
-            #virtualwire_rx_pin=10,
         ),
         ArduinoService(
             device="/dev/ttyUSB1",
             sample_rate=2000,
             home_address=target_home,
             device_address=target_dev,
-            #virtualwire_tx_pin=11,
             virtualwire_rx_pin=10,
         ),
         TextUIService(),

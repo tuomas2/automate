@@ -12,6 +12,7 @@ s = ArduinoSystem(
             home_address=1,
             device_address=1,
             virtualwire_tx_pin=11,
+            virtualwire_ptt_pin=12,
         ),
     ],
 )

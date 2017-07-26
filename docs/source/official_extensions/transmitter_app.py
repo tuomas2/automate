@@ -24,6 +24,7 @@ s = ArduinoSystem(
             home_address=1,
             device_address=4,
             virtualwire_tx_pin=11,
+            virtualwire_ptt_pin=12,
         ),
         WebService(read_only=False),
     ],

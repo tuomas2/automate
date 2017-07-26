@@ -38,14 +38,13 @@ logger = logging.getLogger(__name__)
 PinTuple = namedtuple('PinTuple', ['type', 'pin'])
 
 # Pin modes
-PIN_MODE_VIRTUALWIRE_WRITE = 0x0C
-PIN_MODE_VIRTUALWIRE_READ = 0x0D
 PIN_MODE_PULLUP = 0x0B
 
 # Sysex to arduino
-SYSEX_VIRTUALWRITE_MESSAGE = 0x01
+SYSEX_VIRTUALWIRE_MESSAGE = 0x01
 SYSEX_SET_IDENTIFICATION = 0x02
 SYSEX_KEEP_ALIVE = 0x03
+SYSEX_SETUP_VIRTUALWIRE = 0x04
 
 VIRTUALWIRE_SET_PIN_MODE = 0x01
 VIRTUALWIRE_ANALOG_MESSAGE = 0x02
@@ -152,6 +151,9 @@ class ArduinoService(AbstractSystemService):
     #: VirtualWire receiver pin
     virtualwire_rx_pin = CInt(0)
 
+    #: VirtualWire PTT (push to transmit) pin
+    virtualwire_ptt_pin = CInt(0)
+
     #: Send keep-alive messages periodically over serial port to prevent Arduino device from
     #: falling to power save mode.
     keep_alive = CBool(True)
@@ -202,12 +204,19 @@ class ArduinoService(AbstractSystemService):
             self.write(pyfirmata.SYSTEM_RESET)
             self._board.send_sysex(pyfirmata.SAMPLING_INTERVAL,
                                    pyfirmata.util.to_two_bytes(self.sample_rate))
-            if self.virtualwire_tx_pin:
-                self.setup_virtualwire_output()
-            if self.virtualwire_rx_pin:
-                self.setup_virtualwire_input()
-            self.setup_identification()
+
+            self.configure_virtualwire()
             self._keep_alive()
+
+    def configure_virtualwire(self):
+        if not self._board:
+            return
+        with self._lock:
+            self._board.send_sysex(SYSEX_SETUP_VIRTUALWIRE, [self.virtualwire_rx_pin,
+                                                             self.virtualwire_tx_pin,
+                                                             self.virtualwire_ptt_pin])
+            self.setup_identification()
+            self.setup_virtualwire_input()
 
     def _keep_alive(self):
         if self.keep_alive:
@@ -279,16 +288,12 @@ class ArduinoService(AbstractSystemService):
                 else:
                     data.append(a)
             self.logger.debug('VW: Sending command %s', data)
-            board.send_sysex(SYSEX_VIRTUALWRITE_MESSAGE, data)
-
-    def setup_virtualwire_output(self):
-        self.set_pin_mode(self.virtualwire_tx_pin, PIN_MODE_VIRTUALWIRE_WRITE)
+            board.send_sysex(SYSEX_VIRTUALWIRE_MESSAGE, data)
 
     def setup_virtualwire_input(self):
         if not self._board:
             return
-        self.set_pin_mode(self.virtualwire_rx_pin, PIN_MODE_VIRTUALWIRE_READ)
-        self._board.add_cmd_handler(pyfirmata.DIGITAL_PULSE, self._virtualwire_message_callback)
+        self._board.add_cmd_handler(SYSEX_VIRTUALWIRE_MESSAGE, self._virtualwire_message_callback)
 
     def _virtualwire_message_callback(self, sender_address, command, *data):
         self.logger.debug('pulse %s %s %s', int(sender_address), hex(command), bytearray(data))
