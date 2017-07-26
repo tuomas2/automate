@@ -69,7 +69,7 @@ class ArduinoRemoteDigitalActuator(AbstractArduinoActuator):
     """
         Actuator that sends target device digital output pin status change requests
 
-        Needs AutomateFirmata: https://github.com/tuomas2/AutomateFirmata
+        Needs `AutomateFirmata <https://github.com/tuomas2/AutomateFirmata>`_
     """
 
     _status = CBool(transient=True)
@@ -98,7 +98,7 @@ class ArduinoRemotePWMActuator(AbstractArduinoActuator):
     """
         Actuator that sends target device analog (PWM) output pin status change requests
 
-        Needs AutomateFirmata: https://github.com/tuomas2/AutomateFirmata
+        Needs `AutomateFirmata <https://github.com/tuomas2/AutomateFirmata>`_
     """
 
     _status = CFloat(transient=True)

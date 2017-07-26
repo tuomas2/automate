@@ -84,7 +84,7 @@ class ArduinoRemoteDigitalSensor(AbstractArduinoSensor):
         Sensor which listens to status changes of remote digital input pin
         (transmission via VirtualWire).
 
-        Needs AutomateFirmata: https://github.com/tuomas2/AutomateFirmata
+        Needs `AutomateFirmata <https://github.com/tuomas2/AutomateFirmata>`_
     """
 
     _status = CBool
@@ -106,7 +106,7 @@ class ArduinoRemoteAnalogSensor(AbstractArduinoSensor):
         Sensor which listens to status changes of remote analog input pin
         (transmission via VirtualWire)
 
-        Needs AutomateFirmata: https://github.com/tuomas2/AutomateFirmata
+        Needs `AutomateFirmata <https://github.com/tuomas2/AutomateFirmata>`_
     """
 
     _status = CFloat

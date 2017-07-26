@@ -1,0 +1,30 @@
+class ArduinoSystem(System):
+    ubool = UserBoolSensor()
+    ufloat1 = UserFloatSensor(value_min=0, value_max=1)
+
+    remote_actuator = ArduinoRemoteDigitalActuator(
+        dev=0,
+        target_device=3,
+        target_pin=13,
+        on_update=SetStatus('remote_actuator', 'ubool'))
+
+    remote_pwm = ArduinoRemotePWMActuator(
+        dev=0,
+        target_device=3,
+        target_pin=5,
+        on_update=SetStatus('remote_pwm', 'ufloat1'))
+
+
+
+s = ArduinoSystem(
+    services=[
+        ArduinoService(
+            device="/dev/ttyUSB0",
+            sample_rate=2000,
+            home_address=1,
+            device_address=4,
+            virtualwire_tx_pin=11,
+        ),
+        WebService(read_only=False),
+    ],
+)

@@ -108,6 +108,7 @@ class ArduinoSystem(System):
                                               on_update=SetStatus('remote_pwm', 'ufloat1'))
 
         source_sens1 = ArduinoDigitalSensor(dev=0, pull_up_resistor=True, pin=2)
+        source_sens1_2 = ArduinoDigitalSensor(dev=1, pull_up_resistor=True, pin=2)
         source_sens2 = ArduinoAnalogSensor(dev=0, pin=0)
 
     class Remote(Group):
