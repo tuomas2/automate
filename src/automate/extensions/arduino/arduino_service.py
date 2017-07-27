@@ -153,7 +153,8 @@ class ArduinoService(AbstractSystemService):
     #: VirtualWire PTT (push to talk) pin
     virtualwire_ptt_pin = CInt(0)
 
-    #: VirtualWire speed (baud rate = speex * 1000 bps)
+    #: VirtualWire speed, (bit rate = speed * 1000 bps). Values 1-9 are allowed.
+    #: Values up to 7 should be working, but your mileage may vary.
     virtualwire_speed = CInt(2)
 
     #: Send keep-alive messages periodically over serial port to prevent Arduino device from
