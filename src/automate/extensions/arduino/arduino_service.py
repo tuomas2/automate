@@ -138,11 +138,11 @@ class ArduinoService(AbstractSystemService):
     #: Arduino sample rate in milliseconds (i.e. how often to send data to host)
     sample_rate = Int(500)
 
-    #: Device home address (integer) in VirtualWire network. This should be same for all
+    #: Device home address (0-255) in VirtualWire network. This should be same for all
     #: devices in a network.
     home_address = CInt(0)
 
-    #: Device address (integer) in VirtualWire network. Unique for each device.
+    #: Device address (0-255) in VirtualWire network. Unique for each device.
     device_address = CInt(0)
 
     #: VirtualWire transfer pin
