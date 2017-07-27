@@ -154,6 +154,9 @@ class ArduinoService(AbstractSystemService):
     #: VirtualWire PTT (push to talk) pin
     virtualwire_ptt_pin = CInt(0)
 
+    #: VirtualWire speed (baud rate = speex * 1000 bps)
+    virtualwire_speed = CInt(2)
+
     #: Send keep-alive messages periodically over serial port to prevent Arduino device from
     #: falling to power save mode.
     keep_alive = CBool(True)
@@ -212,9 +215,12 @@ class ArduinoService(AbstractSystemService):
         if not self._board:
             return
         with self._lock:
+            self.logger.debug('Configuring wirtualwire')
             self._board.send_sysex(SYSEX_SETUP_VIRTUALWIRE, [self.virtualwire_rx_pin,
                                                              self.virtualwire_tx_pin,
-                                                             self.virtualwire_ptt_pin])
+                                                             self.virtualwire_ptt_pin,
+                                                             self.virtualwire_speed,
+                                                             ])
             self.setup_identification()
             self.setup_virtualwire_input()
 

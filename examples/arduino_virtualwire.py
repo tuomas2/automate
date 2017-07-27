@@ -44,12 +44,12 @@ LOGGING = {
             'level': 'INFO',
             'propagate': True,
         },
-        'automate.arduino2.ArduinoService': {
+        'automate.arduino_virtualwire.ArduinoService': {
             'handlers': ['console'],
-            'level': 'INFO', #'DEBUG',
+            'level': 'DEBUG',
             'propagate': False,
         },
-        'django.template': {
+         'django.template': {
             'handlers': ['console'],
             'level': 'WARNING',
             'propagate': False,
@@ -119,6 +119,7 @@ class ArduinoSystem(System):
         awds2 = ArduinoRemoteAnalogSensor(dev=1, source_device=source_dev, pin=0) # receives via VW
 
 
+vw_speed = 7
 s = ArduinoSystem(
     services=[
         ArduinoService(
@@ -128,7 +129,8 @@ s = ArduinoSystem(
             device_address=source_dev,
             virtualwire_ptt_pin=9,
             virtualwire_tx_pin=11,
-            keep_alive=False,
+            keep_alive=True,
+            virtualwire_speed=vw_speed,
         ),
         ArduinoService(
             device="/dev/ttyUSB1",
@@ -136,6 +138,7 @@ s = ArduinoSystem(
             home_address=target_home,
             device_address=target_dev,
             virtualwire_rx_pin=10,
+            virtualwire_speed=vw_speed,
         ),
         TextUIService(),
         WebService(read_only=False),
