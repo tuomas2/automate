@@ -3,15 +3,11 @@ class ArduinoSystem(System):
     ufloat1 = UserFloatSensor(value_min=0, value_max=1)
 
     remote_actuator = ArduinoRemoteDigitalActuator(
-        dev=0,
-        target_device=3,
-        target_pin=13,
+        device=3, pin=13,
         on_update=SetStatus('remote_actuator', 'ubool'))
 
     remote_pwm = ArduinoRemotePWMActuator(
-        dev=0,
-        target_device=3,
-        target_pin=5,
+        device=3, pin=5,
         on_update=SetStatus('remote_pwm', 'ufloat1'))
 
 

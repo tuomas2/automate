@@ -46,20 +46,20 @@ Automate system is written by subclassing :class:`~automate.system.System` and a
   from automate import *
   class MySystem(System):
     mysensor = FloatSensor()
-    myactuator = ArduinoDigitalActuator(pin=13, dev=0)
+    myactuator = ArduinoDigitalActuator(pin=13, service=0)
     myprogram = Program()
     ...
 
 After defining the system, it can be instantiated. There, services with their necessary arguments
 can be explicitly defined as follows::
 
-  mysys = MySystem(services=[WebService(http_port=8080), ArduinoService(dev='/dev/ttyS0')])
+  mysys = MySystem(services=[WebService(http_port=8080), ArduinoService(device='/dev/ttyS0')])
 
 Some services (those that have :attr:`~automate.service.AbstractService.autoload` atribute set to True)
 do not need to be explicitly defined. For example,
 :class:`~automate.extensions.arduino.arduino_service..ArduinoService` would be used automatically
 loaded because of the usage of :class:`~automate.extensions.arduino.arduino_actuator.ArduinoDigitalActuator`,
-with default settings (``dev='/dev/ttyUSB0'``). Instantiating
+with default settings (``device='/dev/ttyUSB0'``). Instantiating
 System will launch IPython shell to access the system internals from the command line. This can be prevented, if
 necessary, by defining keyword argument :attr:`~automate.system.System.exclude_services` as
 ``['TextUIService']``, which disables autoloading of

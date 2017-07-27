@@ -18,22 +18,22 @@ def plot(x, y, z):
 
 
 class Motion(System):
-    x = ArduinoAnalogSensor(dev=0, pin=0,
+    x = ArduinoAnalogSensor(service=0, pin=0,
                             active_condition=Value(True),
                             update_condition=Value(True),
                             on_update=Func(plot, 'x', 'y', 'z'),
                             exclude_triggers={'y', 'z'}
                             )
-    y = ArduinoAnalogSensor(dev=0, pin=1)
-    z = ArduinoAnalogSensor(dev=0, pin=2)
+    y = ArduinoAnalogSensor(service=0, pin=1)
+    z = ArduinoAnalogSensor(service=0, pin=2)
 
 
 s = Motion(
     services=[
         ArduinoService(
-            arduino_devs=["/dev/ttyUSB0"],
-            arduino_dev_types=["Arduino"],
-            arduino_dev_sampling=[100],
+            device="/dev/ttyUSB0",
+            device_type='arduino"',
+            sample_rate=100,
         ),
         WebService(),
     ],

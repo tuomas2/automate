@@ -154,13 +154,13 @@ class autoaqua(System):
         ala_altaat_alaraja = RpioSensor(port=portmap['ala-altaiden alaraja'], change_delay=1,
                                         inverted=True)
 
-        kaapin_ulkosuodatin = ArduinoDigitalSensor(dev=0, pin=arduino_ports['kaapin sensori'], change_delay=1)
-        lattiasensori_2 = ArduinoDigitalSensor(dev=0, pin=arduino_ports['keski lattiasensori'], change_delay=1,
+        kaapin_ulkosuodatin = ArduinoDigitalSensor(service=0, pin=arduino_ports['kaapin sensori'], change_delay=1)
+        lattiasensori_2 = ArduinoDigitalSensor(service=0, pin=arduino_ports['keski lattiasensori'], change_delay=1,
                                                description='altaan alla oleva lattiasensori')
-        ala_varoitus = ArduinoDigitalSensor(dev=0, pin=arduino_ports['ala varoitus'], change_delay=1)
-        co2_stop_sensor = ArduinoDigitalSensor(dev=0, pin=arduino_ports['co2_stop'], safety_delay=300,
+        ala_varoitus = ArduinoDigitalSensor(service=0, pin=arduino_ports['ala varoitus'], change_delay=1)
+        co2_stop_sensor = ArduinoDigitalSensor(service=0, pin=arduino_ports['co2_stop'], safety_delay=300,
                                                safety_mode='falling', change_delay=1)
-        #analog1 = ArduinoAnalogSensor(dev=0, pin=0, silent=True)
+        #analog1 = ArduinoAnalogSensor(service=0, pin=0, silent=True)
 
         water_temp_min = UserFloatSensor(default=20.0)
         water_temp_max = UserFloatSensor(default=30.5)
@@ -384,9 +384,9 @@ class autoaqua(System):
             tags='quick',
         )
         if is_raspi():
-            alarm = ArduinoDigitalActuator(dev=0, pin=arduino_ports['alarm'], default=False, silent=True)
+            alarm = ArduinoDigitalActuator(service=0, pin=arduino_ports['alarm'], default=False, silent=True)
         else:
-            alarm = ArduinoDigitalActuator(dev=0, pin=13, default=False, silent=True,
+            alarm = ArduinoDigitalActuator(service=0, pin=13, default=False, silent=True,
                                             active_condition=Value('alarm'),
                                             on_activate=Shell("notify.sh", no_wait=True)
             )
@@ -537,7 +537,6 @@ if __name__ == '__main__':
         filename='autoaqua.dmp',
         services=[
             web,
-            ard,
             rpcs,
             PlantUMLService(url='http://www.plantuml.com/plantuml/svg/'),
             StatusSaverService(),

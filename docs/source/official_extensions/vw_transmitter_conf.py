@@ -1,8 +1,8 @@
 class ArduinoSystem(System):
-    digital_sensor1 = ArduinoDigitalSensor(dev=0, pull_up_resistor=True, pin=2)
-    digital_sensor2 = ArduinoDigitalSensor(dev=0, pull_up_resistor=True, pin=3)
-    analog_sensor1= ArduinoAnalogSensor(dev=0, pin=0)
-    analog_sensor2= ArduinoAnalogSensor(dev=0, pin=1)
+    digital_sensor1 = ArduinoDigitalSensor(pull_up_resistor=True, pin=2)
+    digital_sensor2 = ArduinoDigitalSensor(pull_up_resistor=True, pin=3)
+    analog_sensor1= ArduinoAnalogSensor(pin=0)
+    analog_sensor2= ArduinoAnalogSensor(pin=1)
 
 s = ArduinoSystem(
     services=[

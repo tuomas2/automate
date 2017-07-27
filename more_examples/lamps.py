@@ -53,8 +53,8 @@ def calc_val_reverse(i, max_i):
 
 class LampGroupsMixin:
     class LampsHardware(Group):
-        cold_lamp_out = ArduinoPWMActuator(dev=0, pin=9, default=0.)
-        warm_lamp_out = ArduinoPWMActuator(dev=0, pin=10, default=0.)  # 9,10 30 kHz
+        cold_lamp_out = ArduinoPWMActuator(service=0, pin=9, default=0.)
+        warm_lamp_out = ArduinoPWMActuator(service=0, pin=10, default=0.)  # 9,10 30 kHz
 
     class LampAdjustment(Group):
         tags ='adj'

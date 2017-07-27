@@ -54,7 +54,7 @@ Automate computer:
 
 .. literalinclude:: listener_app.py
 
-Notice that here you need to configure ``source_device`` attribute same as device_address
+Notice that here you need to configure ``device`` attribute same as device_address
 that you configured above. Also ``home_address`` needs to be same between all Arduino
 devices that you configure in your system.
 

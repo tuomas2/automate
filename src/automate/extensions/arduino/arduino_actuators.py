@@ -32,8 +32,8 @@ class AbstractArduinoActuator(AbstractActuator):
         Abstract base class for Arduino actuators
     """
 
-    #: Arduino device number (specify, if more than 1 devices configured in ArduinoService)
-    dev = CInt(0)
+    #: Arduino service number (specify, if more than 1 ArduinoService are configured in the system)
+    service = CInt(0)
 
     #: Arduino pin number
     pin = CInt
@@ -45,7 +45,7 @@ class AbstractArduinoActuator(AbstractActuator):
 
     def setup(self, *args, **kwargs):
         super(AbstractArduinoActuator, self).setup(*args, **kwargs)
-        self._arduino = self.system.request_service('ArduinoService', self.dev)
+        self._arduino = self.system.request_service('ArduinoService', self.service)
 
 
 class ArduinoDigitalActuator(AbstractArduinoActuator):
@@ -75,22 +75,19 @@ class ArduinoRemoteDigitalActuator(AbstractArduinoActuator):
     _status = CBool(transient=True)
 
     #: Target device number
-    target_device = CInt
-
-    #: Target device pin number
-    target_pin = CInt
+    device = CInt
 
     def setup(self, *args, **kwargs):
         super(ArduinoRemoteDigitalActuator, self).setup(*args, **kwargs)
-        self._arduino.send_virtualwire_command(self.target_device,
+        self._arduino.send_virtualwire_command(self.device,
                                                arduino_service.VIRTUALWIRE_SET_PIN_MODE,
-                                               self.target_pin,
+                                               self.pin,
                                                pyfirmata.OUTPUT)
 
     def _status_changed(self):
-        self._arduino.send_virtualwire_command(self.target_device,
+        self._arduino.send_virtualwire_command(self.device,
                                                arduino_service.VIRTUALWIRE_SET_DIGITAL_PIN_VALUE,
-                                               self.target_pin,
+                                               self.pin,
                                                self.status)
 
 
@@ -104,23 +101,21 @@ class ArduinoRemotePWMActuator(AbstractArduinoActuator):
     _status = CFloat(transient=True)
 
     #: Target device number
-    target_device = CInt
-
-    #: Target device pin number
-    target_pin = CInt
+    device = CInt
 
     def setup(self, *args, **kwargs):
         super(ArduinoRemotePWMActuator, self).setup(*args, **kwargs)
-        self._arduino.send_virtualwire_command(self.target_device,
+        self._arduino.send_virtualwire_command(self.device,
                                                arduino_service.VIRTUALWIRE_SET_PIN_MODE,
-                                               self.target_pin,
+                                               self.pin,
                                                pyfirmata.PWM)
 
     def _status_changed(self):
-        value = int(round(self.status * 255))
-        self._arduino.send_virtualwire_command(self.target_device,
+        value = min(max(self.status, 0.), 1.)
+        value = int(round(value * 255))  # Arduino PWM has 8 bit resolution
+        self._arduino.send_virtualwire_command(self.device,
                                                arduino_service.VIRTUALWIRE_ANALOG_MESSAGE,
-                                               self.target_pin,
+                                               self.pin,
                                                value)
 
 
@@ -149,7 +144,7 @@ class ArduinoServoActuator(AbstractArduinoActuator):
 
     def setup(self, *args, **kwargs):
         super(ArduinoServoActuator, self).setup(*args, **kwargs)
-        self.logger.debug("setup_servo %s %s %s %s %s %s", self, self.dev, self.pin, self.min_pulse, self.max_pulse,
+        self.logger.debug("setup_servo %s %s %s %s %s %s", self, self.service, self.pin, self.min_pulse, self.max_pulse,
                           int(round(self._status)))
         self._arduino.setup_servo(self.pin, self.min_pulse, self.max_pulse, int(round(self._status)))
 

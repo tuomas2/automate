@@ -18,10 +18,11 @@
 
 from __future__ import unicode_literals
 from traits.api import CInt, Instance, CFloat, CBool, CStr, Int, Any, Enum
+import pyfirmata
+
 from automate.service import AbstractSystemService
 from automate.statusobject import AbstractSensor
 from . import arduino_service
-
 
 class AbstractArduinoSensor(AbstractSensor):
     """
@@ -30,8 +31,8 @@ class AbstractArduinoSensor(AbstractSensor):
 
     user_editable = CBool(False)
 
-    #: Arduino device number (specify, if more than 1 devices configured in ArduinoService)
-    dev = CInt(0)
+    #: Arduino service number (specify, if more than 1 ArduinoServices are configured in system)
+    service = CInt(0)
 
     #: Arduino pin number
     pin = CInt
@@ -40,7 +41,7 @@ class AbstractArduinoSensor(AbstractSensor):
 
     def setup(self, *args, **kwargs):
         super(AbstractArduinoSensor, self).setup(*args, **kwargs)
-        self._arduino = self.system.request_service('ArduinoService', self.dev)
+        self._arduino = self.system.request_service('ArduinoService', self.service)
 
 
 class ArduinoDigitalSensor(AbstractArduinoSensor):
@@ -90,14 +91,18 @@ class ArduinoRemoteDigitalSensor(AbstractArduinoSensor):
     _status = CBool
 
     #: Source device number
-    source_device = CInt
+    device = CInt
 
     def setup(self, *args, **kwargs):
         super(ArduinoRemoteDigitalSensor, self).setup(*args, **kwargs)
-        self._arduino.subscribe_virtualwire_digital_broadcast(self, self.source_device)
+        self._arduino.subscribe_virtualwire_digital_broadcast(self, self.device)
+        self._arduino.send_virtualwire_command(self.device,
+                                               arduino_service.VIRTUALWIRE_SET_PIN_MODE,
+                                               self.pin,
+                                               pyfirmata.INPUT)
 
     def cleanup(self):
-        self._arduino.unsubscribe_virtualwire_digital_broadcast(self, self.source_device)
+        self._arduino.unsubscribe_virtualwire_digital_broadcast(self, self.device)
 
 
 class ArduinoRemoteAnalogSensor(AbstractArduinoSensor):
@@ -112,13 +117,13 @@ class ArduinoRemoteAnalogSensor(AbstractArduinoSensor):
     _status = CFloat
 
     #: Source device number
-    source_device = CInt
+    device = CInt
 
     def setup(self, *args, **kwargs):
         super(ArduinoRemoteAnalogSensor, self).setup(*args, **kwargs)
-        self._arduino.subscribe_virtualwire_analog_broadcast(self, self.source_device)
+        self._arduino.subscribe_virtualwire_analog_broadcast(self, self.device)
 
     def cleanup(self):
-        self._arduino.unsubscribe_virtualwire_analog_broadcast(self, self.source_device)
+        self._arduino.unsubscribe_virtualwire_analog_broadcast(self, self.device)
 
 

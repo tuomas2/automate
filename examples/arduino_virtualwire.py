@@ -76,9 +76,6 @@ target_dev = 4
 
 
 class ArduinoSystem(System):
-    ustr0 = UserStrSensor()
-    ustr1 = UserStrSensor()
-    ubool = UserBoolSensor()
     class Input(Group):
         reset1 = UserEventSensor(
             on_activate=FirmataCommand(0, pyfirmata.SYSTEM_RESET)
@@ -90,33 +87,36 @@ class ArduinoSystem(System):
         #    on_activate=FirmataCommand(1, pyfirmata.SET_PIN_MODE, 10, pyfirmata.INPUT)
         #)
 
-        ubool2 = UserBoolSensor(
+        ustr0 = UserStrSensor()
+        ustr1 = UserStrSensor()
+        remote_actuator_set = UserBoolSensor()
+        remote_pwm_set = UserFloatSensor(value_min=0, value_max=1)
+
+        target13 = UserBoolSensor(
             on_update=VirtualWireCommand(0, target_dev,
                                          arduino_service.VIRTUALWIRE_SET_DIGITAL_PIN_VALUE, 13,
-                                         'ubool2')
+                                         'target13')
         )
 
-        ufloat1 = UserFloatSensor(value_min=0, value_max=1)
-        ufloat2 = UserFloatSensor(value_min=0, value_max=1)
+        local_pwm_set = UserFloatSensor(value_min=0, value_max=1)
 
     class Local(Group):
-        local_pwm = ArduinoPWMActuator(dev=0, pin=3, on_update=SetStatus('local_pwm', 'ufloat2'))
+        local_pwm = ArduinoPWMActuator(service=1, pin=11, on_update=SetStatus('local_pwm', 'local_pwm_set'))
 
         remote_actuator = ArduinoRemoteDigitalActuator(
-            dev=0, target_device=target_dev,
-            target_pin=12,
-            on_update=SetStatus('remote_actuator', 'ubool'))
+            service=0, device=target_dev, pin=13,
+            on_update=SetStatus('remote_actuator', 'remote_actuator_set'))
 
-        remote_pwm = ArduinoRemotePWMActuator(dev=0, target_device=target_dev, target_pin=5,
-                                              on_update=SetStatus('remote_pwm', 'ufloat1'))
+        remote_pwm = ArduinoRemotePWMActuator(service=0, device=target_dev, pin=3,
+                                              on_update=SetStatus('remote_pwm', 'remote_pwm_set'))
 
-        source_sens1 = ArduinoDigitalSensor(dev=0, pull_up_resistor=True, pin=2)
-        source_sens1_2 = ArduinoDigitalSensor(dev=1, pull_up_resistor=True, pin=2)
-        source_sens2 = ArduinoAnalogSensor(dev=0, pin=0)
+        source_sens1 = ArduinoDigitalSensor(service=0, pull_up_resistor=True, pin=2)
+        source_sens1_2 = ArduinoDigitalSensor(service=1, pull_up_resistor=True, pin=2)
+        source_sens2 = ArduinoAnalogSensor(service=0, pin=0)
 
     class Remote(Group):
-        awds1 = ArduinoRemoteDigitalSensor(dev=1, source_device=source_dev, pin=2) # receives via VW
-        awds2 = ArduinoRemoteAnalogSensor(dev=1, source_device=source_dev, pin=0) # receives via VW
+        awds1 = ArduinoRemoteDigitalSensor(service=1, device=source_dev, pin=2) # receives via VW
+        awds2 = ArduinoRemoteAnalogSensor(service=1, device=source_dev, pin=0) # receives via VW
 
 
 vw_speed = 7
