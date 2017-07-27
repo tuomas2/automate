@@ -41,10 +41,9 @@ PinTuple = namedtuple('PinTuple', ['type', 'pin'])
 PIN_MODE_PULLUP = 0x0B
 
 # Sysex to arduino
-SYSEX_VIRTUALWIRE_MESSAGE = 0x01
-SYSEX_SET_IDENTIFICATION = 0x02
-SYSEX_KEEP_ALIVE = 0x03
-SYSEX_SETUP_VIRTUALWIRE = 0x04
+SYSEX_VIRTUALWIRE_MESSAGE = 0x00
+SYSEX_KEEP_ALIVE = 0x01
+SYSEX_SETUP_VIRTUALWIRE = 0x02
 
 VIRTUALWIRE_SET_PIN_MODE = 0x01
 VIRTUALWIRE_ANALOG_MESSAGE = 0x02
@@ -220,8 +219,9 @@ class ArduinoService(AbstractSystemService):
                                                              self.virtualwire_tx_pin,
                                                              self.virtualwire_ptt_pin,
                                                              self.virtualwire_speed,
+                                                             self.home_address,
+                                                             self.device_address,
                                                              ])
-            self.setup_identification()
             self.setup_virtualwire_input()
 
     def _keep_alive(self):
