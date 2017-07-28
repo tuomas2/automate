@@ -124,17 +124,18 @@ s = ArduinoSystem(
     services=[
         ArduinoService(
             device="/dev/ttyUSB0",
-            sample_rate=2000,
+            sample_rate=8000,
             home_address=source_home,
             device_address=source_dev,
             virtualwire_ptt_pin=9,
             virtualwire_tx_pin=11,
-            keep_alive=True,
+            keep_alive=False,
+            wakeup_pin=2,
             virtualwire_speed=vw_speed,
         ),
         ArduinoService(
             device="/dev/ttyUSB1",
-            sample_rate=2000,
+            sample_rate=8000,
             home_address=target_home,
             device_address=target_dev,
             virtualwire_rx_pin=10,

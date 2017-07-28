@@ -153,6 +153,10 @@ class ArduinoService(AbstractSystemService):
     #: VirtualWire PTT (push to talk) pin
     virtualwire_ptt_pin = CInt(0)
 
+    #: Wakeup pin (0 to disable) that wakes Arduino from sleep mode. On Atmega328 based boards,
+    #: possible values are 2 and 3
+    wakeup_pin = CInt(0)
+
     #: VirtualWire speed, (bit rate = speed * 1000 bps). Values 1-9 are allowed.
     #: Values up to 7 should be working, but your mileage may vary.
     virtualwire_speed = CInt(2)
@@ -219,6 +223,7 @@ class ArduinoService(AbstractSystemService):
             self._board.send_sysex(SYSEX_SETUP_VIRTUALWIRE, [self.virtualwire_rx_pin,
                                                              self.virtualwire_tx_pin,
                                                              self.virtualwire_ptt_pin,
+                                                             self.wakeup_pin,
                                                              self.virtualwire_speed,
                                                              self.home_address,
                                                              self.device_address,
@@ -237,10 +242,6 @@ class ArduinoService(AbstractSystemService):
 
     def _string_data_handler(self, *data):
         self.logger.debug('String data: %s', bytearray(data[::2]).decode('ascii'))
-
-    def setup_identification(self):
-        self.logger.debug('Setting home %s and device %s', self.home_address, self.device_address)
-        self._board.send_sysex(SYSEX_SET_IDENTIFICATION, bytearray([self.home_address, self.device_address]))
 
     def cleanup(self):
         self.logger.debug("Cleaning up Arduino subsystem. ")
