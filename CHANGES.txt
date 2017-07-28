@@ -1,12 +1,14 @@
 0.10.19 (unreleased)
 --------------------
 
-- Arduino service instance now serves only 1 device. Use multiple services if you want to
-  use many devices. For usage see examples/arduino2.py. Only ArduinoService attributes
-  were changed, see the documentation.
+- First release with support for special support for AutomateFirmata features for Arduino module,
+  see <https://github.com/tuomas2/AutomateFirmata>.
 - VirtualWire support in Arduino. This allows wireless communication to remote Arduinos using
   very cheap RF circuits. See documentation!
 - Add support to builtin pull up resistors in Arduino digital input pins.
+- Arduino service instance now serves only 1 device. Use multiple services if you want to
+  use many devices. For usage see examples/arduino2.py. Only ArduinoService attributes
+  were changed, see the documentation.
 
 
 0.10.18 (2017-07-19)
