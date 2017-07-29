@@ -10,6 +10,11 @@ from automate.test_utils import CaptureLogHandler
 
 @pytest.fixture(autouse=True, scope='session')
 def logging_configuration():
+
+    from colorlog import default_log_colors
+    colors = default_log_colors.copy()
+    colors['DEBUG'] = 'purple'
+
     LOGGING = {
         'version': 1,
         'disable_existing_loggers': True,
@@ -22,7 +27,8 @@ def logging_configuration():
             },
             'colorful': {
                 '()': 'colorlog.ColoredFormatter',
-                'format': '%(threadName)s:%(asctime)s %(log_color)s%(name)s%(reset)s %(levelname)s:%(message)s'
+                'format': '%(threadName)s:%(asctime)s %(log_color)s%(name)s%(reset)s %(levelname)s:%(message)s',
+                'log_colors': colors,
                 # 'format': "%(log_color)s%(levelname)-8s%(reset)s %(blue)s%(message)s"
             },
             'old_caplog_format': {
