@@ -92,7 +92,7 @@ def sysloader(request, tmpdir):
         class Loader(object):
 
             def new_system(self, sys, *args, **kwargs):
-                kwargs.setdefault('name', 'SysloaderSystem')
+                kwargs.setdefault('name', 'Sysloader')
                 kwargs.setdefault('exclude_services', ['TextUIService'])
                 self.sys = sys(*args, **kwargs)
                 self.sys.flush()

@@ -460,8 +460,7 @@ class System(SystemBase):
     def __init__(self, loadstate=None, **traits):
         super(System, self).__init__(**traits)
         if not self.name:
-            self.name = os.path.split(sys.argv[0])[-1].replace('.py', '')
-
+            self.name = self.__class__.__name__
 
         # Initialize Sentry / raven client, if is configured
         if not self.raven_client and self.raven_dsn:
