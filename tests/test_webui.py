@@ -46,7 +46,7 @@ def sys_with_web():
         a1 = BoolActuator(default=False)
         a2 = BoolActuator()
 
-    s = sys(exclude_services=['TextUIService'], services=[web])
+    s = sys(exclude_services=['TextUIService'], services=[web], name='SyWithWeb')
     s.flush()
     yield s
     s.cleanup()

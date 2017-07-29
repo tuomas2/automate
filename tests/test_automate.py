@@ -33,7 +33,7 @@ import time
 
 
 def test_namespace():
-    sys = System(exclude_services=['TextUIService'])
+    sys = System(exclude_services=['TextUIService'], name='test')
     ns = sys.namespace  # AutomateNamespace(sys)
     # ns.set_system()
     s = AbstractSensor()
@@ -78,7 +78,7 @@ def mysys(request):
                            SetStatus(myactuator if request.param else 'myactuator', 1),
                            Debug("Hello World!")),
                        )
-    s = sysclass(exclude_services=['TextUIService'])
+    s = sysclass(exclude_services=['TextUIService'], name='MySys')
 
     yield s
     s.cleanup()

@@ -147,7 +147,7 @@ def mysys_groups():
                      priority=2,
                      )
 
-    s = _mysys(exclude_services=['TextUIService'])
+    s = _mysys(exclude_services=['TextUIService'], name='MysysGroups')
     s.flush()
     yield s
     s.cleanup()
@@ -172,7 +172,7 @@ def test_samename(caplog):
         class group2(Group):
             s1 = UserFloatSensor(default=HIGH)
     with pytest.raises(NameError):
-        s = _mysys()
+        s = _mysys(name='MysysSamename')
     caplog.error_ok = True
 
 

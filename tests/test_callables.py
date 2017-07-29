@@ -60,7 +60,7 @@ def mysys(request):
                 active_condition=Value('sens'),
                 on_activate=SetStatus('act', NEWVAL),
             )
-    sys = _mysys(exclude_services=['TextUIService'])
+    sys = _mysys(exclude_services=['TextUIService'], name='MySys')
     sys.flush()
     yield sys
     sys.cleanup()
@@ -76,7 +76,7 @@ def prog(request):
             active_condition=Value(sens),
             on_activate=SetStatus(act, NEWVAL),
         )
-    sys = _mysys(exclude_services=['TextUIService'])
+    sys = _mysys(exclude_services=['TextUIService'], name="ProgSystem")
     sys.flush()
     yield sys.prog
     sys.cleanup()
@@ -1347,7 +1347,7 @@ def self_sys():
         s = UserIntSensor(active_condition=Value('s'),
                           on_activate=SetStatus(['s', 's2'], [0, 1])
                           )
-    s = sys(exclude_services=['TextUIService'])
+    s = sys(exclude_services=['TextUIService'], name="SelfSys")
     s.flush()
     yield s
     s.cleanup()

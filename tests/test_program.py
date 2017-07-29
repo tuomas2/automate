@@ -51,7 +51,7 @@ def mysys(request, progtype):
             p3 = progtype(priority=2.0, active_condition=Value(False),
                           on_activate=Run(Run(SetStatus('a2', 's1'))),
                           )
-    s = sys(exclude_services=['TextUIService'])
+    s = sys(exclude_services=['TextUIService'], name='MySys')
     s.flush()
     yield s
     s.cleanup()
@@ -102,7 +102,7 @@ def freezesys(request):
             active_condition=Value(s1),
             on_activate=SetStatus(s1, 1)
         )
-    s = sys(exclude_services=['TextUIService'])
+    s = sys(exclude_services=['TextUIService'], name="FreezeSys")
     s.flush()
     yield s
     s.cleanup()
@@ -114,7 +114,7 @@ def freezesys2(request):
         s = request.param()
         p = Program(on_update=SetStatus(s, 1), triggers=[s])
 
-    s = sys(exclude_services=['TextUIService'])
+    s = sys(exclude_services=['TextUIService'], name="FreezeSys")
     s.flush()
     yield s
     s.cleanup()
@@ -145,7 +145,7 @@ def freezesys_act(request):
                 SetStatus(a2, a1),
             )
         )
-    s = sys(exclude_services=['TextUIService'])
+    s = sys(exclude_services=['TextUIService'], name='FreezeSysAct')
     s.flush()
     yield s
     s.cleanup()
