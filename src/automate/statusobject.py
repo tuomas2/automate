@@ -268,8 +268,9 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
 
     def _request_status_change_in_queue(self, status, force=False):
         def timer_func(func, *args):
-            func(*args)
-            self._timed_action = None
+            with self._status_lock:
+                func(*args)
+                self._timed_action = None
 
         with self._status_lock:
             timenow = time.time()
@@ -317,7 +318,8 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
                 logger("Scheduling safety/change_delay timer for %f sek. Now %s. Going to change to %s.",
                        delaytime, self._status, status)
                 self._timed_action = threading.Timer(delaytime, timer_func,
-                                                     args=(self._add_statuschange_to_queue, status, getattr(self, "program", None), True))
+                                                     args=(self._add_statuschange_to_queue, status,
+                                                     getattr(self, "program", None), False))
                 self._timed_action.name = "Safety/change_delay for %s timed at %s (%f sek)" % (self.name, time_after_delay, delaytime)
                 self._timed_action.next_action = time_after_delay
                 self._timed_action.start()
