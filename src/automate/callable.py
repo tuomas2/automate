@@ -129,7 +129,7 @@ class AbstractCallable(SystemObject, CompareMixin):
             # Raising exception prevents invalid value from being cached when system is in pre-mature state
             raise SystemNotReady('System not ready yet -- this is normal when loading dump.')
         triggers = self.collect('triggers')
-        self.logger.debug('Collected triggers for %s: %s', self, triggers)
+        self.logger.debug('Collected triggers for %s (%s): %s', self, id(self), triggers)
         return triggers
 
     @cached_property
@@ -138,7 +138,7 @@ class AbstractCallable(SystemObject, CompareMixin):
             # Raising exception prevents invalid value from being cached when system is in pre-mature state
             raise SystemNotReady('System not ready yet -- this is normal when loading dump.')
         targets = self.collect('targets')
-        self.logger.debug('Collected targets for %s: %s', self, targets)
+        self.logger.debug('Collected targets for %s (%s): %s', self, id(self), targets)
         return targets
 
     def __getitem__(self, item):
