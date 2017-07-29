@@ -35,7 +35,7 @@ from automate.program import Program
 logger = logging.getLogger('automate.tests')
 
 DELAYTIME = 1.0
-SLEEPTIME = 1.7 * DELAYTIME
+SLEEPTIME = 2.5 * DELAYTIME
 LOW = 1.0
 HIGH = 100.0
 AMOUNT = 20
@@ -571,8 +571,7 @@ def test_statusobject_setup(sysloader):
     assert s.a.setup_called
     assert s.b.setup_called
 
-
-class TestActuator(FloatActuator):
+class TstActuator(FloatActuator):
     change_count = CInt(0)
 
     def _status_changed(self):
@@ -581,7 +580,7 @@ class TestActuator(FloatActuator):
 
 def test_customactuator_statuschange(sysloader):
     class sys(System):
-        testact = TestActuator(default=0.0)
+        testact = TstActuator(default=0.0)
         sens = UserFloatSensor(default=0.0)
         prog = Program(on_update=SetStatus(testact, sens))
     s = sysloader.new_system(sys)
