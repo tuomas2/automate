@@ -398,15 +398,14 @@ class System(SystemBase):
 
         for i in self.objects:
             i.cleanup()
-            del i
 
         self.logger.debug('Sensors etc cleanups done')
 
         for ser in (i for i in self.services if isinstance(i, AbstractUserService)):
             ser.cleanup_system()
         self.logger.debug('User services cleaned up')
-
-        self.worker_thread.stop()
+        if self.worker_thread.is_alive():
+            self.worker_thread.stop()
         self.logger.debug('Worker thread really stopped')
 
         for ser in (i for i in self.services if isinstance(i, AbstractSystemService)):
