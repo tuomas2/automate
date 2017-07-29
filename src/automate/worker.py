@@ -77,12 +77,12 @@ class DummyStatusWorkerTask(object):
 class StatusWorkerThread(threading.Thread):
 
     def _set_stop(self):
-        self._stop = True
+        self._stop_now = True
         self.logger.debug('Stop set')
 
     def __init__(self, system=None, *args, **kwargs):
         self.queue = queue.Queue()
-        self._stop = False
+        self._stop_now = False
         self.system = system
         self.logger = system.logger.getChild('StatusWorkerThread')
         super(StatusWorkerThread, self).__init__(*args, **kwargs)
@@ -108,7 +108,7 @@ class StatusWorkerThread(threading.Thread):
 
     def run(self):
         self.logger.debug('StatusWorkerThread starting')
-        while not self._stop:
+        while not self._stop_now:
             self.process_job()
 
         self.logger.debug('StatusWorkerThread exiting, entries: %s', self.queue.queue)
