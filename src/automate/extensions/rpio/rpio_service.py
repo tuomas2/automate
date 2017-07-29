@@ -22,6 +22,7 @@ from threading import Thread
 
 from traits.api import CBool, Any
 from automate.service import AbstractSystemService
+from automate.common import threaded
 import signal
 
 
@@ -84,7 +85,8 @@ class RpioService(AbstractSystemService):
             self._hw.add_interrupt_callback(port, callback, edge="both", pull_up_down=pud[pull_up_down])
         else:
             self._hw.setup(port, self._hw.IN, pull_up_down=pud[pull_up_down])
-            self._hw.add_event_detect(port, self._hw.BOTH, lambda _port: callback(_port, self._hw.input(_port)))
+            self._hw.add_event_detect(port, self._hw.BOTH,
+                                      lambda _port: threaded(self.system, callback, _port, self._hw.input(_port)))
 
     def get_input_status(self, port):
         return self._hw.input(port)
