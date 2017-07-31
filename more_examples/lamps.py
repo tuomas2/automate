@@ -53,8 +53,8 @@ def calc_val_reverse(i, max_i):
 
 class LampGroupsMixin:
     class LampsHardware(Group):
-        cold_lamp_out = ArduinoPWMActuator(service=0, pin=9, default=0.)
-        warm_lamp_out = ArduinoPWMActuator(service=0, pin=10, default=0.)  # 9,10 30 kHz
+        cold_lamp_out = ArduinoPWMActuator(service=0, pin=3, default=0.)
+        warm_lamp_out = ArduinoPWMActuator(service=0, pin=11, default=0.)  # 9,10 30 kHz
 
     class LampAdjustment(Group):
         tags ='adj'
@@ -131,7 +131,7 @@ class LampGroupsMixin:
                   do_after=SetStatus(['preset1', 'fade_in', '_count'], [1, 0, 0]))
         )
 
-        fade_in = UserBoolSensor(active_condition=Value('fade_in'),
+        fade_in = UserBoolSensor(active_condition=Value('fade_in'), tags='quick_lamps',
                                  on_activate=Run(
                                      '_lighter'))
 
@@ -164,7 +164,7 @@ class LampGroupsMixin:
 
     class AlarmClock(Group):
         tags = 'adj'
-        alarm_clock = CronTimerSensor(timer_on='45 6 * * *', timer_off='0 9 * * *',
+        alarm_clock = CronTimerSensor(timer_on='45 7 * * *', timer_off='0 9 * * *',
                                       active_condition=And('alarm_enabled', Value('alarm_clock')),
                                       on_activate=SetStatus('fade_in', True))
 
