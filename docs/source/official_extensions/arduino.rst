@@ -39,9 +39,10 @@ To configure independent Arduino transmitter module with Automate:
 
 .. literalinclude:: vw_transmitter_conf.py
 
-Here you need to connect your RF transmitter device to digital pin 11 and
-transmitter device's VCC into your digital pin 12 (push to talk (PTT) pin).
-This will configure your module to transmit values from analog pins 0 and 1, and
+Here you need to connect your RF transmitter device to digital pin 11.
+With some transmitter devices you might save some power by using push to talk
+(PTT) pin 12 to power on/off your transmitter device. This will configure
+your module to transmit values from analog pins 0 and 1, and
 digital pins 2 and 3. Now you can disconnect Arduino's serial interface and
 it will work independently. When running this configuration application,
 Arduino stores configuration to its EEPROM memory, such that after booting
@@ -64,8 +65,8 @@ You can also configure independent receiver module:
 
 This is all that is needed for receiver. What this does is sets ``home_address``, ``device_address``
 and ``virtualwire_tx_pin`` in your Arduino receiver device correctly. You must connect
-your RF receiver device to digital pin 11 and tranmitter VCC to digital pin 12
-(push to talk, PTT). Now you can control this device remotely like this:
+your RF receiver device to digital pin 11. Now you can control this device remotely
+like this:
 
 .. literalinclude:: transmitter_app.py
 
