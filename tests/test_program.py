@@ -229,7 +229,6 @@ class TestProgramFeatures(object):
             setattr(p, i, SetStatus('a1', 's1'))
             assert p.actual_triggers == {mysys.s1} | add
             assert p.actual_targets == {mysys.a1}
-        assert False
 
     def test_program_priorities(self, mysys):
         p1, p2 = mysys.p1, mysys.p2
