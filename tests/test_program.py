@@ -216,6 +216,7 @@ class TestProgramFeatures(object):
         #                            N https://travis-ci.org/tuomas2/automate/jobs/251888696
         #                            N https://travis-ci.org/tuomas2/automate/jobs/253184596
         # MORE DEBUG MSGS:          N2 https://travis-ci.org/tuomas2/automate/jobs/258812927
+        #                           N2 https://travis-ci.org/tuomas2/automate/jobs/259299363
         # TODO: check also similar tests above.
         p = mysys.p
         #add = {p} if isinstance(p, StatusObject) else set()
@@ -228,6 +229,7 @@ class TestProgramFeatures(object):
             setattr(p, i, SetStatus('a1', 's1'))
             assert p.actual_triggers == {mysys.s1} | add
             assert p.actual_targets == {mysys.a1}
+        assert False
 
     def test_program_priorities(self, mysys):
         p1, p2 = mysys.p1, mysys.p2

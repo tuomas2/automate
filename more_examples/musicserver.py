@@ -238,10 +238,12 @@ class MusicServer(lamps.LampGroupsMixin, System):
         )
 
         prev = UserEventSensor(
+            tags='quick_music',
             on_activate=Shell(ToStr('mpc -p 660{} prev', Value('mpc_instance'))),
         )
 
         next = UserEventSensor(
+            tags='quick_music',
             on_activate=Shell(ToStr('mpc -p 660{} next', Value('mpc_instance'))),
         )
 

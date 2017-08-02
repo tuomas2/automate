@@ -29,7 +29,7 @@ import pkg_resources
 try:
     __version__ = pkg_resources.get_distribution("automate").version
 except pkg_resources.DistributionNotFound:
-    __version__ = 'not installed'
+    __version__ = '(version information not available)'
 
 from . import traits_fixes
 from .common import *
