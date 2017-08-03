@@ -324,7 +324,7 @@ class autoaqua(System):
                                   timer_off="0 16 * * *")
 
         co2_ajastin_loma = CronTimerSensor(timer_on="30 15 * * *",
-                                       timer_off="0 19 * * *",
+                                       timer_off="30 18 * * *",
                                        tags="holiday")
 
         # Muista: tämä kontrolloi (myös) UVC:ta!

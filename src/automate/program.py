@@ -104,8 +104,8 @@ class ProgrammableSystemObject(SystemObject):
     #: (and actions to be executed). This data is updated from custom triggers list, conditions and actions.
     actual_triggers = Property(trait=CSet(trait=Instance(AbstractStatusObject)),
                                depends_on='triggers, triggers_items, exclude_triggers, exclude_triggers_items, '
-                               'update_condition.triggers, active_condition.triggers, on_update.triggers, '
-                               'on_activate.triggers')
+                                          'update_condition.triggers, active_condition.triggers, on_update.triggers, '
+                                          'on_activate.triggers')
 
     #: (read-only property) Set of targets that this Program might touch. This data is updated
     #: from custom targets list and actions.
