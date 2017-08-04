@@ -1,4 +1,4 @@
-0.10.19 (unreleased)
+0.10.19 (2017-08-04)
 --------------------
 
 - First release with support for special support for AutomateFirmata features for Arduino module,
