@@ -50,7 +50,7 @@ arduino_ports = {
     'kaapin sensori': 2,
     'ala varoitus': 3,
     'keski lattiasensori': 4,
-    'unused4': 5,
+    'ala_altaat_alaraja': 5,
     'unused5': 6,
     'unused6': 7,
     'alarm': 8,
@@ -62,7 +62,7 @@ portmap = {
     'pääallas yläraja critical': inputboard[1],
     'pääallas yläraja warning': inputboard[2],
     'valutusputki': inputboard[3],
-    'ala-altaiden alaraja': inputboard[4],
+    #'ala-altaiden alaraja': inputboard[4], # KÄYTTÄMÄTÖN
     'ala-altaiden yläraja': inputboard[5],  # ei vielä aktivoitu (--what -- kai nyt sentään on?)
     'vasen lattiasensori': inputboard[6],  # ei vielä aktivoitu
 
@@ -151,8 +151,10 @@ class autoaqua(System):
         lattiasensori_1 = RpioSensor(port=portmap['vasen lattiasensori'], change_delay=1,
                                      description='Ylivalutuksen alla lattialla')
 
-        ala_altaat_alaraja = RpioSensor(port=portmap['ala-altaiden alaraja'], change_delay=1,
-                                        inverted=True)
+        #ala_altaat_alaraja = RpioSensor(port=portmap['ala-altaiden alaraja'], change_delay=1,
+        #                                inverted=True)
+        ala_altaat_alaraja = ArduinoDigitalSensor(service=0, pin=arduino_ports['ala_altaat_alaraja'],
+                                                  change_delay=1, pull_up_resistor=True)
 
         kaapin_ulkosuodatin = ArduinoDigitalSensor(service=0, pin=arduino_ports['kaapin sensori'], change_delay=1)
         lattiasensori_2 = ArduinoDigitalSensor(service=0, pin=arduino_ports['keski lattiasensori'], change_delay=1,
