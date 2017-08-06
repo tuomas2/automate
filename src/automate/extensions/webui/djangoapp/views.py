@@ -306,7 +306,8 @@ def info_panel(request, name):
         info_items = [(i.capitalize().replace('_', ' '),
                        getattr(obj, i)) for i in view_items
                       if (not i.endswith('_str')
-                          and i not in ['tags', 'name', 'priority', 'status']
+                          and i not in ['tags', 'name', 'priority', 'status', 'history_length',
+                                        'history_frequency']
                           and (
                           getattr(obj, i, None) or type(getattr(obj, i, None)) in (int, float)))]
 

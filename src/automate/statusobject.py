@@ -110,7 +110,8 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
     logger = Instance(logging.Logger, transient=True)
 
     view = ["name", "status", "description", "safety_delay",
-            "safety_mode", "change_delay", "change_mode", "history_length"] + SystemObject.view
+            "safety_mode", "change_delay", "change_mode",
+            "history_length", 'history_frequency'] + SystemObject.view
 
     simple_view = []
 
