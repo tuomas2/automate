@@ -47,6 +47,8 @@ from functools import wraps
 from automate.statusobject import AbstractActuator
 from automate.statusobject import AbstractSensor
 try:
+    import matplotlib
+    matplotlib.use('SVG')
     from matplotlib import pyplot
     pyplot.ioff()
 except ImportError:
