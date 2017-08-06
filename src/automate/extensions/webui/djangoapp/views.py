@@ -168,19 +168,20 @@ def history_plot(request, name, type_):
         system.logger.error('Matplotlib is not installed, can not plot')
         raise Http404
 
-    limit_time = int(request.GET.get('t_lim', service.plots_limit_time))
+    t_min = int(request.GET.get('t_min', service.plots_limit_time))
     format = request.GET.get('format', service.plot_format)
     if format not in CONTENT_TYPES:
         raise RuntimeError('Invalid format %s' % format)
 
-    oldest_time = time.time() - limit_time
-    y_lim = int(request.GET.get('y_lim', 0))
+    oldest_time = time.time() - t_min
+    y_max = float(request.GET.get('y_max', 0))
+    y_min = float(request.GET.get('y_min', 0))
 
     imgdata = StringIO()
     if type_ == 'object':
         fig, ax = pyplot.subplots(figsize=(10, 2))
         obj = service.system.namespace[name]
-        history = [(t, s) for t, s in obj.history if t > oldest_time] if limit_time else obj.history
+        history = [(t, s) for t, s in obj.history if t > oldest_time] if t_min else obj.history
         _time, status = tuple(zip(*history)) if history else ([], [])
         _time = [datetime.datetime.fromtimestamp(t) for t in _time]
         ax.step(_time, status, '-', where='post')
@@ -191,14 +192,17 @@ def history_plot(request, name, type_):
 
         for obj in objs:
             history = [(t, s) for t, s in obj.history
-                       if t > oldest_time] if limit_time else obj.history
+                       if t > oldest_time] if t_min else obj.history
             _time, status = tuple(zip(*history)) if history else ([], [])
             _time = [datetime.datetime.fromtimestamp(t) for t in _time]
             ax.step(_time, status, '-', where='post', label=obj.name)
     else:
         raise RuntimeError('Invalid type %s' % type_)
-    if y_lim:
-        ax.set_ylim(0, y_lim)
+    if y_min:
+        ax.set_ylim(bottom=y_min)
+    if y_max:
+        ax.set_ylim(top=y_max)
+
     fig.savefig(imgdata, format=format, bbox_inches='tight')
     pyplot.close(fig)
     return HttpResponse(content=imgdata.getvalue(), content_type=CONTENT_TYPES[format])
