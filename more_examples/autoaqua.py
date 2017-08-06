@@ -174,6 +174,7 @@ class autoaqua(System):
             default=25.123,
             max_jump=2.,
             max_errors=7,
+            history_length=10000,
             active_condition=Or(Value('aqua_temperature') > water_temp_max, Value('aqua_temperature') < water_temp_min),
             on_activate=Run('push_sender'),
             on_deactivate=Run('push_sender'),
@@ -183,6 +184,7 @@ class autoaqua(System):
 
         cpu_lampo = PollingSensor(
             interval=5,
+            history_length=10000,
             status_updater=Func(read_cpu_temp, add_caller=True),
             active_condition=Value('cpu_lampo') > 70,
             on_activate=Run(
@@ -192,7 +194,10 @@ class autoaqua(System):
             priority=2
         )
 
-        ph = UserFloatSensor(default=6.5)
+        ph = UserFloatSensor(default=6.5,
+                             history_length=10000,
+                             )
+
         sahkot = UserBoolSensor(default=1,
                                 active_condition=Not('sahkot'),
                                 on_activate=Run(SetStatus('lamppu1', 0), SetStatus('lamppu2', 0), SetStatus('lamppu3', 0),

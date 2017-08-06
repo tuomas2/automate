@@ -288,6 +288,7 @@ class AbstractPollingSensor(AbstractSensor):
     _pollthread = Any(transient=True)
     view = AbstractSensor.view + ["interval"]
     silent = CBool(True)
+    history_frequency = CFloat(1.0)
 
     def setup(self):
         self._restart()
