@@ -162,8 +162,10 @@ def object_history_plot(request, name):
         system.logger.error('Matplotlib is not installed, can not plot')
         raise Http404
 
-    limit_time = int(request.GET.get('limit_time', service.plots_limit_time))
+    limit_time = int(request.GET.get('t_lim', service.plots_limit_time))
     oldest_time = time.time() - limit_time
+    y_lim = int(request.GET.get('y_lim', 0))
+
     imgdata = StringIO()
     fig, ax = plt.subplots(figsize=(10,2))
     obj = service.system.namespace[name]
@@ -173,7 +175,9 @@ def object_history_plot(request, name):
     _time, status = tuple(zip(*history)) if history else ([], [])
     _time = [datetime.datetime.fromtimestamp(t) for t in _time]
     ax.plot(_time, status)
-    fig.savefig(imgdata, format='svg')
+    if y_lim:
+        ax.set_ylim(0, y_lim)
+    fig.savefig(imgdata, format='svg', bbox_inches='tight')
     plt.close(fig)
     return HttpResponse(content=imgdata.getvalue(), content_type='image/svg+xml')
 
@@ -184,20 +188,25 @@ def tag_history_plot(request, name):
         system.logger.error('Matplotlib is not installed, can not plot')
         raise Http404
 
-    limit_time = int(request.GET.get('limit_time', service.plots_limit_time))
+    limit_time = int(request.GET.get('t_lim', service.plots_limit_time))
+    y_lim = int(request.GET.get('y_lim', 0))
     oldest_time = time.time() - limit_time
 
     imgdata = StringIO()
-    fig, ax = plt.subplots(figsize=(10,5))
-    objs = [i for i in service.system.objects_sorted if name in i.tags]
+    fig, ax = plt.subplots(figsize=(10,3))
+    objs = [i for i in service.system.objects_sorted if name in i.tags
+            and hasattr(i, 'history') and isinstance(i.status, (float, int))]
 
     for obj in objs:
-        history = [(t, s) for t, s in obj.history if t > oldest_time] if limit_time else obj.history
+        history = [(t, s) for t, s in obj.history
+                   if t > oldest_time] if limit_time else obj.history
         _time, status = tuple(zip(*history)) if history else ([], [])
         _time = [datetime.datetime.fromtimestamp(t) for t in _time]
         ax.plot(_time, status, label=obj.name)
+    if y_lim:
+        ax.set_ylim(0, y_lim)
     ax.legend(loc='lower right')
-    fig.savefig(imgdata, format='svg')
+    fig.savefig(imgdata, format='svg', bbox_inches='tight')
     plt.close(fig)
     return HttpResponse(content=imgdata.getvalue(), content_type='image/svg+xml')
 
