@@ -54,11 +54,19 @@ class ArduinoDigitalSensor(AbstractArduinoSensor):
     #: Enable built-in pull-up resistor
     pull_up_resistor = CBool(False)
 
+    #: Set to True to have inversed status value
+    inverted = CBool(False)
+
     def setup(self, *args, **kwargs):
         super(ArduinoDigitalSensor, self).setup(*args, **kwargs)
         self._arduino.subscribe_digital(self.pin, self)
         if self.pull_up_resistor:
             self._arduino.set_pin_mode(self.pin, arduino_service.PIN_MODE_PULLUP)
+
+    def set_status(self, status, **kwargs):
+        if self.inverted:
+            status = not status
+        return super(ArduinoDigitalSensor, self).set_status(status, **kwargs)
 
     def cleanup(self):
         self._arduino.unsubscribe_digital(self.pin)
@@ -93,6 +101,9 @@ class ArduinoRemoteDigitalSensor(AbstractArduinoSensor):
     #: Source device number
     device = CInt
 
+    #: Set to True to have inversed status value
+    inverted = CBool(False)
+
     def setup(self, *args, **kwargs):
         super(ArduinoRemoteDigitalSensor, self).setup(*args, **kwargs)
         self._arduino.subscribe_virtualwire_digital_broadcast(self, self.device)
@@ -100,6 +111,11 @@ class ArduinoRemoteDigitalSensor(AbstractArduinoSensor):
                                                arduino_service.VIRTUALWIRE_SET_PIN_MODE,
                                                self.pin,
                                                pyfirmata.INPUT)
+
+    def set_status(self, status, **kwargs):
+        if self.inverted:
+            status = not status
+        return super(ArduinoRemoteDigitalSensor, self).set_status(status, **kwargs)
 
     def cleanup(self):
         self._arduino.unsubscribe_virtualwire_digital_broadcast(self, self.device)

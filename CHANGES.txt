@@ -1,7 +1,7 @@
 0.10.20 (unreleased)
 --------------------
 
-- Nothing changed yet.
+- Add inverted property to ArduinoDigitalSensor and ArduinoRemoteDigitalSensor
 
 
 0.10.19 (2017-08-04)

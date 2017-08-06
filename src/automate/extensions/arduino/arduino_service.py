@@ -314,7 +314,7 @@ class ArduinoService(AbstractSystemService):
                 port = s.pin // 8
                 pin_in_port = s.pin % 8
                 if port_nr == port:
-                    s.status = bool(value & 1 << pin_in_port)
+                    s.set_status(bool(value & 1 << pin_in_port))
         elif command == VIRTUALWIRE_ANALOG_BROADCAST:
             if len(data) != 3:
                 self.logger.error('Broken analog data: %s %s %s', sender_address, command, data)
@@ -325,7 +325,7 @@ class ArduinoService(AbstractSystemService):
             self.logger.debug('Analog data: %s %s', pin, value)
             for s in self._sens_virtualwire_analog[sender_address]:
                 if s.pin == pin:
-                    s.status = value
+                    s.set_status(value)
 
     def write(self, *data):
         data = bytearray(data)
