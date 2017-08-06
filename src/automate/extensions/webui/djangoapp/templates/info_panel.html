@@ -83,7 +83,7 @@
       {% endif %}
 
     {% endblock %}
-        {% if i.history %}
+        {% if plotting_enabled and i.history %}
         <div class="panel panel-warning">
           <div class="panel-heading">History</div>
           <div class="panel-body">

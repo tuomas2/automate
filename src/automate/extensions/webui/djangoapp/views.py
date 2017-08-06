@@ -47,10 +47,10 @@ from functools import wraps
 from automate.statusobject import AbstractActuator
 from automate.statusobject import AbstractSensor
 try:
-    from matplotlib import pyplot as plt
-    plt.ioff()
+    from matplotlib import pyplot
+    pyplot.ioff()
 except ImportError:
-    plt = None
+    pyplot = None
 
 
 def set_globals(_service, _system):
@@ -103,7 +103,7 @@ def common_context(request):
 
     from automate import __version__
     return {'views': views, 'tag_views': tag_views, 'system': system, 'service': service,
-            'automate_version': __version__}
+            'automate_version': __version__, 'plotting_enabled': bool(pyplot)}
 
 
 def require_login(func):
@@ -158,7 +158,7 @@ def custom(request, name):
 
 @require_login
 def object_history_plot(request, name):
-    if plt is None:
+    if pyplot is None:
         system.logger.error('Matplotlib is not installed, can not plot')
         raise Http404
 
@@ -167,7 +167,7 @@ def object_history_plot(request, name):
     y_lim = int(request.GET.get('y_lim', 0))
 
     imgdata = StringIO()
-    fig, ax = plt.subplots(figsize=(10,2))
+    fig, ax = pyplot.subplots(figsize=(10, 2))
     obj = service.system.namespace[name]
 
     history = [(t, s) for t, s in obj.history if t > oldest_time] if limit_time else obj.history
@@ -178,13 +178,13 @@ def object_history_plot(request, name):
     if y_lim:
         ax.set_ylim(0, y_lim)
     fig.savefig(imgdata, format='svg', bbox_inches='tight')
-    plt.close(fig)
+    pyplot.close(fig)
     return HttpResponse(content=imgdata.getvalue(), content_type='image/svg+xml')
 
 
 @require_login
 def tag_history_plot(request, name):
-    if plt is None:
+    if pyplot is None:
         system.logger.error('Matplotlib is not installed, can not plot')
         raise Http404
 
@@ -193,7 +193,7 @@ def tag_history_plot(request, name):
     oldest_time = time.time() - limit_time
 
     imgdata = StringIO()
-    fig, ax = plt.subplots(figsize=(10,3))
+    fig, ax = pyplot.subplots(figsize=(10, 3))
     objs = [i for i in service.system.objects_sorted if name in i.tags
             and hasattr(i, 'history') and isinstance(i.status, (float, int))]
 
@@ -207,7 +207,7 @@ def tag_history_plot(request, name):
         ax.set_ylim(0, y_lim)
     ax.legend(loc='lower right')
     fig.savefig(imgdata, format='svg', bbox_inches='tight')
-    plt.close(fig)
+    pyplot.close(fig)
     return HttpResponse(content=imgdata.getvalue(), content_type='image/svg+xml')
 
 

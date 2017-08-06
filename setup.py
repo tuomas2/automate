@@ -11,9 +11,12 @@ rpc_requirements = [
 web_requirements = [
     "Django~=1.11.0",
     "django-crispy-forms~=1.6.0",
-    "matplotlib",
     # "whitenoise",
 ] + rpc_requirements
+
+web_plotting = [
+    "matplotlib",
+] + web_requirements
 
 gpio_requirements = ['RPi.GPIO']
 rpio_requirements = ['RPIO']
@@ -43,6 +46,7 @@ setupopts = dict(
         ],
     extras_require={
         'web': web_requirements,
+        'web_plotting': web_plotting,
         'rpc': rpc_requirements,
         'raspberrypi': gpio_requirements,
         'rpio': rpio_requirements,
