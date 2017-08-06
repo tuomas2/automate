@@ -8,8 +8,9 @@ Introduction
 
 This extension provides interface to Arduino devices via `pyFirmata library <https://github.com/tino/pyFirmata>`_.
 You can use either StandardFirmata or preferrably `AutomateFirmata <https://github.com/tuomas2/AutomateFirmata>`_,
-which offers additional features that can be used with Automate. I have tested
-this module with Arduino Pro Mini compatible boards but it should work with
+which offers additional features that can be used with Automate. Please use corresponding version
+of AutomateFirmata from `releases -page <https://github.com/tuomas2/AutomateFirmata/releases>`_.
+I have tested this module with Arduino Pro Mini compatible boards but it should work with
 others too.
 
 Example application
