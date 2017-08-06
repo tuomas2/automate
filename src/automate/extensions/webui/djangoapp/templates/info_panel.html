@@ -83,5 +83,13 @@
       {% endif %}
 
     {% endblock %}
+        {% if i.history %}
+        <div class="panel panel-warning">
+          <div class="panel-heading">History</div>
+          <div class="panel-body">
+            <img class="history-svg" src="{% url "history_object_plot" i.name %}?t={%time_now%}">
+          </div>
+        </div>
+        {% endif %}
   </div>
 </div>

@@ -11,6 +11,7 @@ rpc_requirements = [
 web_requirements = [
     "Django~=1.11.0",
     "django-crispy-forms~=1.6.0",
+    "matplotlib",
     # "whitenoise",
 ] + rpc_requirements
 

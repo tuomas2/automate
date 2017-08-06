@@ -101,6 +101,10 @@ em.condition_inactive {
 .info_panel {
 }
 
+.history-svg {
+    width: 100%;
+}
+
 div.object_row {
     padding-top: 8pt;
     padding-bottom: 8pt;

@@ -102,7 +102,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
     _status_lock = Instance(Lock, transient=True)
 
     # Deque of history, which consists of tuples (timestamp, status)
-    _history = Any(transient=True)
+    history = Any(transient=True)
 
     logger = Instance(logging.Logger, transient=True)
 
@@ -166,7 +166,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
 
     def setup_system(self, *args, **kwargs):
         super(StatusObject, self).setup_system(*args, **kwargs)
-        self._history = collections.deque(maxlen=self.history_length)
+        self.history = collections.deque(maxlen=self.history_length)
         self.data_type = self._status.__class__.__name__
 
     def set_status(self, new_status, origin=None, force=False):
@@ -229,7 +229,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
                 self._status_trigger = True
             else:
                 self._status = status
-                self._history.append((self._last_changed, status))
+                self.history.append((self._last_changed, status))
         except TraitError as e:
             self.logger.warning('Wrong type of status %s was passed to %s. Error: %s', status, self, e)
 
@@ -397,8 +397,11 @@ class AbstractSensor(StatusObject):
         name, traits = self._passed_arguments
         default = traits.get('default', None)
         super(AbstractSensor, self).setup_system(system, *args, **kwargs)
-        if not default is None and not kwargs.get('loadstate', None):
+        load_state = kwargs.get('loadstate', None)
+        if not default is None and not load_state:
             self.set_status(default)
+        elif load_state:
+            self.history.append((time.time(), self._status))
 
 
 class AbstractActuator(StatusObject):

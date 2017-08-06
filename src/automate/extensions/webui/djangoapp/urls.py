@@ -40,6 +40,8 @@ urlpatterns = [
     url(r'^logout$', views.logout, name='logout'),
     url('^custom/(\w*)$', views.custom, name='custom'),
     url('^uml/system.svg$', views.puml_svg, name='puml_svg'),
+    url('^history.svg/object/(\w*)$', views.object_history_plot, name='history_object_plot'),
+    url('^history.svg/tag/([\:\w]*)$', views.tag_history_plot, name='history_tag_plot'),
     url('^uml/system.puml$', views.puml_raw, name='puml_raw'),
     url('^uml$', views.plantuml, name='plantuml'),
 

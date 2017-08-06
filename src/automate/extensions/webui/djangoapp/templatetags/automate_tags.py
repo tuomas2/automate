@@ -24,6 +24,7 @@
 import re
 import operator
 import logging
+import time
 
 from django import template
 from django.core.urlresolvers import reverse
@@ -39,6 +40,10 @@ logger = logging.getLogger(__name__)
 
 register = template.Library()
 
+
+@register.simple_tag()
+def time_now():
+    return time.time()
 
 @register.simple_tag(takes_context=True)
 def mocked_services(context):

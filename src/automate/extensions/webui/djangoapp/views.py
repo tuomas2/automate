@@ -26,6 +26,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 import threading
+import datetime
+import time
+
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
+
 from django.contrib import messages
 
 from django.core.urlresolvers import reverse
@@ -38,6 +46,11 @@ from .forms import LoginForm, CmdForm, FORMTYPES, QUICK_EDITS, TextForm
 from functools import wraps
 from automate.statusobject import AbstractActuator
 from automate.statusobject import AbstractSensor
+try:
+    from matplotlib import pyplot as plt
+    plt.ioff()
+except ImportError:
+    plt = None
 
 
 def set_globals(_service, _system):
@@ -141,6 +154,52 @@ def custom(request, name):
         return HttpResponse(content=Template(service.custom_pages[name]).render(context))
     except KeyError:
         raise Http404
+
+
+@require_login
+def object_history_plot(request, name):
+    if plt is None:
+        system.logger.error('Matplotlib is not installed, can not plot')
+        raise Http404
+
+    limit_time = int(request.GET.get('limit_time', 0))
+    oldest_time = time.time() - limit_time
+    imgdata = StringIO()
+    fig, ax = plt.subplots(figsize=(10,2))
+    obj = service.system.namespace[name]
+
+    history = [(t, s) for t, s in obj.history if t > oldest_time] if limit_time else obj.history
+
+    _time, status = tuple(zip(*history)) if history else ([], [])
+    _time = [datetime.datetime.fromtimestamp(t) for t in _time]
+    ax.plot(_time, status)
+    fig.savefig(imgdata, format='svg')
+    plt.close(fig)
+    return HttpResponse(content=imgdata.getvalue(), content_type='image/svg+xml')
+
+
+@require_login
+def tag_history_plot(request, name):
+    if plt is None:
+        system.logger.error('Matplotlib is not installed, can not plot')
+        raise Http404
+
+    limit_time = int(request.GET.get('limit_time', 0))
+    oldest_time = time.time() - limit_time
+
+    imgdata = StringIO()
+    fig, ax = plt.subplots(figsize=(10,5))
+    objs = [i for i in service.system.objects_sorted if name in i.tags]
+
+    for obj in objs:
+        history = [(t, s) for t, s in obj.history if t > oldest_time] if limit_time else obj.history
+        _time, status = tuple(zip(*history)) if history else ([], [])
+        _time = [datetime.datetime.fromtimestamp(t) for t in _time]
+        ax.plot(_time, status, label=obj.name)
+    ax.legend(loc='lower right')
+    fig.savefig(imgdata, format='svg')
+    plt.close(fig)
+    return HttpResponse(content=imgdata.getvalue(), content_type='image/svg+xml')
 
 
 @require_login
