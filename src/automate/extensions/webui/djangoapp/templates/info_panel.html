@@ -41,6 +41,13 @@
               </div>
             </div>
           {% endif %}
+          {% if plotting_enabled and i.history %}
+            {% if service.show_plots %}
+              <img class="history-svg" src="{% url "history_object_plot" i.name %}?t={%time_now%}">
+            {% else %}
+              <a href="{% url "history_object_plot" i.name %}">History graph</a>
+            {% endif %}
+          {% endif %}
         </div>
       </div>
     {% endif %}
@@ -83,13 +90,5 @@
       {% endif %}
 
     {% endblock %}
-        {% if plotting_enabled and i.history %}
-        <div class="panel panel-warning">
-          <div class="panel-heading">History</div>
-          <div class="panel-body">
-            <img class="history-svg" src="{% url "history_object_plot" i.name %}?t={%time_now%}">
-          </div>
-        </div>
-        {% endif %}
   </div>
 </div>

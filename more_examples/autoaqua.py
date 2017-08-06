@@ -518,6 +518,7 @@ if __name__ == '__main__':
                        os.getenv('AUTOMATE_PASSWORD', 'test'),
             ),
             debug = not is_raspi(),
+            show_plots=False,
             user_tags={'quick'},
             read_only = False,
             default_view = 'tags_view',

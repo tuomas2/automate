@@ -22,7 +22,11 @@
       </div>
     {% if plotting_enabled %}
       <h1> History</h1>
-      <img class="history-svg" src="{% url "history_tag_plot" tag %}">
+      {% if service.show_plots %}
+        <img class="history-svg" src="{% url "history_tag_plot" tag %}?t={%time_now%}">
+      {% else %}
+        <a href="{% url "history_tag_plot" tag %}">Link to history graph</a>
+      {% endif %}
     {% endif %}
     </div>
   </div>

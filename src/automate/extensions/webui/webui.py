@@ -97,6 +97,9 @@ class WebService(TornadoService):
     #: Age of oldest events shown in status graphs, in seconds. Defaults to 1 day.
     plots_limit_time = CInt(86400)
 
+    #: Show plots by default, or only links to figures. Disable this on slow machines.
+    show_plots = CBool(True)
+
     _sockets = List(transient=True)
 
     def get_filehandler_class(service):
