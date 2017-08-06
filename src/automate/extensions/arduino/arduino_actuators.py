@@ -65,6 +65,22 @@ class ArduinoDigitalActuator(AbstractArduinoActuator):
         self._arduino.cleanup_digital_actuator(self.pin)
 
 
+class ArduinoLCDActuator(AbstractArduinoActuator):
+    """
+        Actuator that sends target device digital output pin status change requests
+
+        Needs `AutomateFirmata <https://github.com/tuomas2/AutomateFirmata>`_
+    """
+
+    _status = CStr(transient=True)
+
+    #: Target device number
+    device = CInt
+
+    def _status_changed(self):
+        self._arduino.print_to_lcd(self._status)
+
+
 class ArduinoRemoteDigitalActuator(AbstractArduinoActuator):
     """
         Actuator that sends target device digital output pin status change requests

@@ -1,6 +1,7 @@
 from automate import *
 from automate.extensions.arduino import ArduinoAnalogSensor, ArduinoDigitalSensor, \
     ArduinoServoActuator, ArduinoDigitalActuator, ArduinoService
+from automate.extensions.arduino.arduino_actuators import ArduinoLCDActuator
 from automate.extensions.webui import WebService
 from automate.program import Program
 
@@ -19,6 +20,10 @@ class ArduinoSystem(System):
 
     # pwm = ArduinoPWMActuator(dev = 0, pin = 4, slave = True)
     interp = ConstantTimeActuator(change_time=2., change_frequency=20., slave_actuator=servo)
+
+    u3 = UserStrSensor(on_update=SetStatus('lcd', 'u3'))
+
+    lcd = ArduinoLCDActuator()
 
     prog = Program(
         triggers=[a1],

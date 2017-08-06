@@ -44,6 +44,8 @@ PIN_MODE_PULLUP = 0x0B
 SYSEX_VIRTUALWIRE_MESSAGE = 0x00
 SYSEX_KEEP_ALIVE = 0x01
 SYSEX_SETUP_VIRTUALWIRE = 0x02
+SYSEX_SETUP_LCD = 0x03
+SYSEX_LCD_COMMAND = 0x04
 
 VIRTUALWIRE_SET_PIN_MODE = 0x01
 VIRTUALWIRE_ANALOG_MESSAGE = 0x02
@@ -52,6 +54,10 @@ VIRTUALWIRE_START_SYSEX = 0x04
 VIRTUALWIRE_SET_DIGITAL_PIN_VALUE = 0x05
 VIRTUALWIRE_DIGITAL_BROADCAST = 0x06
 VIRTUALWIRE_ANALOG_BROADCAST = 0x07
+
+# LCD commands
+LCD_SET_BACKLIGHT = 0x01
+LCD_PRINT = 0x02
 
 
 def float_to_bytes(value):
@@ -153,6 +159,16 @@ class ArduinoService(AbstractSystemService):
     #: VirtualWire PTT (push to talk) pin
     virtualwire_ptt_pin = CInt(0)
 
+    #: LCD Port
+    lcd_port = CInt(0)
+
+    #: LCD Columns
+    lcd_columns = 16
+
+    #: LCD Rows
+    lcd_rows = 2
+
+
     #: Wakeup pin (0 to disable) that wakes Arduino from sleep mode. On Atmega328 based boards,
     #: possible values are 2 and 3
     wakeup_pin = CInt(0)
@@ -214,6 +230,7 @@ class ArduinoService(AbstractSystemService):
                                    pyfirmata.util.to_two_bytes(self.sample_rate))
 
             self.configure_virtualwire()
+            self.configure_lcd()
             self._keep_alive()
 
     def configure_virtualwire(self):
@@ -230,6 +247,20 @@ class ArduinoService(AbstractSystemService):
                                                              self.device_address,
                                                              ])
             self.setup_virtualwire_input()
+
+    def configure_lcd(self):
+        if not self._board:
+            return
+        with self._lock:
+            self.logger.debug('Configuring LCD')
+            self._board.send_sysex(SYSEX_SETUP_LCD, [self.lcd_port, self.lcd_columns, self.lcd_rows])
+
+    def print_to_lcd(self, value_str):
+        if not self._board:
+            return
+        with self._lock:
+            self.logger.debug('Printing to LCD')
+            self._board.send_sysex(LCD_PRINT, bytearray(value_str.encode('utf-8')))
 
     def _keep_alive(self):
         if self.keep_alive:
