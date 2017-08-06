@@ -137,6 +137,11 @@ if __name__ == '__main__':
                 'level': 'WARNING',
                 'propagate': False,
             },
+            'traits': {
+                'handlers': ['console', 'sentry'],
+                'level': 'WARNING',
+                'propagate': False,
+            },
             'django': {
                 'handlers': ['console', 'sentry'],
                 'level': 'INFO',

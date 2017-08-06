@@ -50,11 +50,12 @@ arduino_ports = {
     'kaapin sensori': 2,
     'ala varoitus': 3,
     'keski lattiasensori': 4,
-    'ala_altaat_alaraja': 5,
+    'unused4': 5,
     'unused5': 6,
     'unused6': 7,
     'alarm': 8,
     'co2_stop': 11,
+    'ala_altaat_alaraja': 12,
 }
 portmap = {
     # inputs:
@@ -326,7 +327,7 @@ class autoaqua(System):
                                   timer_off="0 16 * * *")
 
         co2_ajastin_loma = CronTimerSensor(timer_on="30 15 * * *",
-                                       timer_off="30 18 * * *",
+                                       timer_off="0 18 * * *",
                                        tags="holiday")
 
         # Muista: tämä kontrolloi (myös) UVC:ta!
