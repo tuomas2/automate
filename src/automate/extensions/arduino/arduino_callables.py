@@ -27,7 +27,7 @@ class VirtualWireCommand(AbstractCallable):
           - VirtualWire command byte (see arduino_service.VIRTUALWIRE_*)
           - Command arguments...
 
-        Keyword arguments:
+        Keyword arguments::
 
           - service: Arduino service number (defaults to 0)
 
@@ -51,7 +51,7 @@ class LCDSetBacklight(AbstractCallable):
 
           - LCD on/off value
 
-        Keyword arguments:
+        Keyword arguments::
 
           - service: Arduino service number (defaults to 0)
     """
@@ -74,7 +74,7 @@ class LCDPrint(AbstractCallable):
 
           - Value to be printed on LCD
 
-        Keyword arguments:
+        Keyword arguments::
 
           - service: Arduino service number (defaults to 0)
     """
