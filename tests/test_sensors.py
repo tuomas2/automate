@@ -63,14 +63,14 @@ def test_history(sysloader):
 
     sys = sysloader.new_system(HistoryTest)
 
-    assert len(sys.s._history) == 0
+    assert len(sys.s.history) == 0
     sys.s.status=True
     sys.flush()
-    assert len(sys.s._history) == 1
+    assert len(sys.s.history) == 1
     sys.s.status=True
     sys.flush()
-    assert len(sys.s._history) == 1
+    assert len(sys.s.history) == 1
     sys.s.status=False
     sys.flush()
-    assert len(sys.s._history) == 2
+    assert len(sys.s.history) == 2
 
