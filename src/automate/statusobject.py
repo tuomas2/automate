@@ -28,10 +28,11 @@ import operator
 import threading
 import time
 import sys
+import collections
 
 import datetime
 from traits.api import (cached_property, Any, CBool, Instance, Dict, Str, CFloat,
-                        List, Enum, Bool, Property, Event)
+                        List, Enum, Bool, Property, Event, CInt)
 from traits.trait_errors import TraitError
 
 from .common import Lock, AbstractStatusObject, CompareMixin, nomutex
@@ -76,6 +77,9 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
     #: (property) Is delayed change taking place at the moment?
     changing = Property(trait=Bool, transient=True, depends_on='_timed_action, _queued_job')
 
+    #: Amount of status change events to be stored in history
+    history_length = CInt(100)
+
     @cached_property
     def _get_changing(self):
         if self._queued_job or self._timed_action:
@@ -96,6 +100,9 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
 
     # Lock that is acquired when changing the status
     _status_lock = Instance(Lock, transient=True)
+
+    # Deque of history, which consists of tuples (timestamp, status)
+    _history = Any(transient=True)
 
     logger = Instance(logging.Logger, transient=True)
 
@@ -159,6 +166,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
 
     def setup_system(self, *args, **kwargs):
         super(StatusObject, self).setup_system(*args, **kwargs)
+        self._history = collections.deque(maxlen=self.history_length)
         self.data_type = self._status.__class__.__name__
 
     def set_status(self, new_status, origin=None, force=False):
@@ -221,6 +229,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
                 self._status_trigger = True
             else:
                 self._status = status
+                self._history.append((self._last_changed, status))
         except TraitError as e:
             self.logger.warning('Wrong type of status %s was passed to %s. Error: %s', status, self, e)
 

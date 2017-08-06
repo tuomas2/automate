@@ -55,3 +55,22 @@ def test_crontimersensor(_timer_on, _timer_off, now, status, sysloader):
 
         s = sysloader.new_system(ms)
         assert s.t.status == status
+
+
+def test_history(sysloader):
+    class HistoryTest(System):
+        s = UserBoolSensor(history_length=5, default=False)
+
+    sys = sysloader.new_system(HistoryTest)
+
+    assert len(sys.s._history) == 0
+    sys.s.status=True
+    sys.flush()
+    assert len(sys.s._history) == 1
+    sys.s.status=True
+    sys.flush()
+    assert len(sys.s._history) == 1
+    sys.s.status=False
+    sys.flush()
+    assert len(sys.s._history) == 2
+

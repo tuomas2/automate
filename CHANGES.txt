@@ -2,6 +2,9 @@
 --------------------
 
 - Add inverted property to ArduinoDigitalSensor and ArduinoRemoteDigitalSensor
+- Add .history_length attribute to all StatusObjects, which can be used to configure the length
+  of history of events that is stored in _history. This can be used to plot graphs of events
+  in webui, for example.
 
 
 0.10.19 (2017-08-04)
