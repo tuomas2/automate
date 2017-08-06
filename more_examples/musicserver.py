@@ -24,6 +24,10 @@ socket.setdefaulttimeout(30) # Do not keep waiting forever for RemoteFuncs
 def meminfo():
     return psutil.virtual_memory().percent
 
+def loadavg():
+    return os.getloadavg()[0]
+
+
 #class MidiSensor(AbstractSensor):
 #    _status = Bool(False)
 #
@@ -391,8 +395,9 @@ class MusicServer(lamps.LampGroupsMixin, System):
         )
 
     class SystemInfo(Group):
-        load_average = PollingSensor(interval=10, status_updater=ToStr('{}', Func(os.getloadavg)))
-        memory = PollingSensor(interval=10, status_updater=ToStr(Func(meminfo)))
+        tags = 'web'
+        load_average = PollingSensor(interval=10, status_updater=Func(loadavg))
+        memory = PollingSensor(interval=10, status_updater=Func(meminfo))
 
     class Out(Group):
         launchtime = UserBoolSensor() #at launchtime, this is used to set out_buffer to 1, before playback can start

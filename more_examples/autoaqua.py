@@ -21,6 +21,8 @@ from automate.statusobject import AbstractActuator
 import time
 
 import socket
+import psutil
+
 socket.setdefaulttimeout(30) # Do not keep waiting forever for RemoteFuncs
 
 def is_raspi():
@@ -88,6 +90,13 @@ akva = "28-00000558263c"
 raspi2host = 'http://raspi2:3031/' if is_raspi() else 'http://localhost:3031/'
 
 
+def meminfo():
+    return psutil.virtual_memory().percent
+
+
+def loadavg():
+    return os.getloadavg()[0]
+
 class IsRaspi(SystemObject, SortableMixin):
 
     def call(self, caller, **kwargs):
@@ -128,6 +137,10 @@ class autoaqua(System):
     #    remote_sensor='start',
     #    host='http://raspi1:3031/' if is_raspi() else 'http://localhost:3031/',
     #)
+    class SystemInfo(Group):
+        tags = 'web'
+        load_average = PollingSensor(interval=10, status_updater=Func(loadavg))
+        memory = PollingSensor(interval=10, status_updater=Func(meminfo))
 
     class Sensors(Group):
         valutusputki = RpioSensor(port=portmap['valutusputki'], change_delay=1)

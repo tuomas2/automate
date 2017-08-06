@@ -13,8 +13,13 @@ import socket
 socket.setdefaulttimeout(30) # Do not keep waiting forever for RemoteFuncs
 import lamps
 
+
 def meminfo():
     return psutil.virtual_memory().percent
+
+
+def loadavg():
+    return os.getloadavg()[0]
 
 
 def is_raspi():
@@ -69,8 +74,8 @@ class Makuuhuone(lamps.LampGroupsMixin, System):
 
     class SystemInfo(Group):
         tags = 'web'
-        load_average = PollingSensor(interval=10, status_updater=ToStr('{}', Func(os.getloadavg)))
-        memory = PollingSensor(interval=10, status_updater=ToStr(Func(meminfo)))
+        load_average = PollingSensor(interval=10, status_updater=Func(loadavg))
+        memory = PollingSensor(interval=10, status_updater=Func(meminfo))
 
     class Debug(Group):
         tags = 'web'
