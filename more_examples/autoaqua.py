@@ -182,6 +182,7 @@ class autoaqua(System):
         water_temp_max = UserFloatSensor(default=30.5)
 
         aqua_temperature = TemperatureSensor(
+            tags='temperature',
             addr=akva,
             interval=60,
             default=25.123,
@@ -193,7 +194,12 @@ class autoaqua(System):
             on_deactivate=Run('push_sender'),
         )
 
-        parvekkeen_lampo = TemperatureSensor(addr=ulko, interval=60, default=25.123)
+        parvekkeen_lampo = TemperatureSensor(
+            tags='temperature',
+            addr=ulko,
+            interval=60,
+            history_length=10000,
+            default=25.123)
 
         cpu_lampo = PollingSensor(
             interval=5,
