@@ -176,6 +176,7 @@ class ArduinoService(AbstractSystemService):
         self._board = None
         self._lock = None
         self._iterator_thread = None
+        self._keepalive_thread = None
 
     class FileNotReadableError(Exception):
         pass
