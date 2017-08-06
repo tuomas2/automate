@@ -176,7 +176,7 @@ def object_history_plot(request, name):
 
     _time, status = tuple(zip(*history)) if history else ([], [])
     _time = [datetime.datetime.fromtimestamp(t) for t in _time]
-    ax.step(_time, status, '-.')
+    ax.step(_time, status, '-.', where='post')
     if y_lim:
         ax.set_ylim(0, y_lim)
     fig.savefig(imgdata, format='svg', bbox_inches='tight')
