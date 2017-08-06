@@ -66,7 +66,7 @@ def lirc_filter(line):
     return key
 
 
-class IsRaspi(SystemObject):
+class IsRaspi(SortableMixin, SystemObject):
 
     def call(self, caller, **kwargs):
         return is_raspi()

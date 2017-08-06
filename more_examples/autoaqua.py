@@ -88,7 +88,7 @@ akva = "28-00000558263c"
 raspi2host = 'http://raspi2:3031/' if is_raspi() else 'http://localhost:3031/'
 
 
-class IsRaspi(SystemObject):
+class IsRaspi(SystemObject, SortableMixin):
 
     def call(self, caller, **kwargs):
         return is_raspi()

@@ -29,11 +29,11 @@ import time
 from traits.api import CUnicode, Unicode, CInt
 import requests
 
-from .common import threaded
+from .common import threaded, SortableMixin
 from .systemobject import SystemObject
 
 
-class PushOver(SystemObject):
+class PushOver(SortableMixin, SystemObject):
     """
         Send push notifications to android/IOS phones (see http://pushover.net).
 
@@ -108,7 +108,7 @@ class PushOver(SystemObject):
         t.start()
 
 
-class EmailSender(SystemObject):
+class EmailSender(SortableMixin, SystemObject):
 
     """ Send email notification of the current status of the system """
 

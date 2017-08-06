@@ -221,6 +221,11 @@ class CompareMixin(object):
         return callables.More(self, obj)
 
 
+class SortableMixin(object):
+    def __lt__(self, other):
+        return self.name < other.name
+
+
 class TagSet(CSet):
 
     def validate(self, object, name, value):
