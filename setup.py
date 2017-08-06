@@ -15,7 +15,7 @@ web_requirements = [
 ] + rpc_requirements
 
 web_plotting = [
-    "matplotlib",
+    "matplotlib~=2.0.2",
 ] + web_requirements
 
 gpio_requirements = ['RPi.GPIO']
