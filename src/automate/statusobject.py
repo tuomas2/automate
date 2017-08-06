@@ -228,7 +228,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
             return
 
         self._change_start = 0.
-        self._last_changed = time.time()
+        change_time = self._last_changed = time.time()
 
         try:
             if self._status == status:
@@ -236,10 +236,11 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
             else:
                 self._status = status
                 if self.history:
-                    last_history_entry = self.history[-1][0]
-                    if self._last_changed - last_history_entry < self.history_frequency:
+                    last_time, last_value = self.history[-1]
+                    if self._last_changed - last_time < self.history_frequency:
                         self.history.pop()
-                self.history.append((self._last_changed, status))
+                        change_time = last_time
+                self.history.append((change_time, status))
         except TraitError as e:
             self.logger.warning('Wrong type of status %s was passed to %s. Error: %s', status, self, e)
 

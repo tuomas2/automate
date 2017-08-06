@@ -48,7 +48,6 @@ class RpioSensor(UserBoolSensor):
 
     def setup(self):
         self._hw_service = self.system.request_service('RpioService')
-
         self._hw_service.enable_input_port(self.port, self.gpio_callback, self.button_type)
 
     def _button_type_changed(self, new):
