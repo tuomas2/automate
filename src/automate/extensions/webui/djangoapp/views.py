@@ -32,7 +32,7 @@ import time
 try:
     from StringIO import StringIO
 except ImportError:
-    from io import StringIO
+    from io import BytesIO as StringIO
 
 from django.contrib import messages
 
@@ -54,6 +54,11 @@ try:
 except ImportError:
     pyplot = None
 
+CONTENT_TYPES = {
+    'svg': 'image/svg+xml',
+    'jpg': 'image/jpeg',
+    'png': 'image/png'
+}
 
 def set_globals(_service, _system):
     global system, service
@@ -176,12 +181,12 @@ def object_history_plot(request, name):
 
     _time, status = tuple(zip(*history)) if history else ([], [])
     _time = [datetime.datetime.fromtimestamp(t) for t in _time]
-    ax.step(_time, status, '-.', where='post')
+    ax.step(_time, status, '-', where='post')
     if y_lim:
         ax.set_ylim(0, y_lim)
-    fig.savefig(imgdata, format='svg', bbox_inches='tight')
+    fig.savefig(imgdata, format=service.plot_format, bbox_inches='tight')
     pyplot.close(fig)
-    return HttpResponse(content=imgdata.getvalue(), content_type='image/svg+xml')
+    return HttpResponse(content=imgdata.getvalue(), content_type=CONTENT_TYPES[service.plot_format])
 
 
 @require_login
@@ -204,13 +209,13 @@ def tag_history_plot(request, name):
                    if t > oldest_time] if limit_time else obj.history
         _time, status = tuple(zip(*history)) if history else ([], [])
         _time = [datetime.datetime.fromtimestamp(t) for t in _time]
-        ax.step(_time, status, '-o', where='post', label=obj.name)
+        ax.step(_time, status, '-', where='post', label=obj.name)
     if y_lim:
         ax.set_ylim(0, y_lim)
     ax.legend(loc='lower right', framealpha=0.3)
-    fig.savefig(imgdata, format='svg', bbox_inches='tight')
+    fig.savefig(imgdata, format=service.plot_format, bbox_inches='tight')
     pyplot.close(fig)
-    return HttpResponse(content=imgdata.getvalue(), content_type='image/svg+xml')
+    return HttpResponse(content=imgdata.getvalue(), content_type=CONTENT_TYPES[service.plot_format])
 
 
 @require_login
