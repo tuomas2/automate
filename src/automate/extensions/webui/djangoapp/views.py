@@ -162,7 +162,7 @@ def object_history_plot(request, name):
         system.logger.error('Matplotlib is not installed, can not plot')
         raise Http404
 
-    limit_time = int(request.GET.get('limit_time', 0))
+    limit_time = int(request.GET.get('limit_time', service.plots_limit_time))
     oldest_time = time.time() - limit_time
     imgdata = StringIO()
     fig, ax = plt.subplots(figsize=(10,2))
@@ -184,7 +184,7 @@ def tag_history_plot(request, name):
         system.logger.error('Matplotlib is not installed, can not plot')
         raise Http404
 
-    limit_time = int(request.GET.get('limit_time', 0))
+    limit_time = int(request.GET.get('limit_time', service.plots_limit_time))
     oldest_time = time.time() - limit_time
 
     imgdata = StringIO()

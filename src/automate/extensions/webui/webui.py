@@ -94,6 +94,9 @@ class WebService(TornadoService):
     #: Full exposed url root
     server_url = Unicode()
 
+    #: Age of oldest events shown in status graphs, in seconds. Defaults to 1 day.
+    plots_limit_time = CInt(86400)
+
     _sockets = List(transient=True)
 
     def get_filehandler_class(service):
