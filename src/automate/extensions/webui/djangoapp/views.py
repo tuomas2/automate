@@ -163,59 +163,55 @@ def custom(request, name):
         raise Http404
 
 
-@require_login
-def object_history_plot(request, name):
+def history_plot(request, name, type_):
     if pyplot is None:
         system.logger.error('Matplotlib is not installed, can not plot')
         raise Http404
 
     limit_time = int(request.GET.get('t_lim', service.plots_limit_time))
+    format = request.GET.get('format', service.plot_format)
+    if format not in CONTENT_TYPES:
+        raise RuntimeError('Invalid format %s' % format)
+
     oldest_time = time.time() - limit_time
     y_lim = int(request.GET.get('y_lim', 0))
 
     imgdata = StringIO()
-    fig, ax = pyplot.subplots(figsize=(10, 2))
-    obj = service.system.namespace[name]
+    if type_ == 'object':
+        fig, ax = pyplot.subplots(figsize=(10, 2))
+        obj = service.system.namespace[name]
+        history = [(t, s) for t, s in obj.history if t > oldest_time] if limit_time else obj.history
+        _time, status = tuple(zip(*history)) if history else ([], [])
+        _time = [datetime.datetime.fromtimestamp(t) for t in _time]
+        ax.step(_time, status, '-', where='post')
+    elif type_ == 'tag':
+        fig, ax = pyplot.subplots(figsize=(10, 3))
+        objs = [i for i in service.system.objects_sorted if name in i.tags
+                and hasattr(i, 'history') and isinstance(i.status, (float, int))]
 
-    history = [(t, s) for t, s in obj.history if t > oldest_time] if limit_time else obj.history
-
-    _time, status = tuple(zip(*history)) if history else ([], [])
-    _time = [datetime.datetime.fromtimestamp(t) for t in _time]
-    ax.step(_time, status, '-', where='post')
+        for obj in objs:
+            history = [(t, s) for t, s in obj.history
+                       if t > oldest_time] if limit_time else obj.history
+            _time, status = tuple(zip(*history)) if history else ([], [])
+            _time = [datetime.datetime.fromtimestamp(t) for t in _time]
+            ax.step(_time, status, '-', where='post', label=obj.name)
+    else:
+        raise RuntimeError('Invalid type %s' % type_)
     if y_lim:
         ax.set_ylim(0, y_lim)
-    fig.savefig(imgdata, format=service.plot_format, bbox_inches='tight')
+    fig.savefig(imgdata, format=format, bbox_inches='tight')
     pyplot.close(fig)
-    return HttpResponse(content=imgdata.getvalue(), content_type=CONTENT_TYPES[service.plot_format])
+    return HttpResponse(content=imgdata.getvalue(), content_type=CONTENT_TYPES[format])
+
+
+@require_login
+def object_history_plot(request, name):
+    return history_plot(request, name, 'object')
 
 
 @require_login
 def tag_history_plot(request, name):
-    if pyplot is None:
-        system.logger.error('Matplotlib is not installed, can not plot')
-        raise Http404
-
-    limit_time = int(request.GET.get('t_lim', service.plots_limit_time))
-    y_lim = int(request.GET.get('y_lim', 0))
-    oldest_time = time.time() - limit_time
-
-    imgdata = StringIO()
-    fig, ax = pyplot.subplots(figsize=(10, 3))
-    objs = [i for i in service.system.objects_sorted if name in i.tags
-            and hasattr(i, 'history') and isinstance(i.status, (float, int))]
-
-    for obj in objs:
-        history = [(t, s) for t, s in obj.history
-                   if t > oldest_time] if limit_time else obj.history
-        _time, status = tuple(zip(*history)) if history else ([], [])
-        _time = [datetime.datetime.fromtimestamp(t) for t in _time]
-        ax.step(_time, status, '-', where='post', label=obj.name)
-    if y_lim:
-        ax.set_ylim(0, y_lim)
-    ax.legend(loc='lower right', framealpha=0.3)
-    fig.savefig(imgdata, format=service.plot_format, bbox_inches='tight')
-    pyplot.close(fig)
-    return HttpResponse(content=imgdata.getvalue(), content_type=CONTENT_TYPES[service.plot_format])
+    return history_plot(request, name, 'tag')
 
 
 @require_login
