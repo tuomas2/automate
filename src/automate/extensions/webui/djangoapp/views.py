@@ -176,7 +176,7 @@ def object_history_plot(request, name):
 
     _time, status = tuple(zip(*history)) if history else ([], [])
     _time = [datetime.datetime.fromtimestamp(t) for t in _time]
-    ax.plot(_time, status)
+    ax.step(_time, status, '-.')
     if y_lim:
         ax.set_ylim(0, y_lim)
     fig.savefig(imgdata, format='svg', bbox_inches='tight')
@@ -204,10 +204,10 @@ def tag_history_plot(request, name):
                    if t > oldest_time] if limit_time else obj.history
         _time, status = tuple(zip(*history)) if history else ([], [])
         _time = [datetime.datetime.fromtimestamp(t) for t in _time]
-        ax.plot(_time, status, label=obj.name)
+        ax.step(_time, status, '-o', where='post', label=obj.name)
     if y_lim:
         ax.set_ylim(0, y_lim)
-    ax.legend(loc='lower right')
+    ax.legend(loc='lower right', framealpha=0.3)
     fig.savefig(imgdata, format='svg', bbox_inches='tight')
     pyplot.close(fig)
     return HttpResponse(content=imgdata.getvalue(), content_type='image/svg+xml')
