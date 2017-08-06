@@ -42,6 +42,8 @@ class RpioSensor(UserBoolSensor):
 
     view = UserBoolSensor.view + ["port", "button_type"]
 
+    history_frequency = CFloat(1.0)
+
     _hw_service = Instance(AbstractSystemService, transient=True)
 
     def setup(self):

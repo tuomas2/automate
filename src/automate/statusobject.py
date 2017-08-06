@@ -77,8 +77,14 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
     #: (property) Is delayed change taking place at the moment?
     changing = Property(trait=Bool, transient=True, depends_on='_timed_action, _queued_job')
 
+    # Deque of history, which consists of tuples (timestamp, status), read only
+    history = Any(transient=True)
+
     #: Amount of status change events to be stored in history
     history_length = CInt(100)
+
+    #: How often new values are saved to history, in seconds
+    history_frequency = CFloat(0)
 
     @cached_property
     def _get_changing(self):
@@ -100,9 +106,6 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
 
     # Lock that is acquired when changing the status
     _status_lock = Instance(Lock, transient=True)
-
-    # Deque of history, which consists of tuples (timestamp, status)
-    history = Any(transient=True)
 
     logger = Instance(logging.Logger, transient=True)
 
@@ -232,6 +235,10 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
                 self._status_trigger = True
             else:
                 self._status = status
+                if self.history:
+                    last_history_entry = self.history[-1][0]
+                    if self._last_changed - last_history_entry < self.history_frequency:
+                        self.history.pop()
                 self.history.append((self._last_changed, status))
         except TraitError as e:
             self.logger.warning('Wrong type of status %s was passed to %s. Error: %s', status, self, e)

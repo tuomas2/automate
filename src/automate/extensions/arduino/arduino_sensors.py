@@ -24,11 +24,13 @@ from automate.service import AbstractSystemService
 from automate.statusobject import AbstractSensor
 from . import arduino_service
 
+
 class AbstractArduinoSensor(AbstractSensor):
     """
         Abstract base class for Arduino sensors
     """
 
+    history_frequency = CFloat(1.0)
     user_editable = CBool(False)
 
     #: Arduino service number (specify, if more than 1 ArduinoServices are configured in system)

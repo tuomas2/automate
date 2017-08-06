@@ -1,6 +1,7 @@
 from automate import *
 from automate.extensions.arduino import ArduinoAnalogSensor, ArduinoDigitalSensor, \
     ArduinoServoActuator, ArduinoDigitalActuator, ArduinoService
+from automate.extensions.webui import WebService
 from automate.program import Program
 
 def multiply(value):
@@ -8,7 +9,8 @@ def multiply(value):
 
 class ArduinoSystem(System):
     # Control servo with analog port a1 through interpolating sensor interp
-    u = UserFloatSensor(status_filter=multiply)
+    u1 = UserFloatSensor(status_filter=multiply, value_min=0, value_max=1)
+    u2 = UserFloatSensor(history_frequency=1, value_min=0, value_max=1)
     a1 = ArduinoAnalogSensor(service=0, pin=0)
     d12 = ArduinoDigitalSensor(service=0, pin=12, pull_up_resistor=True, inverted=True)
 
@@ -28,7 +30,7 @@ s = ArduinoSystem(services=[ArduinoService(
     device_type="arduino",
     sample_rate=500,
 ),
-    WebService(),
+    WebService(read_only=False),
     TextUIService(),
 ],
 )
