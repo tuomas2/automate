@@ -107,7 +107,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
     logger = Instance(logging.Logger, transient=True)
 
     view = ["name", "status", "description", "safety_delay",
-            "safety_mode", "change_delay", "change_mode"] + SystemObject.view
+            "safety_mode", "change_delay", "change_mode", "history_length"] + SystemObject.view
 
     simple_view = []
 
@@ -121,6 +121,9 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
     def __setstate__(self, *args, **kwargs):
         self._status_lock = Lock('statuslock')
         super(StatusObject, self).__setstate__(*args, **kwargs)
+
+    def _history_length_changed(self, new_value):
+        self.history = collections.deque(list(self.history or [])[-new_value:], maxlen=new_value)
 
     @property
     def is_program(self):
