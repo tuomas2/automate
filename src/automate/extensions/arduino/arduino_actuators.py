@@ -78,7 +78,7 @@ class ArduinoLCDActuator(AbstractArduinoActuator):
     device = CInt
 
     def _status_changed(self):
-        self._arduino.print_to_lcd(self._status)
+        self._arduino.lcd_print(self._status)
 
 
 class ArduinoRemoteDigitalActuator(AbstractArduinoActuator):

@@ -23,10 +23,14 @@ class VirtualWireCommand(AbstractCallable):
     """
         Send VirtualWire command. Positional Arguments::
 
-          - Arduino service number
           - Recipient device number
           - VirtualWire command byte (see arduino_service.VIRTUALWIRE_*)
           - Command arguments...
+
+        Keyword arguments:
+
+          - service: Arduino service number (defaults to 0)
+
     """
 
     def call(self, caller, **kwargs):
@@ -34,21 +38,76 @@ class VirtualWireCommand(AbstractCallable):
             return
 
         args = [self.call_eval(i, caller, **kwargs) for i in self._args]
-        arduino = self.system.request_service('ArduinoService', args[0])
+        _kwargs = {k: self.call_eval(v, caller, **kwargs) for k, v in list(self._kwargs.items())}
+        service = _kwargs.pop('service', 0)
+        arduino = self.system.request_service('ArduinoService', service)
 
-        return arduino.send_virtualwire_command(*args[1:])
+        return arduino.send_virtualwire_command(*args)
+
+
+class LCDSetBacklight(AbstractCallable):
+    """
+        Set LCD backlight on/off. Positional Arguments::
+
+          - LCD on/off value
+
+        Keyword arguments:
+
+          - service: Arduino service number (defaults to 0)
+    """
+
+    def call(self, caller, **kwargs):
+        if not caller:
+            return
+
+        args = [self.call_eval(i, caller, **kwargs) for i in self._args]
+        _kwargs = {k: self.call_eval(v, caller, **kwargs) for k, v in list(self._kwargs.items())}
+        service = _kwargs.pop('service', 0)
+        arduino = self.system.request_service('ArduinoService', service)
+
+        return arduino.lcd_set_backlight(bool(args[0]))
+
+
+class LCDPrint(AbstractCallable):
+    """
+        Print string to LCD. Positional Arguments::
+
+          - Value to be printed on LCD
+
+        Keyword arguments:
+
+          - service: Arduino service number (defaults to 0)
+    """
+
+    def call(self, caller, **kwargs):
+        if not caller:
+            return
+
+        args = [self.call_eval(i, caller, **kwargs) for i in self._args]
+        _kwargs = {k: self.call_eval(v, caller, **kwargs) for k, v in list(self._kwargs.items())}
+        service = _kwargs.pop('service', 0)
+        arduino = self.system.request_service('ArduinoService', service)
+
+        return arduino.lcd_print(str(args[0]))
 
 
 class FirmataCommand(AbstractCallable):
     """
     Send custom Firmata command to Arduino. Positional arguments::
+
      - Firmata command byte
      - Arguments...
+
+    Keyword arguments::
+
+     - service: Arduino service number (defaults to 0)
     """
     def call(self, caller, **kwargs):
         if not caller:
             return
         args = [self.call_eval(i, caller, **kwargs) for i in self._args]
-        arduino = self.system.request_service('ArduinoService', args[0])
-        arduino.write(*args[1:])
+        _kwargs = {k: self.call_eval(v, caller, **kwargs) for k, v in list(self._kwargs.items())}
+        service = _kwargs.pop('service', 0)
+        arduino = self.system.request_service('ArduinoService', service)
+        arduino.write(*args)
 

@@ -8,6 +8,7 @@
 - Add plotting of status change history to WebUi info panel + tag view
 - Add .status_filter function attribute to all sensors, that can be used to manipulate status
   after set_status().
+- API changes to VirtualWireCommand and FirmataCommand (service is keyword argument, not positional)
 
 0.10.19 (2017-08-04)
 --------------------

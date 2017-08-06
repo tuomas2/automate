@@ -255,12 +255,21 @@ class ArduinoService(AbstractSystemService):
             self.logger.debug('Configuring LCD')
             self._board.send_sysex(SYSEX_SETUP_LCD, [self.lcd_port, self.lcd_columns, self.lcd_rows])
 
-    def print_to_lcd(self, value_str):
+    def lcd_print(self, value_str):
         if not self._board:
             return
         with self._lock:
             self.logger.debug('Printing to LCD')
-            self._board.send_sysex(LCD_PRINT, bytearray(value_str.encode('utf-8')))
+            self._board.send_sysex(SYSEX_LCD_COMMAND,
+                                   bytearray([LCD_PRINT]) + bytearray(value_str.encode('utf-8')))
+
+    def lcd_set_backlight(self, value_bool):
+        if not self._board:
+            return
+        with self._lock:
+            self.logger.debug('Printing to LCD')
+            self._board.send_sysex(SYSEX_LCD_COMMAND,
+                                   bytearray([LCD_SET_BACKLIGHT, value_bool]))
 
     def _keep_alive(self):
         if self.keep_alive:
