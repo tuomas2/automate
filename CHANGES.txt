@@ -6,6 +6,8 @@
   of history of events that is stored in _history. This can be used to plot graphs of events
   in webui, for example.
 - Add plotting of status change history to WebUi info panel + tag view
+- Add .status_filter function attribute to all sensors, that can be used to manipulate status
+  after set_status().
 
 0.10.19 (2017-08-04)
 --------------------

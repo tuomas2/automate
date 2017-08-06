@@ -360,6 +360,10 @@ class AbstractSensor(StatusObject):
     #: Do not log status changes
     silent = CBool(False)
 
+    #: Filter status with a function (lambdas are not serializable, don't use them if you are
+    #: using system state saving)
+    status_filter = Any
+
     view = StatusObject.view + ['default', 'name', 'tags', 'reset_delay']
     simpleview = StatusObject.simple_view + ['_status']
 
@@ -384,6 +388,10 @@ class AbstractSensor(StatusObject):
 
         if status != self.default:
             self._setup_reset_delay()
+
+        if self.status_filter:
+            status = self.status_filter(status)
+
         return self._do_change_status(status, force)
 
     def update_status(self):
