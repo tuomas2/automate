@@ -119,11 +119,15 @@ patch_pyfirmata()
 
 def iterate_serial(board):
     while True:
-        while board.bytes_available():
-            try:
+        try:
+            while board.bytes_available():
                 board.iterate()
-            except Exception as e:
-                logger.exception('Exception in board.iterate: %s', e)
+        except OSError as e:
+            if e.errno == 9:
+                break
+            logger.exception('Exception in iterate_serial: %s', e)
+        except Exception as e:
+            logger.exception('Exception in iterate_serial: %s', e)
         time.sleep(0.01)
 
 
