@@ -22,7 +22,7 @@ gpio_requirements = ['RPi.GPIO']
 rpio_requirements = ['RPIO']
 arduino_requirements = []
 
-all_extras_requirements = web_requirements + gpio_requirements + arduino_requirements
+all_extras_requirements = web_plotting + gpio_requirements + arduino_requirements
 
 setupopts = dict(
     name="automate",
