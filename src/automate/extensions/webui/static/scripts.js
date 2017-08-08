@@ -18,21 +18,29 @@ along with automate-webui.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 var socket = undefined;
-var lastplot = 0;
+
+var lastplots = {};
 
 function plot(object_name) {
     var target = $("#graph-" + object_name);
     if(target.length === 0) return;
+
+    var target_canvas = target.children("canvas");
     now = Date.now();
-    if(now - lastplot < 5000) return;
-    lastplot = now;
+
+    if(target_canvas.length > 0) {
+        var lastplot = lastplots[object_name] || 0;
+        if (now - lastplot < 1000) return;
+    }
+    lastplots[object_name] = now;
 
     $.getJSON("/history.json/object/" + object_name, function(data_points) {
         $.plot(target,
             [
                 {
                     data: data_points,
-                    lines: {show: true, steps: true},
+                    lines: {show: true, steps: true, lineWidth: 0.7},
+                    color: "blue",
                 },
             ],
             {
