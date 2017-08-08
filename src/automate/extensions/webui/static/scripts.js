@@ -1,5 +1,5 @@
 /*
-(c) 2015 Tuomas Airaksinen
+(c) 2015-2017 Tuomas Airaksinen
 
 This file is part of automate-webui.
 
@@ -18,6 +18,33 @@ along with automate-webui.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 var socket = undefined;
+var lastplot = 0;
+
+function plot(object_name) {
+    var target = $("#graph-" + object_name);
+    if(target.length === 0) return;
+    now = Date.now();
+    if(now - lastplot < 5000) return;
+    lastplot = now;
+
+    $.getJSON("/history.json/object/" + object_name, function(data_points) {
+        $.plot(target,
+            [
+                {
+                    data: data_points,
+                    lines: {show: true, steps: true},
+                },
+            ],
+            {
+                xaxis: {
+                    mode: "time",
+                    timeformat: "%d %H:%M",
+                    timezone: "browser",
+                }
+            }
+        );
+    });
+}
 
 function object_status_changed(obj)
 {
@@ -52,6 +79,7 @@ function object_status_changed(obj)
     $(':input[name="name"][value="' + name + '"]').parent().find('#id_status').val(status);
     var sliders = $('.slider_sensor_'+name);
     sliders.slider('setValue', status);
+    plot(name);
 }
 
 function update_actuator(obj)
@@ -229,3 +257,5 @@ $(document).ready(function() {
     }
     refresh_queries();
 });
+
+

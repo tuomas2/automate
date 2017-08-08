@@ -1,7 +1,7 @@
 {% load crispy_forms_tags %}
 {% load staticfiles %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -17,6 +17,8 @@
   <script src="{% static "jquery.min.js" %}"></script>
   <script src="{% static "bootstrap/js/bootstrap.min.js" %}"></script>
   <script src="{% static "bootstrap/js/bootstrap-slider.js" %}"></script>
+  <script src="{% static "flot/jquery.flot.min.js"%}"></script>
+  <script src="{% static "flot/jquery.flot.time.min.js"%}"></script>
   {% block jsscripts %}
     <script src="{% static "scripts.js" %}?ver={{automate_version}}"></script>
   {% endblock %}
