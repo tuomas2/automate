@@ -194,7 +194,7 @@ def history_plot(request, name, type_):
         history = [(datetime.datetime.fromtimestamp(t), float(s or 0))
                    for t, s in obj.history if t > oldest_time]
         _time, status = tuple(zip(*history)) if history else ([], [])
-        ax.step(_time, status, '-', where='post')
+        ax.step(_time, status, '-', linewidth=0.5, where='post')
     elif type_ == 'tag':
         fig, ax = pyplot.subplots(figsize=(10, 3))
         objs = [i for i in service.system.objects_sorted if name in i.tags
@@ -204,7 +204,7 @@ def history_plot(request, name, type_):
             history = [(datetime.datetime.fromtimestamp(t), float(s or 0)) for t, s in obj.history
                        if t > oldest_time]
             _time, status = tuple(zip(*history)) if history else ([], [])
-            ax.step(_time, status, '-', where='post', label=obj.name)
+            ax.step(_time, status, '-', linewidth=0.5, where='post', label=obj.name)
     else:
         raise RuntimeError('Invalid type %s' % type_)
     if y_min:
