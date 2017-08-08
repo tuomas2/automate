@@ -97,10 +97,11 @@ class WebService(TornadoService):
     #: Age of oldest events shown in status graphs, in seconds. Defaults to 1 day.
     plots_limit_time = CInt(86400)
 
-    #: Show plots by default, or only links to figures. Disable this on slow machines.
+    #: Show matplotlib based plots by default, or only links to figures. Disable this on
+    #: slow machines. JS based plots are shown always.
     show_plots = CBool(True)
 
-    #: Plot file format. Allowed: svg, jpg, png
+    #: Matplotlib based plotting file format. Allowed: svg, jpg, png
     plot_format = Str('svg')
 
     _sockets = List(transient=True)
