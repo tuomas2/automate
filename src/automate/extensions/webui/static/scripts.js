@@ -19,6 +19,29 @@ along with automate-webui.  If not, see <http://www.gnu.org/licenses/>.
 
 var socket = undefined;
 
+function plot(object_name) {
+    var target = $("#graph-" + object_name);
+    if(target.length === 0) return;
+
+    $.getJSON("/history.json/object/" + object_name, function(data_points) {
+        $.plot(target,
+            [
+                {
+                    data: data_points,
+                    lines: {show: true, steps: true},
+                },
+            ],
+            {
+                xaxis: {
+                    mode: "time",
+                    timeformat: "%d %H:%M",
+                    timezone: "browser",
+                }
+            }
+        );
+    });
+}
+
 function object_status_changed(obj)
 {
     var status = obj['status'];
@@ -52,6 +75,7 @@ function object_status_changed(obj)
     $(':input[name="name"][value="' + name + '"]').parent().find('#id_status').val(status);
     var sliders = $('.slider_sensor_'+name);
     sliders.slider('setValue', status);
+    plot(name);
 }
 
 function update_actuator(obj)
@@ -229,3 +253,5 @@ $(document).ready(function() {
     }
     refresh_queries();
 });
+
+

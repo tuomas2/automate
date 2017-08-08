@@ -163,15 +163,14 @@ def custom(request, name):
         raise Http404
 
 
+@require_login
 def history_json(request, name):
     t_min = int(request.GET.get('t_min', service.plots_limit_time))
     oldest_time = time.time() - t_min
-
     obj = service.system.namespace[name]
-    history = [(t, float(s)) for t, s in obj.history if t > oldest_time] if t_min else obj.history
-    _time, status = tuple(zip(*history)) if history else ([], [])
-    out_json = {'time': _time, 'status': status}
-    return JsonResponse(out_json)
+    data_points = [(int(t*1000), float(s or 0))
+                   for t, s in obj.history if t > oldest_time]
+    return JsonResponse(data_points, safe=False)
 
 
 def history_plot(request, name, type_):
@@ -193,7 +192,7 @@ def history_plot(request, name, type_):
         fig, ax = pyplot.subplots(figsize=(10, 2))
         obj = service.system.namespace[name]
         history = [(datetime.datetime.fromtimestamp(t), float(s or 0))
-                   for t, s in obj.history if t > oldest_time] if t_min else obj.history
+                   for t, s in obj.history if t > oldest_time]
         _time, status = tuple(zip(*history)) if history else ([], [])
         ax.step(_time, status, '-', where='post')
     elif type_ == 'tag':
@@ -203,7 +202,7 @@ def history_plot(request, name, type_):
 
         for obj in objs:
             history = [(datetime.datetime.fromtimestamp(t), float(s or 0)) for t, s in obj.history
-                       if t > oldest_time] if t_min else obj.history
+                       if t > oldest_time]
             _time, status = tuple(zip(*history)) if history else ([], [])
             ax.step(_time, status, '-', where='post', label=obj.name)
     else:

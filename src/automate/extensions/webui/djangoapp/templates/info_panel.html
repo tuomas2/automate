@@ -41,12 +41,12 @@
               </div>
             </div>
           {% endif %}
-          {% if plotting_enabled and i.history %}
-            {% if service.show_plots %}
-              <img class="history-svg" src="{% url "history_object_plot" i.name %}?t={%time_now%}">
-            {% else %}
-              <a href="{% url "history_object_plot" i.name %}">History graph</a>
-            {% endif %}
+            <div id="graph-{{i.name}}" class="graph-container"></div>
+            <script type="text/javascript">
+              plot("{{i.name}}");
+            </script>
+          {% if plotting_enabled %}
+            <a href="{% url "history_object_plot" i.name %}">SVG</a>
           {% endif %}
         </div>
       </div>
