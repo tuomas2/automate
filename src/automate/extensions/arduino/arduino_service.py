@@ -172,7 +172,6 @@ class ArduinoService(AbstractSystemService):
     #: LCD Rows
     lcd_rows = 2
 
-
     #: Wakeup pin (0 to disable) that wakes Arduino from sleep mode. On Atmega328 based boards,
     #: possible values are 2 and 3
     wakeup_pin = CInt(0)

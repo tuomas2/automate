@@ -37,7 +37,7 @@ except ImportError:
 from django.contrib import messages
 
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect, Http404, HttpResponse
+from django.http import HttpResponseRedirect, Http404, HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.template import Template, RequestContext
 from django.utils.http import urlencode
@@ -163,6 +163,18 @@ def custom(request, name):
         raise Http404
 
 
+@require_login
+def history_json(request, name):
+    t_min = int(request.GET.get('t_min', service.plots_limit_time))
+    oldest_time = time.time() - t_min
+
+    obj = service.system.namespace[name]
+    history = [(t, float(s)) for t, s in obj.history if t > oldest_time] if t_min else obj.history
+    _time, status = tuple(zip(*history)) if history else ([], [])
+    out_json = {'time': _time, 'status': status}
+    return JsonResponse(out_json)
+
+
 def history_plot(request, name, type_):
     if pyplot is None:
         system.logger.error('Matplotlib is not installed, can not plot')
@@ -181,9 +193,9 @@ def history_plot(request, name, type_):
     if type_ == 'object':
         fig, ax = pyplot.subplots(figsize=(10, 2))
         obj = service.system.namespace[name]
-        history = [(t, s) for t, s in obj.history if t > oldest_time] if t_min else obj.history
+        history = [(datetime.datetime.fromtimestamp(t), float(s or 0))
+                   for t, s in obj.history if t > oldest_time] if t_min else obj.history
         _time, status = tuple(zip(*history)) if history else ([], [])
-        _time = [datetime.datetime.fromtimestamp(t) for t in _time]
         ax.step(_time, status, '-', where='post')
     elif type_ == 'tag':
         fig, ax = pyplot.subplots(figsize=(10, 3))
@@ -191,10 +203,9 @@ def history_plot(request, name, type_):
                 and hasattr(i, 'history') and isinstance(i.status, (float, int))]
 
         for obj in objs:
-            history = [(t, s) for t, s in obj.history
+            history = [(datetime.datetime.fromtimestamp(t), float(s or 0)) for t, s in obj.history
                        if t > oldest_time] if t_min else obj.history
             _time, status = tuple(zip(*history)) if history else ([], [])
-            _time = [datetime.datetime.fromtimestamp(t) for t in _time]
             ax.step(_time, status, '-', where='post', label=obj.name)
     else:
         raise RuntimeError('Invalid type %s' % type_)
