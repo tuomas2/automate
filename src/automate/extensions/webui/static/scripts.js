@@ -57,7 +57,11 @@ function plot(object_name) {
             grid: {
                 hoverable: true,
                 clickable: true
+            },
+            touch: {
+                scale: 'x'
             }
+
         }
     );
     plotters[object_name] = plot;
