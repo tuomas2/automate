@@ -43,14 +43,10 @@ function plot(object_name) {
             xaxis: {
                 mode: "time",
                 timeformat: "%d %H:%M",
-                timezone: "browser",
-                //zoomRange: [0.1, 10],
-                //panRange: [-10, 10]
+                timezone: "browser"
             },
             yaxis: {
-                zoomRange: [1, 1],
-                //panRange: [-10, 10]
-
+                zoomRange: [1, 1]
             },
             zoom: {
                 interactive: true
@@ -133,15 +129,21 @@ function object_status_changed(obj)
     sliders.slider('setValue', status);
     var plotter = plotters[name];
     if(plotter) {
-        data = plot_data[name];
-        prev_t = data[data.length -1][0];
+        var data = plot_data[name];
+        var prev_t = 0;
+
+        if(data.length > 0)
+            prev_t = data[data.length -1][0];
+
         data.push([time, status]);
-        var xaxis = plotter.getXAxes()[0];
-        var new_left = xaxis.min + (time-prev_t);
         plotter.setData(get_data(data));
         plotter.setupGrid();
         plotter.draw();
-        plotter.pan({left: xaxis.p2c(new_left), top: 0})
+        if(prev_t) {
+            var xaxis = plotter.getXAxes()[0];
+            var new_left = xaxis.min + (time - prev_t);
+            plotter.pan({left: xaxis.p2c(new_left), top: 0})
+        }
     }
 }
 
