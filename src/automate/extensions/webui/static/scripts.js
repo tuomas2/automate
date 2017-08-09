@@ -69,6 +69,8 @@ function plot(object_name) {
     $.getJSON("/history.json/object/" + object_name, function(data_points) {
         plot_data[object_name] = data_points;
         plot.setData(get_data(data_points));
+        plotter.setupGrid();
+        plotter.draw();
     });
 
     $("<div id='tooltip-" + object_name + "'></div>").css({
