@@ -19,77 +19,79 @@ along with automate-webui.  If not, see <http://www.gnu.org/licenses/>.
 
 var socket = undefined;
 
-var lastplots = {};
+var plot_data = {};
+var plotters = {};
+
+function get_data(data) {
+    return [
+        {
+            data: data,
+            lines: {show: true, steps: true, lineWidth: 0.7},
+            color: "blue"
+        }
+    ]
+}
 
 function plot(object_name) {
     var target = $("#graph-" + object_name);
     if(target.length === 0) return;
+    var initial_data = plot_data[object_name] || [];
 
-    var target_canvas = target.children("canvas");
-    now = Date.now();
+    var plot = $.plot(target,
+        get_data(initial_data),
+        {
+            xaxis: {
+                mode: "time",
+                timeformat: "%d %H:%M",
+                timezone: "browser",
+                //zoomRange: [0.1, 10],
+                //panRange: [-10, 10]
+            },
+            yaxis: {
+                zoomRange: [1, 1],
+                //panRange: [-10, 10]
 
-    if(target_canvas.length > 0) {
-        var lastplot = lastplots[object_name] || 0;
-        if (now - lastplot < 1000) return;
-    }
-    lastplots[object_name] = now;
+            },
+            zoom: {
+                interactive: true
+            },
+            pan: {
+                interactive: true
+            },
+            grid: {
+                hoverable: true,
+                clickable: true
+            }
+        }
+    );
+    plotters[object_name] = plot;
 
     $.getJSON("/history.json/object/" + object_name, function(data_points) {
-        $.plot(target,
-            [
-                {
-                    data: data_points,
-                    lines: {show: true, steps: true, lineWidth: 0.7},
-                    color: "blue"
-                }
-            ],
-            {
-                xaxis: {
-                    mode: "time",
-                    timeformat: "%d %H:%M",
-                    timezone: "browser",
-                    //zoomRange: [0.1, 10],
-                    //panRange: [-10, 10]
-                },
-                yaxis: {
-                    zoomRange: [1, 1],
-                    //panRange: [-10, 10]
+        plot_data[object_name] = data_points;
+        plot.setData(get_data(data_points));
+    });
 
-                },
-                zoom: {
-                    interactive: true
-                },
-                pan: {
-                    interactive: true
-                },
-                grid: {
-                    hoverable: true,
-                    clickable: true
-                }
-            }
-        );
-		$("<div id='tooltip-" + object_name + "'></div>").css({
-			position: "absolute",
-			display: "none",
-			border: "1px solid #fdd",
-			padding: "2px",
-			"background-color": "#fee",
-			opacity: 0.80
-		}).appendTo("body");
+    $("<div id='tooltip-" + object_name + "'></div>").css({
+        position: "absolute",
+        display: "none",
+        border: "1px solid #fdd",
+        padding: "2px",
+        "background-color": "#fee",
+        opacity: 0.80
+    }).appendTo("body");
 
-        target.bind("plothover", function (event, pos, item) {
-            if (item) {
-                var t = new Date(item.datapoint[0]),
-                    y = item.datapoint[1].toFixed(2);
+    target.bind("plothover", function (event, pos, item) {
+        if (item) {
+            var t = new Date(item.datapoint[0]),
+                y = item.datapoint[1].toFixed(2);
 
-                $("#tooltip-" + object_name).html(t.getDate() + '.' + t.getMonth() +
-                    ' ' + t.getHours() + ':' + t.getMinutes() + ": " + y)
-                    .css({top: item.pageY+5, left: item.pageX+5})
-                    .fadeIn(200);
-            } else {
-                $("#tooltip-"+object_name).hide();
-            }
-        });
+            $("#tooltip-" + object_name).html(t.getDate() + '.' + t.getMonth() +
+                ' ' + t.getHours() + ':' + t.getMinutes() + ": " + y)
+                .css({top: item.pageY+5, left: item.pageX+5})
+                .fadeIn(200);
+        } else {
+            $("#tooltip-"+object_name).hide();
+        }
     });
 }
 
@@ -127,7 +129,14 @@ function object_status_changed(obj)
     $(':input[name="name"][value="' + name + '"]').parent().find('#id_status').val(status);
     var sliders = $('.slider_sensor_'+name);
     sliders.slider('setValue', status);
-    plot(name);
+    var plotter = plotters[name];
+    if(plotter) {
+
+        plot_data[name].push([time, status]);
+        plotter.setData(get_data(plot_data[name]));
+        plotter.setupGrid();
+        plotter.draw();
+    }
 }
 
 function update_actuator(obj)
