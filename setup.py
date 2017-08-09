@@ -14,15 +14,11 @@ web_requirements = [
     # "whitenoise",
 ] + rpc_requirements
 
-web_plotting = [
-    "matplotlib~=2.0.2",
-] + web_requirements
-
 gpio_requirements = ['RPi.GPIO']
 rpio_requirements = ['RPIO']
 arduino_requirements = []
 
-all_extras_requirements = web_plotting + gpio_requirements + arduino_requirements
+all_extras_requirements = web_requirements + gpio_requirements + arduino_requirements
 
 setupopts = dict(
     name="automate",
@@ -46,7 +42,6 @@ setupopts = dict(
         ],
     extras_require={
         'web': web_requirements,
-        'web_plotting': web_plotting,
         'rpc': rpc_requirements,
         'raspberrypi': gpio_requirements,
         'rpio': rpio_requirements,

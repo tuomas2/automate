@@ -171,7 +171,6 @@ if __name__ == '__main__':
                 http_auth=(os.getenv('AUTOMATE_USERNAME', 'test'),
                            os.getenv('AUTOMATE_PASSWORD', 'test')),
                 debug=False if is_raspi() else True,
-                show_plots=False,
                 user_tags={'web'}, default_view='user_defined_view',
                 read_only=False,
                 show_actuator_details=False,

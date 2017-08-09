@@ -33,12 +33,6 @@ Install extras::
 
     pip install automate[web]
 
-If you want to have nice, but optional graphs about status changes in web ui,
-you could instead run (installs matplotlib)::
-
-    pip install automate[web_plotting]
-
-
 Main view
 ^^^^^^^^^
 

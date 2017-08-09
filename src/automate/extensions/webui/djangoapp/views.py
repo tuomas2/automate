@@ -26,7 +26,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import unicode_literals
 import threading
-import datetime
 import time
 
 try:
@@ -46,19 +45,6 @@ from .forms import LoginForm, CmdForm, FORMTYPES, QUICK_EDITS, TextForm
 from functools import wraps
 from automate.statusobject import AbstractActuator
 from automate.statusobject import AbstractSensor
-try:
-    import matplotlib
-    matplotlib.use('SVG')
-    from matplotlib import pyplot
-    pyplot.ioff()
-except ImportError:
-    pyplot = None
-
-CONTENT_TYPES = {
-    'svg': 'image/svg+xml',
-    'jpg': 'image/jpeg',
-    'png': 'image/png'
-}
 
 def set_globals(_service, _system):
     global system, service
@@ -110,7 +96,7 @@ def common_context(request):
 
     from automate import __version__
     return {'views': views, 'tag_views': tag_views, 'system': system, 'service': service,
-            'automate_version': __version__, 'plotting_enabled': bool(pyplot)}
+            'automate_version': __version__}
 
 
 def require_login(func):
@@ -165,66 +151,9 @@ def custom(request, name):
 
 @require_login
 def history_json(request, name):
-    t_min = int(request.GET.get('t_min', service.plots_limit_time))
-    oldest_time = time.time() - t_min
     obj = service.system.namespace[name]
-    data_points = [(int(t*1000), float(s or 0))
-                   for t, s in obj.history if t > oldest_time]
+    data_points = [(int(t*1000), float(s or 0)) for t, s in obj.history]
     return JsonResponse(data_points, safe=False)
-
-
-def history_plot(request, name, type_):
-    if pyplot is None:
-        system.logger.error('Matplotlib is not installed, can not plot')
-        raise Http404
-
-    t_min = int(request.GET.get('t_min', service.plots_limit_time))
-    format = request.GET.get('format', service.plot_format)
-    if format not in CONTENT_TYPES:
-        raise RuntimeError('Invalid format %s' % format)
-
-    oldest_time = time.time() - t_min
-    y_max = float(request.GET.get('y_max', 0))
-    y_min = float(request.GET.get('y_min', 0))
-
-    imgdata = StringIO()
-    if type_ == 'object':
-        fig, ax = pyplot.subplots(figsize=(10, 2))
-        obj = service.system.namespace[name]
-        history = [(datetime.datetime.fromtimestamp(t), float(s or 0))
-                   for t, s in obj.history if t > oldest_time]
-        _time, status = tuple(zip(*history)) if history else ([], [])
-        ax.step(_time, status, '-', linewidth=0.5, where='post')
-    elif type_ == 'tag':
-        fig, ax = pyplot.subplots(figsize=(10, 3))
-        objs = [i for i in service.system.objects_sorted if name in i.tags
-                and hasattr(i, 'history') and isinstance(i.status, (float, int))]
-
-        for obj in objs:
-            history = [(datetime.datetime.fromtimestamp(t), float(s or 0)) for t, s in obj.history
-                       if t > oldest_time]
-            _time, status = tuple(zip(*history)) if history else ([], [])
-            ax.step(_time, status, '-', linewidth=0.5, where='post', label=obj.name)
-    else:
-        raise RuntimeError('Invalid type %s' % type_)
-    if y_min:
-        ax.set_ylim(bottom=y_min)
-    if y_max:
-        ax.set_ylim(top=y_max)
-
-    fig.savefig(imgdata, format=format, bbox_inches='tight')
-    pyplot.close(fig)
-    return HttpResponse(content=imgdata.getvalue(), content_type=CONTENT_TYPES[format])
-
-
-@require_login
-def object_history_plot(request, name):
-    return history_plot(request, name, 'object')
-
-
-@require_login
-def tag_history_plot(request, name):
-    return history_plot(request, name, 'tag')
 
 
 @require_login

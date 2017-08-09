@@ -45,9 +45,6 @@
             <script type="text/javascript">
               plot("{{i.name}}");
             </script>
-          {% if plotting_enabled %}
-            <a href="{% url "history_object_plot" i.name %}">SVG</a>
-          {% endif %}
         </div>
       </div>
     {% endif %}
