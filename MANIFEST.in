@@ -10,6 +10,7 @@ recursive-include src/automate/extensions/webui/djangoapp/templates *.html
 exclude docs
 exclude examples
 exclude more_examples
+exclude **/*.ignore
 
 recursive-exclude docs *
 recursive-exclude examples *
