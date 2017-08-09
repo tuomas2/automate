@@ -131,11 +131,15 @@ function object_status_changed(obj)
     sliders.slider('setValue', status);
     var plotter = plotters[name];
     if(plotter) {
-
-        plot_data[name].push([time, status]);
-        plotter.setData(get_data(plot_data[name]));
+        data = plot_data[name];
+        prev_t = data[data.length -1][0];
+        data.push([time, status]);
+        var xaxis = plotter.getXAxes()[0];
+        var new_left = xaxis.min + (time-prev_t);
+        plotter.setData(get_data(data));
         plotter.setupGrid();
         plotter.draw();
+        plotter.pan({left: xaxis.p2c(new_left), top: 0})
     }
 }
 
