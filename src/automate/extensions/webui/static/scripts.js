@@ -42,7 +42,7 @@ function plot(object_name) {
         {
             xaxis: {
                 mode: "time",
-                timeformat: "%d %H:%M",
+                timeformat: "%H:%M",
                 timezone: "browser"
             },
             yaxis: {
@@ -59,7 +59,8 @@ function plot(object_name) {
                 clickable: true
             },
             touch: {
-                scale: 'x'
+                scale: 'x',
+                pan: 'x'
             }
 
         }
@@ -82,13 +83,13 @@ function plot(object_name) {
         opacity: 0.80
     }).appendTo("body");
 
-    target.bind("plothover", function (event, pos, item) {
+    target.bind("plothover plotclick", function (event, pos, item) {
         if (item) {
             var t = new Date(item.datapoint[0]),
                 y = item.datapoint[1].toFixed(2);
 
             $("#tooltip-" + object_name).html(t.getDate() + '.' + t.getMonth() +
-                ' ' + t.getHours() + ':' + t.getMinutes() + ": " + y)
+                ' ' + t.getHours() + ':' + t.getMinutes() + ": <b>" + y+"</b>")
                 .css({top: item.pageY+5, left: item.pageX+5})
                 .fadeIn(200);
         } else {
