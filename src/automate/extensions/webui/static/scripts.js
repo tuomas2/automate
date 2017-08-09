@@ -61,9 +61,35 @@ function plot(object_name) {
                 },
                 pan: {
                     interactive: true
+                },
+                grid: {
+                    hoverable: true,
+                    clickable: true
                 }
             }
         );
+		$("<div id='tooltip-" + object_name + "'></div>").css({
+			position: "absolute",
+			display: "none",
+			border: "1px solid #fdd",
+			padding: "2px",
+			"background-color": "#fee",
+			opacity: 0.80
+		}).appendTo("body");
+
+        target.bind("plothover", function (event, pos, item) {
+            if (item) {
+                var t = new Date(item.datapoint[0]),
+                    y = item.datapoint[1].toFixed(2);
+
+                $("#tooltip-" + object_name).html(t.getDate() + '.' + t.getMonth() +
+                    ' ' + t.getHours() + ':' + t.getMinutes() + ": " + y)
+                    .css({top: item.pageY+5, left: item.pageX+5})
+                    .fadeIn(200);
+            } else {
+                $("#tooltip-"+object_name).hide();
+            }
+        });
     });
 }
 
