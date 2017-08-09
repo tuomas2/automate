@@ -99,6 +99,7 @@ function object_status_changed(obj)
     var display = obj['display'];
     var changing = obj['changing'];
     var name = obj['name'];
+    var time = obj['time'];
 
     var status_str = display; //tString(status).capitalize();
 

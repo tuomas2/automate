@@ -305,6 +305,7 @@ class WebService(TornadoService):
                         s.write_json(action='object_status',
                                      name=obj.name,
                                      status=obj.status,
+                                     time=int(1000*time.time()),
                                      display=obj.get_status_display(),
                                      changing=obj.changing)
 
