@@ -40,14 +40,27 @@ function plot(object_name) {
                 {
                     data: data_points,
                     lines: {show: true, steps: true, lineWidth: 0.7},
-                    color: "blue",
-                },
+                    color: "blue"
+                }
             ],
             {
                 xaxis: {
                     mode: "time",
                     timeformat: "%d %H:%M",
                     timezone: "browser",
+                    //zoomRange: [0.1, 10],
+                    //panRange: [-10, 10]
+                },
+                yaxis: {
+                    zoomRange: [1, 1],
+                    //panRange: [-10, 10]
+
+                },
+                zoom: {
+                    interactive: true
+                },
+                pan: {
+                    interactive: true
                 }
             }
         );
