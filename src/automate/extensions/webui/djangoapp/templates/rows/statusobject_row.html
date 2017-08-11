@@ -20,7 +20,8 @@
       </div>
       <div class='col-xs-12 edit_area object_status_column'>
         {% if programlist %}
-          {% program_active object %}
+          a: {% program_active object %}<br>
+          s: {% object_status object %}
         {% elif object.user_editable and object.data_type %}
           {% if object.data_type == 'bool' %}
             <a class="btn btn-default mytoggle" href="{% url 'toggle_sensor' object.name %}?source={{ source }}"
