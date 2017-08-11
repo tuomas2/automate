@@ -49,10 +49,12 @@ function plot(object_name) {
                     timezone: "browser"
                 },
                 yaxis: {
-                    zoomRange: [1, 1]
+                    zoomRange: false,
+                    panRange: false
                 },
                 zoom: {
-                    interactive: true
+                    interactive: true,
+                    amount: 1.5
                 },
                 pan: {
                     interactive: true
