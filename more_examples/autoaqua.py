@@ -83,9 +83,12 @@ portmap = {
 # GPIO port 4 is reserved for temperature sensor
 #bread = [17, 27, 22, 10, 9, 11, 2, 3]
 
-sisa = "28-000005502fec"
-ulko = "28-0000055162f1"
-akva = "28-00000558263c"
+sisa =  "28-000005502fec"
+
+ulko =  "28-0000055162f1"
+akva =  "28-00000558263c"
+akva_uppo = "28-031702d25dff"
+
 
 raspi2host = 'http://raspi2:3031/' if is_raspi() else 'http://localhost:3031/'
 
@@ -190,6 +193,19 @@ class autoaqua(System):
             max_errors=7,
             history_length=1000,
             active_condition=Or(Value('aqua_temperature') > water_temp_max, Value('aqua_temperature') < water_temp_min),
+            on_activate=Run('push_sender'),
+            on_deactivate=Run('push_sender'),
+        )
+
+        aqua_uppo_temperature = TemperatureSensor(
+            tags='temperature',
+            addr=akva_uppo,
+            interval=60,
+            default=25.123,
+            max_jump=2.,
+            max_errors=7,
+            history_length=1000,
+            active_condition=Or(Value('aqua_uppo_temperature') > water_temp_max, Value('aqua_uppo_temperature') < water_temp_min),
             on_activate=Run('push_sender'),
             on_deactivate=Run('push_sender'),
         )
