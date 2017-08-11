@@ -20,6 +20,10 @@
    :target: https://github.com/tuomas2/automate/blob/master/LICENSE.txt
 
 
+
+.. image:: https://raw.githubusercontent.com/tuomas2/automate/master/docs/source/official_extensions/images/main_view.png
+   :target: http://python-automate.readthedocs.io/en/latest/official_extensions/webui.html
+
 Automate
 ========
 
