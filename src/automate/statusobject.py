@@ -86,7 +86,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
     history_transpose = Property(transient=True, depends_on='history, _status')
 
     #: Amount of status change events to be stored in history
-    history_length = CInt(100)
+    history_length = CInt(1000)
 
     #: How often new values are saved to history, in seconds
     history_frequency = CFloat(0)
