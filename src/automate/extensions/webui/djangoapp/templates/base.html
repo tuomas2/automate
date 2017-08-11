@@ -22,9 +22,9 @@
   <script src="{% static "flot/jquery.flot.time.min.js"%}"></script>
   <script src="{% static "flot/jquery.flot.navigate.min.js"%}"></script>
   <script src="{% static "flot/jquery.flot.resize.min.js"%}"></script>
-  <script src="{% static "flot/jquery.flot.touch.js"%}"></script>
+  <script src="{% static "flot/jquery.flot.touch.js"%}?ver=4"></script>
   {% block jsscripts %}
-    <script src="{% static "scripts.js" %}?ver=9-{{automate_version}}"></script>
+    <script src="{% static "scripts.js" %}?ver=10-{{automate_version}}"></script>
   {% endblock %}
   <!-- Custom styles for this template -->
   <link href="{% static "style.css" %}?ver={{automate_version}}" rel="stylesheet">

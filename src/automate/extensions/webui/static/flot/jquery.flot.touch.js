@@ -88,6 +88,7 @@ Use as follow:
         }
 
         function scale(delta) {
+            delta *= 0.3;
             var placeholder = plot.getPlaceholder();
             var options = plot.getOptions();
 
