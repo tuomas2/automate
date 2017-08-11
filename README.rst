@@ -20,10 +20,6 @@
    :target: https://github.com/tuomas2/automate/blob/master/LICENSE.txt
 
 
-
-.. image:: https://raw.githubusercontent.com/tuomas2/automate/master/docs/source/official_extensions/images/main_view.png
-   :target: http://python-automate.readthedocs.io/en/latest/official_extensions/webui.html
-
 Automate
 ========
 
@@ -39,6 +35,9 @@ but is quite general in nature and one could find applications from various
 fields that could take advantage of Automate. Automate can be embedded
 in other Python software as a component, which runs its operations in
 its own threads.
+
+.. image:: https://raw.githubusercontent.com/tuomas2/automate/master/docs/source/official_extensions/images/main_view.png
+   :target: http://python-automate.readthedocs.io/en/latest/official_extensions/webui.html
 
 Highlights:
 -----------
