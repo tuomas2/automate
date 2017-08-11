@@ -76,8 +76,6 @@ function plot(object_name) {
 
             }
         );
-        plot.setupGrid();
-        plot.draw();
         plotters[object_name].push(plot);
     }
 
