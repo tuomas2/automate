@@ -175,7 +175,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
     @property
     def full_integral(self):
         try:
-            return self.integral(self.times[0], self.times[-1])
+            return self.integral(self.times[0], time.time())
         except IndexError:
             return 0
 
