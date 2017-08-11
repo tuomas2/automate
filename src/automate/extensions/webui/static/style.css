@@ -20,10 +20,17 @@ along with automate-webui.  If not, see <http://www.gnu.org/licenses/>.
 body {
     padding-top: 50px;
 }
-
+.slider {
+    width: 100% !important;
+}
 .graph-container {
     width: 100%;
     height: 150px;
+}
+
+.icon-button {
+    font-size: 185%;
+    padding: 2pt;
 }
 
 .starter-template {

@@ -255,9 +255,11 @@ function refresh_queries() {
         if($(ev.target).hasClass('edit_area') || $(ev.target).parents().hasClass('edit_area'))
             return;
 
-        var pls_str = $(this).data('placeholder');
-        var placeholder = $(this).next('div.collapse');
+        //var pls_str = $(this).data('placeholder');
         var name = $(this).data('name');
+        var target = $(this).data('target');
+        var parent = $(this).parents('.object_row');
+        var placeholder = parent.nextAll('.collapse-' + target + '-' + name);
 
         var url = $(this).data('url');
 
@@ -265,14 +267,21 @@ function refresh_queries() {
             placeholder.collapse('hide');
         else
         {
-            $.ajax({
-                type: 'GET',
-                url: url,
-                success: function (d) {
-                    placeholder.html(d);
-                    placeholder.collapse('show');
-                }
-            });
+            if(target==="info") {
+                $.ajax({
+                    type: 'GET',
+                    url: url,
+                    success: function (d) {
+                        placeholder.html(d);
+                        placeholder.collapse('show');
+                    }
+                });
+            }
+            else if(target==="graph")
+            {
+                plot(name);
+                placeholder.collapse('show');
+            }
         }
     });
 }

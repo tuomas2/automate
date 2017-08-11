@@ -1,33 +1,44 @@
 {% load automate_tags %}
 {% load crispy_forms_tags %}
-<div class="row object_row request_panel" {% row_attrs sensor.name %}>
+<div class="row object_row" data-name="{{sensor.name}}">
   <div class='col-xs-3'>
-    <a>
-
-      {{ sensor.name }}
+    <a class="request_panel" data-target="info" {% row_attrs sensor.name %}>
+    <i class="icon-button fa fa-info-circle"></i>
     </a>
-    {% if groupview %}
-      ({{ sensor.class_name }})
-    {% endif %}
-
+    <a class="request_panel" data-target="graph" {% row_attrs sensor.name %}>
+    <i class="icon-button fa fa-line-chart"></i>
+    </a>
   </div>
-  <div class='col-xs-9 edit_area object_status_column'>
-    {% if sensor.user_editable and sensor.data_type %}
+  <div class="col-xs-9">
+    <div class="row">
+      <div class="col-xs-12">
+        {{ sensor.name }}
+        {% if groupview %}
+          ({{ sensor.class_name }})
+        {% endif %}
 
-      {% if sensor.data_type == 'bool' %}
-        <a class="btn btn-default mytoggle" href="{% url 'toggle_sensor' sensor.name %}?source={{ source }}"
-           data-name="{{ sensor.name }}" data-status="{{ sensor.status }}">
+      </div>
+      <div class='col-xs-12 edit_area object_status_column'>
+        {% if sensor.user_editable and sensor.data_type %}
+
+          {% if sensor.data_type == 'bool' %}
+            <a class="btn btn-default mytoggle" href="{% url 'toggle_sensor' sensor.name %}?source={{ source }}"
+               data-name="{{ sensor.name }}" data-status="{{ sensor.status }}">
+              {% object_status sensor %}
+            </a>
+          {% else %}
+            {% sensor_form sensor as form %}
+            {% crispy form %}
+          {% endif %}
+
+        {% else %}
           {% object_status sensor %}
-        </a>
-      {% else %}
-        {% sensor_form sensor as form %}
-        {% crispy form %}
-      {% endif %}
-
-    {% else %}
-      {% object_status sensor %}
-    {% endif %}
+        {% endif %}
+      </div>
+    </div>
   </div>
 </div>
-<div class='row collapse'>
+<div class='collapse-graph-{{sensor.name}} row collapse'>
+ <div id="graph-{{sensor.name}}" class="graph-container"></div>
 </div>
+<div class='collapse-info-{{sensor.name}} row collapse'></div>

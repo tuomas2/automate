@@ -31,6 +31,8 @@ import sys
 import collections
 
 import datetime
+from numbers import Number
+
 from traits.api import (cached_property, Any, CBool, Instance, Dict, Str, CFloat,
                         List, Enum, Bool, Property, Event, CInt)
 from traits.trait_errors import TraitError
@@ -153,15 +155,16 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
         return statuses[t_index]
 
     def integral(self, t_a, t_b):
+        self.logger.info('Calculating integral for %s', self)
         if isinstance(t_a, datetime.datetime):
             t_a = t_a.timestamp()
         if isinstance(t_b, datetime.datetime):
             t_b = t_b.timestamp()
-        if t_a < self.history[0][0]:
-            raise ValueError('Status not known at time %s' % t_a)
-        history = [(t, s) for t, s in self.history if t_a <= t <= t_b]
+        history = [(t, s) for t, s in self.history if t_a <= t <= t_b and isinstance(s, Number)]
         t_prev = t_a
         s_prev = self.status_at_time(t_a)
+        if not isinstance(s_prev, Number):
+            s_prev = 0
         s_sum = 0.
         for t, s in history:
             s_sum += s_prev * (t-t_prev)
@@ -171,7 +174,10 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
 
     @property
     def full_integral(self):
-        return self.integral(self.times[0], self.times[-1])
+        try:
+            return self.integral(self.times[0], self.times[-1])
+        except IndexError:
+            return 0
 
     def __init__(self, *args, **kwargs):
         self._status_lock = Lock('statuslock')

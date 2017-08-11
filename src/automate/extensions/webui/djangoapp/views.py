@@ -253,7 +253,11 @@ def info_panel(request, name):
                                         'history_frequency']
                           and (
                           getattr(obj, i, None) or type(getattr(obj, i, None)) in (int, float)))]
-
+        info_items.append(('Integral', obj.full_integral))
+        try:
+            info_items.append(('Average', obj.full_integral/(obj.times[-1]-obj.times[0])))
+        except ZeroDivisionError:
+            pass
         callables = ((i.capitalize().replace('_', ' '), i) for i in obj.callables)
 
         textform = TextForm({'status': obj.status, 'name': obj.name},
