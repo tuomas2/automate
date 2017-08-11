@@ -33,7 +33,6 @@ def sys_with_web():
         user_tags={'web'},
         read_only=False,
         default_view='tags_view',
-        show_actuator_details=False,
         #static_dirs={'/webcam/(.*)': '/home/tuma/public_html/webcam/'},
         #custom_pages={'Webcam': webcam_page},
         #django_settings={

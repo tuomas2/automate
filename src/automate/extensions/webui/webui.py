@@ -53,11 +53,9 @@ class WebService(TornadoService):
     #: Secure SSL configuration HIGHLY recommended, if not operating in ``read_only`` mode.
     read_only = CBool(True)
 
-    #: Default view that is displayed when entering the server. Can be the name of any view in views.py
+    #: Default view that is displayed when entering the server.
+    #: Can be the name of any view in views.py
     default_view = Str('system')
-
-    #: Below Actuator row, show active Programs that are controlling Actuator
-    show_actuator_details = CBool(True)
 
     #: HTTP port to listen
     http_port = Int(8080)
@@ -285,11 +283,7 @@ class WebService(TornadoService):
                     s.close(code=1000, reason='Timeout')
                     continue
                 if obj.name in s.subscribed_objects:
-                    if attribute == 'program_status_items' and self.show_actuator_details:
-                        new_actuator_html = render_to_string(
-                            'rows/actuator_row.html', dict(actuator=obj, source='__SOURCE__', service=self))
-                        s.write_json(action='update_actuator', name=obj.name, html=new_actuator_html)
-                    elif attribute == 'active':
+                    if attribute == 'active':
                         s.write_json(action='program_active', name=obj.name, active=obj.active)
                     elif attribute in ['status', 'changing']:
                         s.write_json(action='object_status',

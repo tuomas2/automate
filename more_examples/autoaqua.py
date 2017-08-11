@@ -545,7 +545,6 @@ if __name__ == '__main__':
             user_tags={'quick'},
             read_only = False,
             default_view = 'tags_view',
-            show_actuator_details = False,
             static_dirs = {'/webcam/(.*)': 'public_html/webcam/'},
             custom_pages = {'Webcam': webcam_page},
             django_settings = {'SESSION_FILE_PATH': 'sessions' if is_raspi() else '/tmp',

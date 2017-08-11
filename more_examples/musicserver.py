@@ -504,7 +504,6 @@ if __name__ == '__main__':
                 debug=False if is_raspi() else True,
                 user_tags={'web'}, default_view='user_editable_view',
                 read_only=False,
-                show_actuator_details=False,
                 django_settings = {'SESSION_FILE_PATH': 'sessions' if is_raspi() else '/tmp',
                                    'SESSION_COOKIE_AGE': 52560000,
                                    'SECRET_KEY': os.getenv('AUTOMATE_SECRET_KEY', 'unsecure-default'),
