@@ -24,6 +24,7 @@ from __future__ import unicode_literals
 
 from automate import *
 import pytest, mock
+from pytest import approx
 from datetime import datetime
 
 
@@ -74,3 +75,37 @@ def test_history(sysloader):
     sys.flush()
     assert len(sys.s.history) == 2
 
+
+def test_history_math(sysloader):
+    class HistoryTest(System):
+        s = UserFloatSensor(history_length=20, default=0)
+    sys = sysloader.new_system(HistoryTest)
+
+    s = sys.s
+    s.history = [(0, 0.), (1, 1.), (2, 0.5)]
+    assert s.status_at_time(0) == approx(0.)
+    assert s.status_at_time(0.5) == approx(0.)
+    assert s.status_at_time(1) == approx(1.)
+    with pytest.raises(ValueError):
+        assert s.status_at_time(-0.5) == approx(1.)
+
+    assert s.status_at_time(2) == approx(0.5)
+    assert s.status_at_time(3) == approx(0.5)
+
+    with pytest.raises(ValueError):
+        assert s.integral(-1,1) == approx(0)
+
+    assert s.integral(0,1) == approx(0)
+    assert s.integral(1,2) == approx(1)
+
+    assert s.integral(0.1,1) == approx(0)
+    assert s.integral(0.1,1.5) == approx(0.5)
+
+    assert s.integral(1.1,2) == approx(0.9)
+    assert s.integral(1.1,1.9) == approx(0.8)
+
+    assert s.integral(0,2) == approx(1)
+    assert s.integral(2,3) == approx(0.5)
+    assert s.integral(2,4) == approx(1.0)
+    assert s.integral(0,3) == approx(1.5)
+    assert s.integral(0,4) == approx(2)

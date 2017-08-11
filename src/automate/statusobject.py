@@ -80,6 +80,9 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
     # Deque of history, which consists of tuples (timestamp, status), read only
     history = Any(transient=True)
 
+    #: Transpose of history (timesstamps, statuses)
+    history_transpose = Property(transient=True, depends_on='status')
+
     #: Amount of status change events to be stored in history
     history_length = CInt(100)
 
@@ -117,6 +120,54 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
 
     # used by Web UI, for templates
     data_type = Str(transient=True)
+
+    @cached_property
+    def _get_history_transpose(self):
+        return list(zip(*self.history))
+
+    @property
+    def times(self):
+        return self.history_transpose[0]
+
+    @property
+    def datetimes(self):
+        return [datetime.datetime.fromtimestamp(i) for i in self.times]
+
+    @property
+    def statuses(self):
+        return self.history_transpose[1]
+
+    def status_at_time(self, T):
+        if isinstance(T, datetime.datetime):
+            T = T.timestamp()
+        t_max = 0
+        times, statuses = self.history_transpose
+        if T < times[0]:
+            raise ValueError('Status not known at time %s' % T)
+        for t in times:
+            if t <= T:
+                t_max = t
+            else:
+                break
+        t_index = times.index(t_max)
+        return statuses[t_index]
+
+    def integral(self, t_a, t_b):
+        if isinstance(t_a, datetime.datetime):
+            t_a = t_a.timestamp()
+        if isinstance(t_b, datetime.datetime):
+            t_b = t_b.timestamp()
+        if t_a < self.history[0][0]:
+            raise ValueError('Status not known at time %s' % t_a)
+        history = [(t, s) for t, s in self.history if t_a <= t <= t_b]
+        t_prev = t_a
+        s_prev = self.status_at_time(t_a)
+        s_sum = 0.
+        for t, s in history:
+            s_sum += s_prev * (t-t_prev)
+            s_prev, t_prev = s, t
+        s_sum += s_prev * (t_b-t_prev)
+        return s_sum
 
     def __init__(self, *args, **kwargs):
         self._status_lock = Lock('statuslock')
