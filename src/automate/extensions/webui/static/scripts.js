@@ -66,6 +66,8 @@ function plot(object_name) {
         }
     );
     plotters[object_name] = plot;
+    plot.setupGrid();
+    plot.draw();
 
     $.getJSON("/history.json/object/" + object_name, function(data_points) {
         plot_data[object_name] = data_points;
@@ -263,8 +265,9 @@ function refresh_queries() {
 
         var url = $(this).data('url');
 
-        if(placeholder.hasClass('in'))
+        if(placeholder.hasClass('in')) {
             placeholder.collapse('hide');
+        }
         else
         {
             if(target==="info") {

@@ -22,7 +22,7 @@
             {{ i.class_name }}s
           </div>
         {% endifchanged %}
-        {% include 'rows/statusobject_row.html' with sensor=i %}
+        {% include 'rows/statusobject_row.html' with object=i %}
         <hr class='object_row'>
       {% endfor %}
     </div>
@@ -33,11 +33,8 @@
         <hr>
 
         <div class="title_row row">
-          <div class="col-xs-8">
+          <div class="col-xs-10">
             Name
-          </div>
-          <div class="col-xs-2" style='text-align: right;'>
-            Pri
           </div>
           <div class="col-xs-2" style='text-align: right;'>
             Act
@@ -46,7 +43,7 @@
         <hr class='object_row'>
         {% for i in system.objects|name_sort %}
           {% if i.is_program %}
-            {% include 'rows/program_row.html' with program=i  programlist=True %}
+            {% include 'rows/statusobject_row.html' with object=i  programlist=True %}
             <hr class='object_row'>
           {% endif %}
         {% endfor %}
@@ -75,7 +72,7 @@
           </div>
         {% endifchanged %}
 
-        {% include 'rows/actuator_row.html' with actuator=i %}
+        {% include 'rows/statusobject_row.html' with object=i %}
         <hr class='object_row'>
       {% endfor %}
 

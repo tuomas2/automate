@@ -155,7 +155,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
         return statuses[t_index]
 
     def integral(self, t_a, t_b):
-        self.logger.info('Calculating integral for %s', self)
+        self.logger.debug('Calculating integral for %s', self)
         if isinstance(t_a, datetime.datetime):
             t_a = t_a.timestamp()
         if isinstance(t_b, datetime.datetime):

@@ -256,7 +256,7 @@ def info_panel(request, name):
         info_items.append(('Integral', obj.full_integral))
         try:
             info_items.append(('Average', obj.full_integral/(obj.times[-1]-obj.times[0])))
-        except ZeroDivisionError:
+        except (ZeroDivisionError, IndexError):
             pass
         callables = ((i.capitalize().replace('_', ' '), i) for i in obj.callables)
 

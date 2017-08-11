@@ -1,44 +1,55 @@
 {% load automate_tags %}
 {% load crispy_forms_tags %}
-<div class="row object_row" data-name="{{sensor.name}}">
+<div class="row object_row" data-name="{{object.name}}">
   <div class='col-xs-3'>
-    <a class="request_panel" data-target="info" {% row_attrs sensor.name %}>
+    <a class="request_panel" data-target="info" {% row_attrs object.name %}>
     <i class="icon-button fa fa-info-circle"></i>
     </a>
-    <a class="request_panel" data-target="graph" {% row_attrs sensor.name %}>
+    <a class="request_panel" data-target="graph" {% row_attrs object.name %}>
     <i class="icon-button fa fa-line-chart"></i>
     </a>
   </div>
   <div class="col-xs-9">
     <div class="row">
       <div class="col-xs-12">
-        {{ sensor.name }}
+        {{ object.name }}
         {% if groupview %}
-          ({{ sensor.class_name }})
+          ({{ object.class_name }})
         {% endif %}
 
       </div>
       <div class='col-xs-12 edit_area object_status_column'>
-        {% if sensor.user_editable and sensor.data_type %}
-
-          {% if sensor.data_type == 'bool' %}
-            <a class="btn btn-default mytoggle" href="{% url 'toggle_sensor' sensor.name %}?source={{ source }}"
-               data-name="{{ sensor.name }}" data-status="{{ sensor.status }}">
-              {% object_status sensor %}
+        {% if programlist %}
+          {% program_active object %}
+        {% elif object.user_editable and object.data_type %}
+          {% if object.data_type == 'bool' %}
+            <a class="btn btn-default mytoggle" href="{% url 'toggle_sensor' object.name %}?source={{ source }}"
+               data-name="{{ object.name }}" data-status="{{ object.status }}">
+              {% object_status object %}
             </a>
           {% else %}
-            {% sensor_form sensor as form %}
+            {% sensor_form object as form %}
             {% crispy form %}
           {% endif %}
-
         {% else %}
-          {% object_status sensor %}
+          {% object_status object %}
         {% endif %}
       </div>
     </div>
   </div>
 </div>
-<div class='collapse-graph-{{sensor.name}} row collapse'>
- <div id="graph-{{sensor.name}}" class="graph-container"></div>
+<div class='collapse-graph-{{object.name}} row collapse'>
+  <div class="panel-body info_panel">
+    <div class="panel">
+      <div class="panel panel-warning">
+        <div class="panel-heading">
+        Graph
+        </div>
+        <div class="panel-body">
+          <div id="graph-{{object.name}}" class="graph-container"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-<div class='collapse-info-{{sensor.name}} row collapse'></div>
+<div class='collapse-info-{{object.name}} row collapse'></div>

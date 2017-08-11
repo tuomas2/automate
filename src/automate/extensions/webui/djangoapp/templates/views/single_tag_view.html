@@ -9,12 +9,10 @@
     <div class="col-md-12 object_list_column">
       <div class="group_content">
         {% for obj in objs %}
-          {% if obj.object_type == 'sensor' %}
-            {% include 'rows/statusobject_row.html' with sensor=obj %}
-          {% elif obj.object_type == 'actuator' %}
-            {% include 'rows/actuator_row.html' with actuator=obj %}
+          {% if obj.object_type == 'sensor' or obj.object_type == 'actuator' %}
+            {% include 'rows/statusobject_row.html' with object=obj %}
           {% elif obj.object_type == 'program' %}
-            {% include 'rows/program_row.html' with program=obj %}
+            {% include 'rows/statusobject_row.html' with object=obj %}
           {% else %}
             {% include 'rows/general_row.html' with object=obj %}
           {% endif %}
