@@ -33,47 +33,53 @@ function get_data(data) {
 }
 
 function plot(object_name) {
-    var target = $("#graph-" + object_name);
-    if(target.length === 0) return;
+    var targets = $(".graph-" + object_name);
+    if(targets.length === 0 || plotters[object_name])
+        return;
+
+    plotters[object_name] = [];
     var initial_data = plot_data[object_name] || [];
+    for (var i = 0; i < targets.length; i++) {
+        var plot = $.plot(targets[i],
+            get_data(initial_data),
+            {
+                xaxis: {
+                    mode: "time",
+                    timeformat: "%H:%M",
+                    timezone: "browser"
+                },
+                yaxis: {
+                    zoomRange: [1, 1]
+                },
+                zoom: {
+                    interactive: true
+                },
+                pan: {
+                    interactive: true
+                },
+                grid: {
+                    hoverable: true,
+                    clickable: true
+                },
+                touch: {
+                    scale: 'x',
+                    pan: 'x'
+                }
 
-    var plot = $.plot(target,
-        get_data(initial_data),
-        {
-            xaxis: {
-                mode: "time",
-                timeformat: "%H:%M",
-                timezone: "browser"
-            },
-            yaxis: {
-                zoomRange: [1, 1]
-            },
-            zoom: {
-                interactive: true
-            },
-            pan: {
-                interactive: true
-            },
-            grid: {
-                hoverable: true,
-                clickable: true
-            },
-            touch: {
-                scale: 'x',
-                pan: 'x'
             }
-
-        }
-    );
-    plotters[object_name] = plot;
-    plot.setupGrid();
-    plot.draw();
+        );
+        plot.setupGrid();
+        plot.draw();
+        plotters[object_name].push(plot);
+    }
 
     $.getJSON("/history.json/object/" + object_name, function(data_points) {
         plot_data[object_name] = data_points;
-        plot.setData(get_data(data_points));
-        plotter.setupGrid();
-        plotter.draw();
+        $.each(plotters[object_name], function(i, plotter) {
+            plotter.setData(get_data(data_points));
+            plotter.setupGrid();
+            plotter.draw();
+        });
     });
 
     $("<div id='tooltip-" + object_name + "'></div>").css({
@@ -85,7 +91,7 @@ function plot(object_name) {
         opacity: 0.80
     }).appendTo("body");
 
-    target.bind("plothover plotclick", function (event, pos, item) {
+    targets.bind("plothover plotclick", function (event, pos, item) {
         if (item) {
             var t = new Date(item.datapoint[0]),
                 y = item.datapoint[1].toFixed(2);
@@ -134,8 +140,8 @@ function object_status_changed(obj)
     $(':input[name="name"][value="' + name + '"]').parent().find('#id_status').val(status);
     var sliders = $('.slider_sensor_'+name);
     sliders.slider('setValue', status);
-    var plotter = plotters[name];
-    if(plotter) {
+    var plotters_ = plotters[name];
+    if(plotters_) {
         var data = plot_data[name];
         var prev_t = 0;
 
@@ -143,14 +149,16 @@ function object_status_changed(obj)
             prev_t = data[data.length -1][0];
 
         data.push([time, status]);
-        plotter.setData(get_data(data));
-        plotter.setupGrid();
-        plotter.draw();
-        if(prev_t) {
-            var xaxis = plotter.getXAxes()[0];
-            var new_left = xaxis.min + (time - prev_t);
-            plotter.pan({left: xaxis.p2c(new_left), top: 0})
-        }
+        $.each(plotters_, function(i, plotter) {
+            plotter.setData(get_data(data));
+            plotter.setupGrid();
+            plotter.draw();
+            if (prev_t) {
+                var xaxis = plotter.getXAxes()[0];
+                var new_left = xaxis.min + (time - prev_t);
+                plotter.pan({left: xaxis.p2c(new_left), top: 0})
+            }
+        });
     }
 }
 
