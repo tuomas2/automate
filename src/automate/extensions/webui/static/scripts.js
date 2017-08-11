@@ -32,6 +32,12 @@ function get_data(data) {
     ]
 }
 
+Number.prototype.pad = function(size) {
+      var s = String(this);
+      while (s.length < (size || 2)) {s = "0" + s;}
+      return s;
+    }
+
 function plot(object_name) {
     var targets = $(".graph-" + object_name);
     if(targets.length === 0 || plotters[object_name])
@@ -98,8 +104,12 @@ function plot(object_name) {
             var t = new Date(item.datapoint[0]),
                 y = item.datapoint[1].toFixed(2);
 
-            $("#tooltip-" + object_name).html(t.getDate() + '.' + t.getMonth() +
-                ' ' + t.getHours() + ':' + t.getMinutes() + ": <b>" + y+"</b>")
+            $("#tooltip-" + object_name).html(
+                t.getDate().pad(2) + '.'
+                + t.getMonth().pad(2) + ' '
+                + t.getHours().pad(2) + ':'
+                + t.getMinutes().pad(2) + ':'
+                + t.getSeconds().pad(2) + " &ndash; " + y)
                 .css({top: item.pageY+5, left: item.pageX+5})
                 .fadeIn(200);
         } else {
