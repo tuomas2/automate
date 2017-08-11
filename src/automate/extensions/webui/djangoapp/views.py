@@ -253,7 +253,8 @@ def info_panel(request, name):
                                         'history_frequency']
                           and (
                           getattr(obj, i, None) or type(getattr(obj, i, None)) in (int, float)))]
-        info_items.append(('Integral', obj.full_integral))
+        if hasattr(obj, 'full_integral'):
+            info_items.append(('Integral', obj.full_integral))
         try:
             info_items.append(('Average', obj.full_integral/(time.time()-obj.times[0])))
         except (ZeroDivisionError, IndexError):
