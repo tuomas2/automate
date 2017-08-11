@@ -706,6 +706,23 @@ class AbstractMathematical(AbstractCallable):
         return None
 
 
+class Integral(AbstractMathematical):
+    """
+    Calculate integral of object status within time interval
+
+    Usage::
+
+        Integral(sensor, time1, time2)
+
+     """
+
+    def call(self, caller=None, **kwargs):
+        obj = self.obj #self.call_eval(self.obj, caller, **kwargs)
+        t0 = self.call_eval(self._args[1], caller, **kwargs)
+        t1 = self.call_eval(self._args[2], caller, **kwargs)
+        return obj.integral(t0, t1)
+
+
 class Min(AbstractMathematical):
 
     """

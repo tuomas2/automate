@@ -109,3 +109,28 @@ def test_history_math(sysloader):
     assert s.integral(2,4) == approx(1.0)
     assert s.integral(0,3) == approx(1.5)
     assert s.integral(0,4) == approx(2)
+
+
+def test_history_integral(sysloader):
+    class HistoryTest(System):
+        s = UserFloatSensor(history_length=20, default=0)
+        trig = UserBoolSensor(
+            triggers=['trig'],
+            on_update=SetStatus('s2', Integral('s', 0, 3))
+        )
+
+        s2 = FloatActuator()
+    sys = sysloader.new_system(HistoryTest)
+
+    s = sys.s
+    s2 = sys.s2
+    assert s2.status == approx(0.)
+    s.history = [(0, 0.), (1, 1.), (2, 0.5)]
+    assert s.integral(0,3) == approx(1.5)
+
+    sys.trig.status = 1
+    sys.flush()
+    assert s2.status == approx(1.5)
+
+
+
