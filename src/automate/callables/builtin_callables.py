@@ -717,10 +717,13 @@ class Integral(AbstractMathematical):
      """
 
     def call(self, caller=None, **kwargs):
-        obj = self.obj #self.call_eval(self.obj, caller, **kwargs)
-        t0 = self.call_eval(self._args[1], caller, **kwargs)
-        t1 = self.call_eval(self._args[2], caller, **kwargs)
-        return obj.integral(t0, t1)
+        obj = self.obj
+        if len(self._args) == 3:
+            t0 = self.call_eval(self._args[1], caller, **kwargs)
+            t1 = self.call_eval(self._args[2], caller, **kwargs)
+            return obj.integral(t0, t1)
+        elif len(self._args) == 1:
+            return obj.full_integral
 
 
 class Min(AbstractMathematical):

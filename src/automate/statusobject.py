@@ -81,7 +81,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
     history = Any(transient=True)
 
     #: Transpose of history (timesstamps, statuses)
-    history_transpose = Property(transient=True, depends_on='status')
+    history_transpose = Property(transient=True, depends_on='history, _status')
 
     #: Amount of status change events to be stored in history
     history_length = CInt(100)
@@ -168,6 +168,10 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
             s_prev, t_prev = s, t
         s_sum += s_prev * (t_b-t_prev)
         return s_sum
+
+    @property
+    def full_integral(self):
+        return self.integral(self.times[0], self.times[-1])
 
     def __init__(self, *args, **kwargs):
         self._status_lock = Lock('statuslock')
@@ -286,13 +290,13 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
             if self._status == status:
                 self._status_trigger = True
             else:
-                self._status = status
                 if self.history:
                     last_time, last_value = self.history[-1]
                     if self._last_changed - last_time < self.history_frequency:
                         self.history.pop()
                         change_time = last_time
                 self.history.append((change_time, status))
+                self._status = status
         except TraitError as e:
             self.logger.warning('Wrong type of status %s was passed to %s. Error: %s', status, self, e)
 

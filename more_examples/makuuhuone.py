@@ -80,6 +80,7 @@ class Makuuhuone(lamps.LampGroupsMixin, System):
     class Debug(Group):
         tags = 'web'
         testpin = ArduinoDigitalActuator(pin=13, default=False)
+        integral = FloatActuator(on_update=SetStatus('integral', Integral(testpin)))
         testpin_toggle = UserBoolSensor(on_update=SetStatus('testpin', 'testpin_toggle'))
         reload_arduino = UserEventSensor(
             on_activate=ReloadService('ArduinoService'),
