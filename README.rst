@@ -21,11 +21,14 @@
 
 
 
+Automate
+========
+
 .. image:: https://raw.githubusercontent.com/tuomas2/automate/master/docs/source/official_extensions/images/main_view.png
    :target: http://python-automate.readthedocs.io/en/latest/official_extensions/webui.html
 
-Automate
-========
+Introduction
+------------
 
 - Github URL: http://github.com/tuomas2/automate
 - Read full documentation at http://python-automate.readthedocs.org/
