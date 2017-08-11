@@ -231,7 +231,7 @@ function refresh_queries() {
         $('a.mytoggle').click(function (ev) {
             ev.preventDefault();
 
-            var new_status = !Boolean($.trim($(this).text()) == 'True');
+            var new_status = !Boolean($.trim($(this).text()) === 'True');
             var data = {action: 'set_status', name: $(this).data('name'), status: new_status};
             var message = JSON.stringify(data);
             socket.send(message);
@@ -317,7 +317,7 @@ $(document).ready(function() {
         return this.charAt(0).toUpperCase() + this.slice(1);
     };
 
-    if(window.WebSocket && source != 'login') {
+    if(window.WebSocket && source !== 'login') {
         socket = new WebSocket(get_websocket_url());
         socket.onmessage = function (evt) {
             var obj = $.parseJSON(evt.data);
