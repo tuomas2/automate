@@ -352,7 +352,7 @@ $(document).ready(function() {
             socket.send(JSON.stringify({'action': 'subscribe', 'objects': names}));
             setInterval(function() {
                 socket.send(JSON.stringify({action: 'ping'}));
-            }, 60000);
+            }, 20000);
         };
     }
     refresh_queries();
