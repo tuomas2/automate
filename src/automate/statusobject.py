@@ -41,8 +41,6 @@ from .worker import StatusWorkerTask, DummyStatusWorkerTask
 from .program import ProgrammableSystemObject, DefaultProgram
 from .systemobject import SystemObject
 
-TimerClass = threading.Timer
-
 
 class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin):
 
@@ -94,7 +92,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
         return False
 
     # Thread of currently running action
-    _timed_action = Instance(TimerClass, transient=True)
+    _timed_action = Instance(threading.Timer, transient=True)
 
     # Reference of status change job that is in the worker queue is saved here
     _queued_job = Instance(StatusWorkerTask, transient=True)

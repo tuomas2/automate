@@ -85,14 +85,12 @@ def test_history_math(sysloader):
     assert s.status_at_time(0) == approx(0.)
     assert s.status_at_time(0.5) == approx(0.)
     assert s.status_at_time(1) == approx(1.)
-    with pytest.raises(ValueError):
-        assert s.status_at_time(-0.5) == approx(1.)
+    assert s.status_at_time(-0.5) == approx(0)
 
     assert s.status_at_time(2) == approx(0.5)
     assert s.status_at_time(3) == approx(0.5)
 
-    with pytest.raises(ValueError):
-        assert s.integral(-1,1) == approx(0)
+    assert s.integral(-1,1) == approx(0)
 
     assert s.integral(0,1) == approx(0)
     assert s.integral(1,2) == approx(1)
