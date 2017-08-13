@@ -16,7 +16,8 @@ django-crispy-forms==1.6.1
 django==1.11.4
 idna==2.5                 # via requests
 ipython-genutils==0.2.0   # via traitlets
-ipython==5.4.1
+ipython==6.1.0
+jedi==0.10.2              # via ipython
 mock==2.0.0
 pbr==3.1.1                # via mock
 pexpect==4.2.1            # via ipython

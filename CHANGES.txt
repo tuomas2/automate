@@ -10,6 +10,7 @@
   after set_status().
 - API changes to VirtualWireCommand and FirmataCommand (service is keyword argument, not positional)
 - Plotting with flot (js library)
+- Drop python 2.7 support
 
 0.10.19 (2017-08-04)
 --------------------
