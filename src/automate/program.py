@@ -290,6 +290,9 @@ class Program(ProgrammableSystemObject):
     is_program = True
     editable = True
 
+    def __lt__(self, other):
+        return self.name < other.name
+
 
 class DefaultProgram(ProgrammableSystemObject):
     editable = True
