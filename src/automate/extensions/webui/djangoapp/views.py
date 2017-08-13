@@ -254,10 +254,11 @@ def info_panel(request, name):
                           getattr(obj, i, None) or type(getattr(obj, i, None)) in (int, float)))]
         if hasattr(obj, 'integral'):
             info_items.append(('Integral (full)', obj.integral()))
-            info_items.append(('Average (full)', obj.average()))
             info_items.append(('Integral (day)', obj.integral(datetime.now() - timedelta(hours=24))))
-            info_items.append(('Average (day)', obj.average(datetime.now() - timedelta(hours=24))))
             info_items.append(('Integral (hour)', obj.integral(datetime.now() - timedelta(hours=1))))
+
+            info_items.append(('Average (full)', obj.average()))
+            info_items.append(('Average (day)', obj.average(datetime.now() - timedelta(hours=24))))
             info_items.append(('Average (hour)', obj.average(datetime.now() - timedelta(hours=1))))
 
         callables = ((i.capitalize().replace('_', ' '), i) for i in obj.callables)
