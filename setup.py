@@ -31,7 +31,6 @@ setupopts = dict(
         "ansiconv",
         "colorlog",
         "croniter~=0.3.0",
-        "future",
         "ipython<6.0",
         "pyinotify",
         "traits~=4.6.0",

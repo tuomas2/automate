@@ -45,6 +45,7 @@ from .forms import LoginForm, CmdForm, FORMTYPES, QUICK_EDITS, TextForm
 from functools import wraps
 from automate.statusobject import AbstractActuator
 from automate.statusobject import AbstractSensor
+from datetime import datetime, timedelta
 
 def set_globals(_service, _system):
     global system, service
@@ -255,12 +256,14 @@ def info_panel(request, name):
                                         'history_frequency']
                           and (
                           getattr(obj, i, None) or type(getattr(obj, i, None)) in (int, float)))]
-        if hasattr(obj, 'full_integral'):
-            info_items.append(('Integral', obj.full_integral))
-            try:
-                info_items.append(('Average', obj.full_integral/(time.time()-obj.times[0])))
-            except (ZeroDivisionError, IndexError):
-                pass
+        if hasattr(obj, 'integral'):
+            info_items.append(('Integral (full)', obj.integral()))
+            info_items.append(('Average (full)', obj.average()))
+            info_items.append(('Integral (day)', obj.integral(datetime.now() - timedelta(hours=24))))
+            info_items.append(('Average (day)', obj.average(datetime.now() - timedelta(hours=24))))
+            info_items.append(('Integral (hour)', obj.integral(datetime.now() - timedelta(hours=1))))
+            info_items.append(('Average (hour)', obj.average(datetime.now() - timedelta(hours=1))))
+
         callables = ((i.capitalize().replace('_', ' '), i) for i in obj.callables)
 
         textform = TextForm({'status': obj.status, 'name': obj.name},

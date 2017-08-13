@@ -100,6 +100,13 @@ def program_active(obj):
     return active_color(obj, obj.active, False, program=True)
 
 
+@register.filter()
+def format_value(val):
+    if isinstance(val, float):
+        return '%.2f' % val
+    else:
+        return val
+
 @register.simple_tag(takes_context=True)
 def row_attrs(context, name, prefix=""):
     source = context['source']

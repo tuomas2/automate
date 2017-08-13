@@ -31,6 +31,7 @@ import sys
 import collections
 
 import datetime
+from functools import lru_cache
 from numbers import Number
 
 from traits.api import (cached_property, Any, CBool, Instance, Dict, Str, CFloat,
@@ -145,7 +146,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
         t_max = 0
         times, statuses = self.history_transpose
         if T < times[0]:
-            raise ValueError('Status not known at time %s' % T)
+            return 0.
         for t in times:
             if t <= T:
                 t_max = t
@@ -154,26 +155,42 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
         t_index = times.index(t_max)
         return statuses[t_index]
 
-    def integral(self, t_a, t_b):
-        self.logger.debug('Calculating integral for %s', self)
-        if isinstance(t_a, datetime.datetime):
+    @staticmethod
+    def _convert_times(t_a, t_b):
+        if t_a is None:
+            t_a = 0.
+        elif isinstance(t_a, datetime.datetime):
             t_a = t_a.timestamp()
-        if isinstance(t_b, datetime.datetime):
+
+        if t_b is None:
+            t_b = time.time()
+        elif isinstance(t_b, datetime.datetime):
             t_b = t_b.timestamp()
-        history = [(t, s) for t, s in self.history if t_a <= t <= t_b and isinstance(s, Number)]
-        t_prev = t_a
-        try:
+
+        return t_a, t_b
+
+    @lru_cache()
+    def integral(self, t_a=None, t_b=None):
+        with self._status_lock:
+            self.logger.debug('Calculating integral for %s', self)
+            t_a, t_b = self._convert_times(t_a, t_b)
+            history = ((t, s) for t, s in self.history if t_a <= t <= t_b and isinstance(s, Number))
+            t_prev = t_a
             s_prev = self.status_at_time(t_a)
-        except ValueError:
-            s_prev = 0.
-        if not isinstance(s_prev, Number):
-            s_prev = 0.
-        s_sum = 0.
-        for t, s in history:
-            s_sum += s_prev * (t-t_prev)
-            s_prev, t_prev = s, t
-        s_sum += s_prev * (t_b-t_prev)
-        return s_sum
+            if not isinstance(s_prev, Number):
+                s_prev = 0.
+            s_sum = 0.
+            for t, s in history:
+                s_sum += s_prev * (t-t_prev)
+                s_prev, t_prev = s, t
+            s_sum += s_prev * (t_b-t_prev)
+            return s_sum
+
+    def average(self, t_a=None, t_b=None):
+        t_a, t_b = self._convert_times(t_a, t_b)
+        if t_a == t_b:
+            return 0.
+        return self.integral(t_a, t_b) / (t_b-t_a)
 
     @property
     def full_integral(self):
@@ -305,6 +322,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
                         self.history.pop()
                         change_time = last_time
                 self.history.append((change_time, status))
+                self.integral.cache_clear()
                 self._status = status
         except TraitError as e:
             self.logger.warning('Wrong type of status %s was passed to %s. Error: %s', status, self, e)

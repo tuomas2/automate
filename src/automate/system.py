@@ -34,7 +34,6 @@ standard_library.install_aliases()
 from builtins import input
 import threading
 import operator
-import sys
 import os
 import logging
 import pickle
