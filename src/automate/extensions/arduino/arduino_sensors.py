@@ -16,7 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with automate-arduino.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals
 from traits.api import CInt, Instance, CFloat, CBool, CStr, Int, Any, Enum
 import pyfirmata
 

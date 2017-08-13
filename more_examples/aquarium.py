@@ -5,14 +5,11 @@
 
   A more through tutorial is on my TODO list.
 """
-from __future__ import division
-from __future__ import unicode_literals
-from past.utils import old_div
 
 import automate
 import commonmixin
 from automate import *
-from automate.extensions.arduino import ArduinoService, ArduinoDigitalActuator, \
+from automate.extensions.arduino import ArduinoDigitalActuator, \
     ArduinoDigitalSensor
 from automate.extensions.rpc import RpcService
 from automate.extensions.rpio import RpioSensor, TemperatureSensor, RpioActuator
@@ -22,7 +19,6 @@ from automate.statusobject import AbstractActuator
 import time
 
 import socket
-import psutil
 
 socket.setdefaulttimeout(30) # Do not keep waiting forever for RemoteFuncs
 
@@ -31,15 +27,15 @@ def is_raspi():
     import platform
     return platform.node() in ["raspi1", "raspi2"]
 
+
 def read_cpu_temp(caller):
     fname = "/sys/class/thermal/thermal_zone0/temp"
-    f = open(fname)
-    try:
-        temp = old_div(float(f.read()), 1000.)
-    except IOError:
-        caller.logger.error("IO-error in temperature sensor %s, not set", caller.name)
-        return
-    f.close()
+    with open(fname) as f:
+        try:
+            temp = float(f.read()) / 1000.
+        except IOError:
+            caller.logger.error("IO-error in temperature sensor %s, not set", caller.name)
+            return
     return temp
 
 

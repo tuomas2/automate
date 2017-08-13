@@ -16,7 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with automate-rpio.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals
 
 from .rpio_actuators import RpioActuator, RpioPWMActuator
 from .rpio_sensors import RpioSensor, TemperatureSensor

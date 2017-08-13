@@ -21,8 +21,6 @@
 # If you like Automate, please take a look at this page:
 # http://evankelista.net/automate/
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
 import logging
 from traits.has_traits import HasStrictTraits, cached_property
 from traits.trait_types import Instance, CUnicode, Tuple, Dict, Event, Unicode, Int, CBool

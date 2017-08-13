@@ -1,5 +1,4 @@
 # encoding:utf-8
-from __future__ import unicode_literals
 import automate
 from automate import *
 from automate.extensions.arduino import ArduinoDigitalActuator

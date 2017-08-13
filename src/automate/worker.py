@@ -1,7 +1,3 @@
-from __future__ import unicode_literals
-from future import standard_library
-standard_library.install_aliases()
-from builtins import object
 # -*- coding: utf-8 -*-
 # (c) 2015 Tuomas Airaksinen
 #
@@ -30,7 +26,7 @@ import logging
 import threading
 
 
-class StatusWorkerTask(object):
+class StatusWorkerTask:
 
     def __init__(self, func, args, object):
         self.func = func
@@ -60,7 +56,7 @@ class StatusWorkerTask(object):
             return '<Task *>'
 
 
-class DummyStatusWorkerTask(object):
+class DummyStatusWorkerTask:
 
     def __init__(self, func, *args, **kwargs):
         self.func = func

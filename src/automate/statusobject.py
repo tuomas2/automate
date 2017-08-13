@@ -21,8 +21,6 @@
 # If you like Automate, please take a look at this page:
 # http://evankelista.net/automate/
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
 import logging
 import operator
 import threading
@@ -43,10 +41,7 @@ from .worker import StatusWorkerTask, DummyStatusWorkerTask
 from .program import ProgrammableSystemObject, DefaultProgram
 from .systemobject import SystemObject
 
-if sys.version_info >= (3, 0):
-    TimerClass = threading.Timer
-else:
-    TimerClass = threading._Timer
+TimerClass = threading.Timer
 
 
 class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin):

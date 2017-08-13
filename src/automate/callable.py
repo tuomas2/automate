@@ -21,8 +21,6 @@
 # If you like Automate, please take a look at this page:
 # http://evankelista.net/automate/
 
-from __future__ import unicode_literals
-from past.builtins import basestring
 import re
 from traits.api import cached_property, on_trait_change, CList, Dict, Instance, Set, Event, Property
 from .common import CompareMixin, Lock, deep_iterate, Object, is_iterable, AbstractStatusObject, DictObject, SystemNotReady
@@ -186,7 +184,7 @@ class AbstractCallable(SystemObject, CompareMixin):
         else:
             raise RuntimeError('Error in _fix_list, type %s', type(lst))
         for idx, obj in lst2:
-            if isinstance(obj, basestring):
+            if isinstance(obj, str):
                 lst[idx] = self.name_to_system_object(obj)
             if isinstance(obj, list):
                 self._fix_list(obj)
@@ -256,7 +254,7 @@ class AbstractCallable(SystemObject, CompareMixin):
         if not self.system:
             raise SystemNotReady
 
-        if isinstance(value, (basestring, Object)):
+        if isinstance(value, (str, Object)):
             rv = self.system.name_to_system_object(value)
             return rv if rv else value
         else:

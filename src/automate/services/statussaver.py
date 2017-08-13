@@ -21,7 +21,6 @@
 # If you like Automate, please take a look at this page:
 # http://evankelista.net/automate/
 
-from __future__ import unicode_literals
 from threading import Timer
 
 from traits.api import Any, CBool, CFloat

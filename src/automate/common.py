@@ -21,9 +21,6 @@
 # If you like Automate, please take a look at this page:
 # http://evankelista.net/automate/
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
-from past.builtins import basestring
 from copy import copy
 import logging
 import re
@@ -90,7 +87,7 @@ class NameOrSensorActuatorBaseTrait(TraitType):
         v = value
         if isinstance(v, StatusObject):
             return v
-        if isinstance(v, basestring):
+        if isinstance(v, str):
             return obj.system.name_to_system_object(v)
         self.error(obj, name, value)
         return value
@@ -229,13 +226,13 @@ class SortableMixin(object):
 class TagSet(CSet):
 
     def validate(self, object, name, value):
-        if isinstance(value, basestring):
+        if isinstance(value, str):
             return set((i.strip() for i in value.split(',')))
         return super(TagSet, self).validate(object, name, value)
 
 
 def is_iterable(y):
-    if isinstance(y, basestring):
+    if isinstance(y, str):
         return False
     return isinstance(y, Iterable)
 

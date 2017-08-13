@@ -21,12 +21,6 @@
 # If you like Automate, please take a look at this page:
 # http://evankelista.net/automate/
 
-from __future__ import unicode_literals
-from __future__ import print_function
-from __future__ import division
-
-from builtins import range
-from builtins import object
 import pytest
 import mock
 

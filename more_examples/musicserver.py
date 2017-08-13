@@ -1,5 +1,4 @@
 # encoding:utf-8
-from __future__ import unicode_literals
 
 import automate
 from automate import *
@@ -12,11 +11,9 @@ from automate.program import Program
 import lamps
 import commonmixin
 #import alsaseq
-from traits.api import Bool
 import time
 import os
 import signal
-import psutil
 
 
 import socket

@@ -16,7 +16,6 @@
 # along with Automate.  If not, see <http://www.gnu.org/licenses/>.
 
 import pytest
-from future.backports.urllib.parse import urlparse
 
 from automate import *
 from automate.extensions.webui import WebService

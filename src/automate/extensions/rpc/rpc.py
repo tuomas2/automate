@@ -16,7 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with automate-rpc.  If not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals
 from builtins import object
 from . import wsgi_xmlrpc
 from traits.api import CSet, Str, Any

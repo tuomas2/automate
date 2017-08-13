@@ -1,4 +1,3 @@
-from __future__ import unicode_literals
 # -*- coding: utf-8 -*-
 # (c) 2015 Tuomas Airaksinen
 #

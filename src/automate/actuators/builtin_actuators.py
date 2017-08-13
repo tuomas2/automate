@@ -24,8 +24,6 @@
 """
     Module for builtin Actuator classes
 """
-from __future__ import division
-from __future__ import unicode_literals
 
 from threading import Thread
 import time
