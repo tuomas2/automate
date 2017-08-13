@@ -102,6 +102,7 @@ class ArduinoSystem(System):
 
     class Local(Group):
         local_pwm = ArduinoPWMActuator(service=1, pin=11, on_update=SetStatus('local_pwm', 'local_pwm_set'))
+        local_pwm1 = ArduinoPWMActuator(service=0, pin=3, on_update=SetStatus('local_pwm1', 'local_pwm_set'))
 
         remote_actuator = ArduinoRemoteDigitalActuator(
             service=0, device=target_dev, pin=13,
@@ -129,7 +130,7 @@ s = ArduinoSystem(
             device_address=source_dev,
             #virtualwire_ptt_pin=9,
             virtualwire_tx_pin=11,
-            keep_alive=False,
+            keep_alive=True,
             wakeup_pin=2,
             virtualwire_speed=vw_speed,
         ),

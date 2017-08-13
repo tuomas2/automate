@@ -12,15 +12,7 @@ import psutil
 import socket
 socket.setdefaulttimeout(30) # Do not keep waiting forever for RemoteFuncs
 import lamps
-
-
-def meminfo():
-    return psutil.virtual_memory().percent
-
-
-def loadavg():
-    return os.getloadavg()[0]
-
+import commonmixin
 
 def is_raspi():
     """Only in my raspi1,2 computers enable GPIO"""
@@ -38,7 +30,7 @@ def lirc_filter(line):
 
 raspi2host = 'http://raspi2:3031/'
 
-class Makuuhuone(lamps.LampGroupsMixin, System):
+class Makuuhuone(commonmixin.CommonMixin, lamps.LampGroupsMixin, System):
     #tmp_lamp_out = RpioActuator(port=2, default=0, active_condition=Value('preset1'), on_activate=SetStatus('tmp_lamp_out', 1))
     class RpioButtons(Group):
         button1 = RpioSensor(port=14, button_type='up', active_condition=Value('button1'), on_activate=Run('_toggler'))
@@ -71,11 +63,6 @@ class Makuuhuone(lamps.LampGroupsMixin, System):
                  }
             ),
         )
-
-    class SystemInfo(Group):
-        tags = 'web'
-        load_average = PollingSensor(interval=10, status_updater=Func(loadavg))
-        memory = PollingSensor(interval=10, status_updater=Func(meminfo))
 
     class Debug(Group):
         tags = 'web'

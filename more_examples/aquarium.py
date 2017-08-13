@@ -10,6 +10,7 @@ from __future__ import unicode_literals
 from past.utils import old_div
 
 import automate
+import commonmixin
 from automate import *
 from automate.extensions.arduino import ArduinoService, ArduinoDigitalActuator, \
     ArduinoDigitalSensor
@@ -86,19 +87,14 @@ portmap = {
 sisa =  "28-000005502fec"
 
 ulko =  "28-0000055162f1"
-akva =  "28-00000558263c"
-akva_uppo = "28-031702d25dff"
+akva_old =  "28-00000558263c" #old aquarium temp sensor
+akva = "28-031702d25dff" #uppo
 
 
 raspi2host = 'http://raspi2:3031/' if is_raspi() else 'http://localhost:3031/'
 
 
-def meminfo():
-    return psutil.virtual_memory().percent
 
-
-def loadavg():
-    return os.getloadavg()[0]
 
 class IsRaspi(SystemObject, SortableMixin):
 
@@ -112,7 +108,7 @@ class RelayActuator(RpioActuator):
     inverted = CBool(True)
 
 
-class autoaqua(System):
+class Aquarium(commonmixin.CommonMixin, System):
     israspi = IsRaspi()
     push_sender = PushOver(
         api_key=os.getenv('PUSHOVER_API_KEY'),
@@ -140,10 +136,7 @@ class autoaqua(System):
     #    remote_sensor='start',
     #    host='http://raspi1:3031/' if is_raspi() else 'http://localhost:3031/',
     #)
-    class SystemInfo(Group):
-        tags = 'web'
-        load_average = PollingSensor(interval=10, status_updater=Func(loadavg))
-        memory = PollingSensor(interval=10, status_updater=Func(meminfo))
+
 
     class Sensors(Group):
         valutusputki = RpioSensor(port=portmap['valutusputki'], change_delay=1)
@@ -185,39 +178,40 @@ class autoaqua(System):
         water_temp_max = UserFloatSensor(default=30.5)
 
         aqua_temperature = TemperatureSensor(
-            tags='temperature',
+            tags='temperature,analog',
             addr=akva,
             interval=60,
             default=25.123,
             max_jump=2.,
             max_errors=7,
-            history_length=1000,
+            history_length=10000,
             active_condition=Or(Value('aqua_temperature') > water_temp_max, Value('aqua_temperature') < water_temp_min),
             on_activate=Run('push_sender'),
             on_deactivate=Run('push_sender'),
         )
 
-        aqua_uppo_temperature = TemperatureSensor(
-            tags='temperature',
-            addr=akva_uppo,
+        aqua_old_temperature = TemperatureSensor(
+            tags='temperature,analog',
+            addr=akva_old,
             interval=60,
             default=25.123,
             max_jump=2.,
             max_errors=7,
-            history_length=1000,
-            active_condition=Or(Value('aqua_uppo_temperature') > water_temp_max, Value('aqua_uppo_temperature') < water_temp_min),
+            history_length=10000,
+            active_condition=Or(Value('aqua_old_temperature') > water_temp_max, Value('aqua_old_temperature') < water_temp_min),
             on_activate=Run('push_sender'),
             on_deactivate=Run('push_sender'),
         )
 
         parvekkeen_lampo = TemperatureSensor(
-            tags='temperature',
+            tags='temperature,analog',
             addr=ulko,
             interval=60,
-            history_length=1000,
+            history_length=10000,
             default=25.123)
 
         cpu_lampo = PollingSensor(
+            tags='temperature,analog',
             interval=5,
             history_length=1000,
             status_updater=Func(read_cpu_temp, add_caller=True),
@@ -226,12 +220,14 @@ class autoaqua(System):
                 SetStatus('alarmtrigger', 1),
                 Run('push_sender')),
             on_deactivate=Run('push_sender'),
-            priority=2
+            priority=2,
         )
 
-        ph = UserFloatSensor(default=6.5,
-                             history_length=1000,
-                             )
+        ph = UserFloatSensor(
+            tags='analog',
+            default=6.5,
+            history_length=1000,
+        )
 
         sahkot = UserBoolSensor(default=1,
                                 active_condition=Not('sahkot'),
@@ -503,7 +499,7 @@ if __name__ == '__main__':
                 'class': 'raven.handlers.logging.SentryHandler',
                 'release': automate.__version__,
                 'dsn': RAVEN_DSN,
-                'tags': {'automate-system': 'autoaqua'}
+                'tags': {'automate-system': 'Aquarium'}
             },
             'console': {
                 'class': 'logging.StreamHandler',
@@ -575,12 +571,12 @@ if __name__ == '__main__':
         )
 
 
-    s = autoaqua.load_or_create(
-        filename='autoaqua.dmp',
+    s = Aquarium.load_or_create(
+        filename='aquarium.dmp',
         services=[
             web,
             rpcs,
-            PlantUMLService(url='http://www.plantuml.com/plantuml/svg/'),
+            #PlantUMLService(url='http://www.plantuml.com/plantuml/svg/'),
             StatusSaverService(),
         ],
         no_input=not is_raspi(),

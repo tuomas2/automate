@@ -10,6 +10,7 @@ from automate.extensions.webui import WebService
 from automate.program import Program
 
 import lamps
+import commonmixin
 #import alsaseq
 from traits.api import Bool
 import time
@@ -20,12 +21,6 @@ import psutil
 
 import socket
 socket.setdefaulttimeout(30) # Do not keep waiting forever for RemoteFuncs
-
-def meminfo():
-    return psutil.virtual_memory().percent
-
-def loadavg():
-    return os.getloadavg()[0]
 
 
 #class MidiSensor(AbstractSensor):
@@ -79,7 +74,7 @@ raspi1host = 'http://raspi1:3030/' if is_raspi() else 'http://localhost:3030/'
 basetime = 5 # if is_raspi() else 100
 
 
-class MusicServer(lamps.LampGroupsMixin, System):
+class MusicServer(commonmixin.CommonMixin, lamps.LampGroupsMixin, System):
     tmp_lamp_out1 = RpioActuator(port=2, default=0, active_condition=Or('preset1', 'preset3'), on_activate=SetStatus('tmp_lamp_out1', 1))
     tmp_lamp_out2 = RpioActuator(port=3, default=0, active_condition=Or('preset1', 'preset2'), on_activate=SetStatus('tmp_lamp_out2', 1))
 
@@ -393,11 +388,6 @@ class MusicServer(lamps.LampGroupsMixin, System):
             interval = basetime,
             status_updater=Not(Shell('aplaymidi -l | grep RD')),
         )
-
-    class SystemInfo(Group):
-        tags = 'web'
-        load_average = PollingSensor(interval=10, status_updater=Func(loadavg))
-        memory = PollingSensor(interval=10, status_updater=Func(meminfo))
 
     class Out(Group):
         launchtime = UserBoolSensor() #at launchtime, this is used to set out_buffer to 1, before playback can start
