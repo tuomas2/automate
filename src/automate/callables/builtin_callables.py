@@ -718,7 +718,7 @@ class Integral(AbstractMathematical):
             t1 = self.call_eval(self._args[2], caller, **kwargs)
             return obj.integral(t0, t1)
         elif len(self._args) == 1:
-            return obj.full_integral
+            return obj.integral()
 
 
 class Min(AbstractMathematical):

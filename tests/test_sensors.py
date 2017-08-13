@@ -148,7 +148,7 @@ def test_full_integral(sysloader):
     assert s2.status == approx(0.)
     s.history = [(0, 0.), (1, 1.), (2, 0.5)]
     with mock.patch("time.time", new_callable=lambda *args: lambda *args: 2):
-        assert s.full_integral == approx(1)
+        assert s.integral() == approx(1)
 
         sys.trig.status = 1
         sys.flush()

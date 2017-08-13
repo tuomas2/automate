@@ -185,13 +185,6 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
             return 0.
         return self.integral(t_a, t_b) / (t_b-t_a)
 
-    @property
-    def full_integral(self):
-        try:
-            return self.integral(self.times[0], time.time())
-        except IndexError:
-            return 0
-
     def __init__(self, *args, **kwargs):
         self._status_lock = Lock('statuslock')
         super(StatusObject, self).__init__(*args, **kwargs)
