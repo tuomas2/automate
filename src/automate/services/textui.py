@@ -25,11 +25,11 @@ from automate.common import ExitException
 from automate.service import AbstractUserService
 
 helpstr = """
- Automate interactive Python shell
- ==================================
+ Automate IPython shell
+ ======================
 
  This interactive shell is intended for making small changes to
- working model.
+ live system.
 
  Any Python commands are accepted. You may refer to all your
  automate objects by their name attribute. You may do anything to
@@ -38,12 +38,9 @@ helpstr = """
 
   help -- show this help message (or with parameter, normal pydoc)
   lsa, lsp, lss -- list actuators, programs, sensors
-  get_statusmsg -- print current system status
-  gui -- show GUI
   quit -- quit cleanly
 
-  python_str(filename) -- print all objects in a python file
-  obj.set_value(value) -- set object value for obj
+  obj.value = new_value -- set object value for obj
   obj.print_traits() -- print all traits attributes for obj
 
 """
