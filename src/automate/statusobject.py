@@ -162,9 +162,12 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
             t_b = t_b.timestamp()
         history = [(t, s) for t, s in self.history if t_a <= t <= t_b and isinstance(s, Number)]
         t_prev = t_a
-        s_prev = self.status_at_time(t_a)
+        try:
+            s_prev = self.status_at_time(t_a)
+        except ValueError:
+            s_prev = 0.
         if not isinstance(s_prev, Number):
-            s_prev = 0
+            s_prev = 0.
         s_sum = 0.
         for t, s in history:
             s_sum += s_prev * (t-t_prev)
