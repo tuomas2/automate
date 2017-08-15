@@ -72,8 +72,8 @@ basetime = 5 # if is_raspi() else 100
 
 
 class MusicServer(commonmixin.CommonMixin, lamps.LampGroupsMixin, System):
-    tmp_lamp_out1 = RpioActuator(port=2, default=0, active_condition=Or('preset1', 'preset3'), on_activate=SetStatus('tmp_lamp_out1', 1))
-    tmp_lamp_out2 = RpioActuator(port=3, default=0, active_condition=Or('preset1', 'preset2'), on_activate=SetStatus('tmp_lamp_out2', 1))
+    tmp_lamp_out1 = RpioActuator(inverted=True, port=2, default=0, active_condition=Or('preset1', 'preset3'), on_activate=SetStatus('tmp_lamp_out1', 1))
+    tmp_lamp_out2 = RpioActuator(inverted=True, port=3, default=0, active_condition=Or('preset1', 'preset2'), on_activate=SetStatus('tmp_lamp_out2', 1))
 
     normal_volume = UserIntSensor(
         default=0,

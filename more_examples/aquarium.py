@@ -271,7 +271,6 @@ class Aquarium(commonmixin.CommonMixin, System):
                                     priority=10,
                                     )
 
-        vedenvaihtomoodi = UserBoolSensor(default=0, tags="quick")
         co2_stop = UserBoolSensor(default=False,
                                   active_condition=Or(Not('pumput'), 'co2_stop', 'co2_stop_sensor'),
                                   priority=5,
@@ -455,17 +454,10 @@ class Aquarium(commonmixin.CommonMixin, System):
         alaraja_saavutettu = UserBoolSensor('alaraja_saavutettu', tags='quick')
 
         waterchange1 = Program(
-            active_condition=And('vedenvaihtomoodi', Or('alaraja_saavutettu', 'ala_altaat_alaraja')),
-            on_activate=Run(SetStatus('pumput', 0), SetStatus('alaraja_saavutettu', 1)),
+            active_condition=Or('alaraja_saavutettu', 'ala_altaat_alaraja'),
+            on_activate=Run(SetStatus('pumput', 0), SetStatus('alaraja_saavutettu', 1), 'push_sender'),
             priority=5,
         )
-
-        # TODO: yläraja on vähän huono. Parempi olisi sellainen "varoitussensori joka on alempana
-        # kuin yläraja.
-        waterchange2 = Program(active_condition=And('vedenvaihtomoodi', Or('ala_varoitus', 'ala_altaat_ylaraja')),
-                               on_activate=Run(
-                                   SetStatus('alarmtrigger', 1)),
-                               )
 
 
 if __name__ == '__main__':
