@@ -35,6 +35,7 @@ from automate.common import threaded
 logger = logging.getLogger(__name__)
 
 PinTuple = namedtuple('PinTuple', ['type', 'pin'])
+TwoBytesTuple = namedtuple('TwoBytesTuple', ['msb', 'lsb'])
 
 # Pin modes
 PIN_MODE_PULLUP = 0x0B
@@ -45,6 +46,16 @@ SYSEX_KEEP_ALIVE = 0x01
 SYSEX_SETUP_VIRTUALWIRE = 0x02
 SYSEX_SETUP_LCD = 0x03
 SYSEX_LCD_COMMAND = 0x04
+
+SYSEX_I2C_REQUEST = 0x76
+SYSEX_I2C_REPLY = 0x77
+SYSEX_I2C_CONFIG = 0x78
+
+# I2C modes
+I2C_WRITE = 0B00000000
+I2C_READ = 0B00001000
+I2C_READ_CONTINUOUSLY = 0B00010000
+I2C_STOP_READING = 0B00011000
 
 VIRTUALWIRE_SET_PIN_MODE = 0x01
 VIRTUALWIRE_ANALOG_MESSAGE = 0x02
@@ -68,6 +79,7 @@ def bytes_to_float(value):
 
 
 def float_to_twobytes(value):
+    # into 7 bit
     value = int(round(value * 255))
     val = bytearray([value % 128, value >> 7])
     return val
@@ -75,6 +87,12 @@ def float_to_twobytes(value):
 
 def twobytes_to_float(lsb, msb):
     return round(float((msb << 7) + lsb) / 1023, 4)
+
+
+def int_to_twobytes(value: int) -> TwoBytesTuple:
+    lsb, msb = pyfirmata.util.to_two_bytes(value)
+    return TwoBytesTuple(msb, lsb)
+
 
 def patch_pyfirmata():
     # Make necessary fixes to pyfirmata library
@@ -221,15 +239,14 @@ class ArduinoService(AbstractSystemService):
         self._lock = Lock()
         if self._board:
             self._board.add_cmd_handler(pyfirmata.STRING_DATA, self._string_data_handler)
-            self._iterator_thread = it = threading.Thread(target=threaded(self.system, iterate_serial,
-                                                                          self._board))
+            self._iterator_thread = it = threading.Thread(
+                target=threaded(self.system, iterate_serial, self._board))
             it.daemon = True
             it.name = "PyFirmata thread for {dev}".format(dev=self.device)
             it.start()
 
             self.write(pyfirmata.SYSTEM_RESET)
-            self._board.send_sysex(pyfirmata.SAMPLING_INTERVAL,
-                                   pyfirmata.util.to_two_bytes(self.sample_rate))
+            self._board.send_sysex(pyfirmata.SAMPLING_INTERVAL, int_to_twobytes(self.sample_rate))
 
             self.configure_virtualwire()
             self.configure_lcd()
@@ -250,30 +267,49 @@ class ArduinoService(AbstractSystemService):
                                                              ])
             self.setup_virtualwire_input()
 
-    def configure_lcd(self):
+    def _i2c_callback(self, num_bytes, *data) -> None:
+        self.logger.debug('Received i2c data (%d): %s', num_bytes, data)
+
+    def configure_i2c(self, delay_time: int) -> None:
+        if not self._board:
+            return
+        with self._lock:
+            msb, lsb = int_to_twobytes(delay_time)
+            self._board.add_cmd_handler(SYSEX_I2C_REPLY, self._i2c_callback)
+            self._board.send_sysex(SYSEX_I2C_CONFIG, [lsb, msb])
+
+    def i2c_request(self, slave_address: int, mode: int, data: bytearray) -> None:
+        if not self._board:
+            return
+        with self._lock:
+            msb, lsb = int_to_twobytes(slave_address)
+            msb |= mode
+            self._board.send_sysex(SYSEX_I2C_REQUEST, bytearray([lsb, msb]) + data)
+
+    def configure_lcd(self) -> None:
         if not self._board:
             return
         with self._lock:
             self.logger.debug('Configuring LCD')
             self._board.send_sysex(SYSEX_SETUP_LCD, [self.lcd_port, self.lcd_columns, self.lcd_rows])
 
-    def lcd_print(self, value_str):
+    def lcd_print(self, value:str) -> None:
         if not self._board:
             return
         with self._lock:
             self.logger.debug('Printing to LCD')
             self._board.send_sysex(SYSEX_LCD_COMMAND,
-                                   bytearray([LCD_PRINT]) + bytearray(value_str.encode('utf-8')))
+                                   bytearray([LCD_PRINT]) + bytearray(value.encode('utf-8')))
 
-    def lcd_set_backlight(self, value_bool):
+    def lcd_set_backlight(self, value: bool) -> None:
         if not self._board:
             return
         with self._lock:
             self.logger.debug('Printing to LCD')
             self._board.send_sysex(SYSEX_LCD_COMMAND,
-                                   bytearray([LCD_SET_BACKLIGHT, value_bool]))
+                                   bytearray([LCD_SET_BACKLIGHT, value]))
 
-    def _keep_alive(self):
+    def _keep_alive(self) -> None:
         if self.keep_alive:
             self.logger.debug('Sending keep-alive message to Arduino')
             self._board.send_sysex(SYSEX_KEEP_ALIVE, [0])
@@ -281,7 +317,6 @@ class ArduinoService(AbstractSystemService):
         self._keepalive_thread = threading.Timer(interval, threaded(self.system, self._keep_alive))
         self._keepalive_thread.name = "Arduino keepalive (60s)"
         self._keepalive_thread.start()
-
 
     def _string_data_handler(self, *data):
         self.logger.debug('String data: %s', bytearray(data[::2]).decode('ascii'))
