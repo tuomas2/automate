@@ -56,9 +56,9 @@ class Namespace(dict):
                 objs.extend(self.give_systemobjects(obj, add_tags | {'group:%s' % name}))
         return objs
 
-    def set_system(self, loadstate=None):
-        if loadstate:
-            objs = [(i._passed_arguments[1]['name'], i, []) for i in loadstate]
+    def set_system(self, load_state=None):
+        if load_state:
+            objs = [(i._passed_arguments[1]['name'], i, []) for i in load_state]
         else:
             objs = self.give_systemobjects(self.system)
 
@@ -84,9 +84,9 @@ class Namespace(dict):
 
         self.logger.info('Set up system and groups into object tags')
         for name, obj, groups in objs:
-            obj.setup_system(self.system, name, loadstate=loadstate)
+            obj.setup_system(self.system, name, load_state=load_state)
 
-            if not loadstate:
+            if not load_state:
                 is_groups = False
                 for g in groups:
                     obj.tags.add(g)

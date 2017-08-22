@@ -544,9 +544,9 @@ class System(SystemBase):
 
         self.logger.info('Logging setup ready')
 
-    def _initialize_namespace(self, loadstate=None):
+    def _initialize_namespace(self, load_state=None):
         self.namespace = Namespace(system=self)
-        self.namespace.set_system(loadstate)
+        self.namespace.set_system(load_state)
 
         self.logger.info('Setup loggers per object')
         for name, obj in self.namespace.items():

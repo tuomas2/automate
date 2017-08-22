@@ -485,7 +485,7 @@ class AbstractSensor(StatusObject):
         name, traits = self._passed_arguments
         default = traits.get('default', None)
         super(AbstractSensor, self).setup_system(system, *args, **kwargs)
-        load_state = kwargs.get('loadstate', None)
+        load_state = kwargs.get('load_state', None)
         if not default is None and not load_state:
             self.set_status(default)
         elif load_state:
