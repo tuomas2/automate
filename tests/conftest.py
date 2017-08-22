@@ -52,6 +52,11 @@ def logging_configuration():
                 'level': 'DEBUG',
                 'propagate': True,
             },
+            'traits': {
+                'handlers': ['caplog', 'console'],
+                'level': 'DEBUG',
+                'propagate': False,
+            },
             'automate': {
                 'handlers': ['caplog', 'console'],
                 'level': 'DEBUG',
