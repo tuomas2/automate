@@ -25,7 +25,6 @@ from collections import defaultdict
 
 from raven.handlers.logging import SentryHandler
 
-from typing import Dict, List, Any
 import threading
 import operator
 import os
@@ -47,6 +46,11 @@ from .systemobject import SystemObject
 from .worker import StatusWorkerThread
 from .callable import AbstractCallable
 from . import __version__
+
+import typing
+
+if typing.TYPE_CHECKING:
+    from typing import Dict, List, Any
 
 STATEFILE_VERSION = 1
 
@@ -472,7 +476,7 @@ class System(SystemBase):
 
         return rval
 
-    def __init__(self, load_state: List[SystemObject]=None, load_config: Dict[str, Any]=None,
+    def __init__(self, load_state: 'List[SystemObject]'=None, load_config: 'Dict[str, Any]'=None,
                  **traits):
         super(System, self).__init__(**traits)
         if not self.name:

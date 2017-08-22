@@ -122,7 +122,8 @@ def test_history_integral(sysloader):
     s = sys.s
     s2 = sys.s2
     assert s2.status == approx(0.)
-    s.history = [(0, 0.), (1, 1.), (2, 0.5)]
+    s.history.extend([(0, 0.), (1, 1.), (2, 0.5)])
+    s.integral.cache_clear()
     assert s.integral(0,3) == approx(1.5)
 
     sys.trig.status = 1
@@ -146,7 +147,8 @@ def test_full_integral(sysloader):
     s = sys.s
     s2 = sys.s2
     assert s2.status == approx(0.)
-    s.history = [(0, 0.), (1, 1.), (2, 0.5)]
+    s.history.extend([(0, 0.), (1, 1.), (2, 0.5)])
+    s.integral.cache_clear()
     with mock.patch("time.time", new_callable=lambda *args: lambda *args: 2):
         assert s.integral() == approx(1)
 

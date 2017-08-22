@@ -77,7 +77,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
     history = Any(transient=True)
 
     #: Transpose of history (timesstamps, statuses)
-    history_transpose = Property(transient=True, depends_on='history, _status')
+    history_transpose = Property(transient=True)
 
     #: Amount of status change events to be stored in history
     history_length = CInt(1000)
@@ -117,9 +117,8 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
     # used by Web UI, for templates
     data_type = Str(transient=True)
 
-    @cached_property
     def _get_history_transpose(self):
-        return list(zip(*self.history)) if self.history else ([0],[self.status])
+        return list(zip(*self.history)) if self.history else [[0], [0]]
 
     @property
     def times(self):

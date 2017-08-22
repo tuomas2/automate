@@ -22,7 +22,7 @@
 # http://evankelista.net/automate/
 
 import threading
-import time
+from datetime import datetime, timedelta
 
 try:
     from StringIO import StringIO
@@ -30,18 +30,18 @@ except ImportError:
     from io import BytesIO as StringIO
 
 from django.contrib import messages
-
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, Http404, HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.template import Template, RequestContext
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
-from .forms import LoginForm, CmdForm, FORMTYPES, QUICK_EDITS, TextForm
+
 from functools import wraps
 from automate.statusobject import AbstractActuator
 from automate.statusobject import AbstractSensor
-from datetime import datetime, timedelta
+from .forms import LoginForm, CmdForm, FORMTYPES, QUICK_EDITS, TextForm
+
 
 def set_globals(_service, _system):
     global system, service
