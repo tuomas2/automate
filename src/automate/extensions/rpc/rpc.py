@@ -16,14 +16,13 @@
 # You should have received a copy of the GNU General Public License
 # along with automate-rpc.  If not, see <http://www.gnu.org/licenses/>.
 
-from builtins import object
 from . import wsgi_xmlrpc
 from traits.api import CSet, Str, Any
 
 from automate.extensions.wsgi.abstractwsgi import TornadoService
 
 
-class ExternalApi(object):
+class ExternalApi:
 
     def __init__(self, system, tag):
         self.system = system

@@ -23,7 +23,6 @@
 
 
 import datetime
-from builtins import bytes
 
 import re
 import threading
