@@ -119,7 +119,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
 
     @cached_property
     def _get_history_transpose(self):
-        return list(zip(*self.history))
+        return list(zip(*self.history)) if self.history else ([0],[self.status])
 
     @property
     def times(self):

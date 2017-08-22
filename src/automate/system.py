@@ -25,7 +25,7 @@ from collections import defaultdict
 
 from raven.handlers.logging import SentryHandler
 
-from builtins import input
+from typing import Dict, List, Any
 import threading
 import operator
 import os
@@ -33,6 +33,7 @@ import logging
 import pickle
 import pkg_resources
 import argparse
+
 import raven
 
 from traits.api import (CStr, Instance, CBool, CList, Property, CInt, CUnicode, Event, CSet, Str, cached_property,
@@ -46,6 +47,8 @@ from .systemobject import SystemObject
 from .worker import StatusWorkerThread
 from .callable import AbstractCallable
 from . import __version__
+
+STATEFILE_VERSION = 1
 
 import sys
 
@@ -200,16 +203,21 @@ class System(SystemBase):
     two_phase_queue = CBool(False)
 
     @classmethod
-    def load_or_create(cls, filename=None, no_input=False, **kwargs):
+    def load_or_create(cls, filename=None, no_input=False, create_new=False, **kwargs):
         """
             Load system from a dump, if dump file exists, or create a new system if it does not exist.
         """
         parser = argparse.ArgumentParser()
         parser.add_argument('--no_input', action='store_true')
+        parser.add_argument('--create_new', action='store_true')
         args = parser.parse_args()
 
         if args.no_input:
             print('Parameter --no_input was given')
+            no_input = True
+        if args.create_new:
+            print('Parameter --create_new was given')
+            create_new = True
             no_input = True
 
         def savefile_more_recent():
@@ -217,20 +225,30 @@ class System(SystemBase):
             time_program = os.path.getmtime(sys.argv[0])
             return time_savefile > time_program
 
+        def load_pickle():
+            with open(filename, 'rb') as of:
+                statefile_version, data = pickle.load(of)
+
+            if statefile_version != STATEFILE_VERSION:
+                raise RuntimeError(f'Wrong statefile version, please remove state file {filename}')
+            return data
+
         def load():
             print('Loading %s' % filename)
-            file = open(filename, 'rb')
-            state = pickle.load(file)
-            file.close()
-            system = System(loadstate=state, filename=filename, **kwargs)
+            obj_list, config = load_pickle()
+            system = System(load_state=obj_list, filename=filename, **kwargs)
+
             return system
 
         def create():
             print('Creating new system')
-            return cls(filename=filename, **kwargs)
+            config = None
+            if filename:
+                obj_list, config = load_pickle()
+            return cls(filename=filename, load_config=config, **kwargs)
 
         if filename and os.path.isfile(filename):
-            if savefile_more_recent():
+            if savefile_more_recent() and not create_new:
                 return load()
             else:
                 if no_input:
@@ -262,7 +280,11 @@ class System(SystemBase):
                 pass
 
         with open(self.filename, 'wb') as file, self.worker_thread.queue.mutex:
-            pickle.dump((list(self.objects)), file, pickle.HIGHEST_PROTOCOL)
+            obj_list = list(self.objects)
+            config = {obj.name: obj.status for obj in obj_list
+                      if getattr(obj, 'user_editable', False)}
+            data = obj_list, config
+            pickle.dump((STATEFILE_VERSION, data), file, pickle.HIGHEST_PROTOCOL)
 
     @property
     def cmd_namespace(self):
@@ -450,7 +472,8 @@ class System(SystemBase):
 
         return rval
 
-    def __init__(self, loadstate=None, **traits):
+    def __init__(self, load_state: List[SystemObject]=None, load_config: Dict[str, Any]=None,
+                 **traits):
         super(System, self).__init__(**traits)
         if not self.name:
             self.name = self.__class__.__name__
@@ -467,7 +490,14 @@ class System(SystemBase):
         self.logger.info('Initializing services')
         self._initialize_services()
         self.logger.info('Initializing namespace')
-        self._initialize_namespace(loadstate)
+        self._initialize_namespace(load_state)
+
+        if load_config:
+            self.logger.info('Loading config')
+            for obj_name, status in load_config.items():
+                if hasattr(self, obj_name):
+                    getattr(self, obj_name).status = status
+
         self.logger.info('Initialize user services')
         self._setup_user_services()
 
