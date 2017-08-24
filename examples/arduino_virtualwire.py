@@ -12,7 +12,7 @@ from automate import *
 from automate.extensions.arduino import ArduinoDigitalActuator, ArduinoPWMActuator, \
     ArduinoService
 from automate.extensions.arduino.arduino_callables import VirtualWireCommand, \
-    FirmataCommand
+    FirmataCommand, LCDPrint, LCDSetBacklight
 from automate.extensions.webui import WebService
 
 
@@ -44,7 +44,7 @@ LOGGING = {
             'level': 'INFO',
             'propagate': True,
         },
-        'automate.arduino_virtualwire.ArduinoService': {
+        'automate.ArduinoSystem.ArduinoService': {
             'handlers': ['console'],
             'level': 'DEBUG',
             'propagate': False,
@@ -78,12 +78,22 @@ target_dev = 4
 class ArduinoSystem(System):
     class Input(Group):
         reset1 = UserEventSensor(
-            on_activate=FirmataCommand(0, pyfirmata.SYSTEM_RESET)
+            on_activate=FirmataCommand(pyfirmata.SYSTEM_RESET)
         )
         reset2 = UserEventSensor(
-            on_activate=FirmataCommand(1, pyfirmata.SYSTEM_RESET)
+            on_activate=FirmataCommand(pyfirmata.SYSTEM_RESET)
         )
-        #inputmode = UserEventSensor(
+        lcdprint = UserEventSensor(
+            on_activate=LCDPrint('Test')
+        )
+        lcdbacklightoff = UserEventSensor(
+            on_activate=LCDSetBacklight(False)
+        )
+        lcdbacklighton = UserEventSensor(
+            on_activate=LCDSetBacklight(True)
+        )
+
+                #inputmode = UserEventSensor(
         #    on_activate=FirmataCommand(1, pyfirmata.SET_PIN_MODE, 10, pyfirmata.INPUT)
         #)
 
@@ -133,6 +143,7 @@ s = ArduinoSystem(
             keep_alive=True,
             wakeup_pin=2,
             virtualwire_speed=vw_speed,
+            lcd_port=0x27,
         ),
         ArduinoService(
             device="/dev/ttyUSB1",

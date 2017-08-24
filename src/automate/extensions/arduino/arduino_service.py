@@ -162,7 +162,7 @@ class ArduinoService(AbstractSystemService):
     #: VirtualWire PTT (push to talk) pin
     virtualwire_ptt_pin = CInt(0)
 
-    #: LCD Port
+    #: LCD I2C Port (0x27)
     lcd_port = CInt(0)
 
     #: LCD Columns
@@ -254,24 +254,24 @@ class ArduinoService(AbstractSystemService):
         if not self._board:
             return
         with self._lock:
-            self.logger.debug('Configuring LCD')
+            self.logger.debug('Configuring LCD in port %d cols %d rows %d', self.lcd_port, self.lcd_columns, self.lcd_rows)
             self._board.send_sysex(SYSEX_SETUP_LCD, [self.lcd_port, self.lcd_columns, self.lcd_rows])
 
-    def lcd_print(self, value_str):
+    def lcd_print(self, value: str):
         if not self._board:
             return
         with self._lock:
-            self.logger.debug('Printing to LCD')
+            self.logger.debug('Printing to LCD: %s', value)
             self._board.send_sysex(SYSEX_LCD_COMMAND,
-                                   bytearray([LCD_PRINT]) + bytearray(value_str.encode('utf-8')))
+                                   bytearray([LCD_PRINT]) + bytearray(value.encode('utf-8')))
 
-    def lcd_set_backlight(self, value_bool):
+    def lcd_set_backlight(self, value: bool):
         if not self._board:
             return
         with self._lock:
-            self.logger.debug('Printing to LCD')
+            self.logger.debug('Setting LCD backlight to %d', value)
             self._board.send_sysex(SYSEX_LCD_COMMAND,
-                                   bytearray([LCD_SET_BACKLIGHT, value_bool]))
+                                   bytearray([LCD_SET_BACKLIGHT, value]))
 
     def _keep_alive(self):
         if self.keep_alive:
