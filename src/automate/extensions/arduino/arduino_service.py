@@ -57,6 +57,8 @@ VIRTUALWIRE_ANALOG_BROADCAST = 0x07
 # LCD commands
 LCD_SET_BACKLIGHT = 0x01
 LCD_PRINT = 0x02
+LCD_CLEAR = 0x03
+LCD_SET_CURSOR = 0x04
 
 
 def float_to_bytes(value):
@@ -162,7 +164,7 @@ class ArduinoService(AbstractSystemService):
     #: VirtualWire PTT (push to talk) pin
     virtualwire_ptt_pin = CInt(0)
 
-    #: LCD I2C Port (0x27)
+    #: LCD I2C Port (often 0x27), 0 to disable I2C LCD
     lcd_port = CInt(0)
 
     #: LCD Columns
@@ -257,13 +259,36 @@ class ArduinoService(AbstractSystemService):
             self.logger.debug('Configuring LCD in port %d cols %d rows %d', self.lcd_port, self.lcd_columns, self.lcd_rows)
             self._board.send_sysex(SYSEX_SETUP_LCD, [self.lcd_port, self.lcd_columns, self.lcd_rows])
 
-    def lcd_print(self, value: str):
+    def lcd_set_cursor(self, col: int, row: int):
+        if not self._board:
+            return
+        with self._lock:
+            self.logger.debug('LCD Setting cursor to %d %d', col, row)
+            self._board.send_sysex(SYSEX_LCD_COMMAND, bytearray([LCD_SET_CURSOR, col, row]))
+
+    def lcd_clear(self):
+        if not self._board:
+            return
+        with self._lock:
+            self.logger.debug('Clearing LCD')
+            self._board.send_sysex(SYSEX_LCD_COMMAND, bytearray([LCD_CLEAR]))
+
+    def _lcd_print_raw(self, value: str):
         if not self._board:
             return
         with self._lock:
             self.logger.debug('Printing to LCD: %s', value)
             self._board.send_sysex(SYSEX_LCD_COMMAND,
-                                   bytearray([LCD_PRINT]) + bytearray(value.encode('utf-8')))
+                                   bytearray([LCD_PRINT]) +
+                                   bytearray(value.encode('utf-8')) +
+                                   b'\0')
+
+    def lcd_print(self, value: str):
+        lines = value.split('\n')
+        self.lcd_clear()
+        for line_number, line in enumerate(lines):
+            self.lcd_set_cursor(0, line_number)
+            self._lcd_print_raw(line)
 
     def lcd_set_backlight(self, value: bool):
         if not self._board:

@@ -91,6 +91,42 @@ class LCDPrint(AbstractCallable):
         return arduino.lcd_print(str(args[0]))
 
 
+class LCDClear(AbstractCallable):
+    """
+    Clear LCD display
+    """
+    def call(self, caller, **kwargs):
+        if not caller:
+            return
+
+        args = [self.call_eval(i, caller, **kwargs) for i in self._args]
+        _kwargs = {k: self.call_eval(v, caller, **kwargs) for k, v in list(self._kwargs.items())}
+        service = _kwargs.pop('service', 0)
+        arduino = self.system.request_service('ArduinoService', service)
+
+        return arduino.lcd_clear()
+
+
+class LCDSetCursor(AbstractCallable):
+    """
+    Set LCD cursor to specified position. Positional arguments::
+
+     - Column (integer)
+     - Row (integer)
+
+    """
+    def call(self, caller, **kwargs):
+        if not caller:
+            return
+
+        args = [self.call_eval(i, caller, **kwargs) for i in self._args]
+        _kwargs = {k: self.call_eval(v, caller, **kwargs) for k, v in list(self._kwargs.items())}
+        service = _kwargs.pop('service', 0)
+        arduino = self.system.request_service('ArduinoService', service)
+
+        return arduino.lcd_set_cursor(args[0], args[1])
+
+
 class FirmataCommand(AbstractCallable):
     """
     Send custom Firmata command to Arduino. Positional arguments::

@@ -12,7 +12,7 @@ from automate import *
 from automate.extensions.arduino import ArduinoDigitalActuator, ArduinoPWMActuator, \
     ArduinoService
 from automate.extensions.arduino.arduino_callables import VirtualWireCommand, \
-    FirmataCommand, LCDPrint, LCDSetBacklight
+    FirmataCommand, LCDPrint, LCDSetBacklight, LCDClear
 from automate.extensions.webui import WebService
 
 
@@ -83,8 +83,14 @@ class ArduinoSystem(System):
         reset2 = UserEventSensor(
             on_activate=FirmataCommand(pyfirmata.SYSTEM_RESET)
         )
+        my_str = UserStrSensor(
+        )
+        clear_lcd = UserEventSensor(
+            on_activate=LCDClear()
+        )
+
         lcdprint = UserEventSensor(
-            on_activate=LCDPrint('Test')
+            on_activate=LCDPrint('Warm greetings\nfrom Automate!')
         )
         lcdbacklightoff = UserEventSensor(
             on_activate=LCDSetBacklight(False)
@@ -123,7 +129,9 @@ class ArduinoSystem(System):
 
         source_sens1 = ArduinoDigitalSensor(service=0, pull_up_resistor=True, pin=2)
         source_sens1_2 = ArduinoDigitalSensor(service=1, pull_up_resistor=True, pin=2)
-        source_sens2 = ArduinoAnalogSensor(service=0, pin=0)
+        source_sens2 = ArduinoAnalogSensor(service=0, pin=0,
+            on_update=LCDPrint(ToStr('Value: {}\n{}', 'source_sens2', 'my_str'))
+        )
 
     class Remote(Group):
         awds1 = ArduinoRemoteDigitalSensor(service=1, device=source_dev, pin=2) # receives via VW
@@ -143,7 +151,7 @@ s = ArduinoSystem(
             keep_alive=True,
             wakeup_pin=2,
             virtualwire_speed=vw_speed,
-            lcd_port=0x27,
+            lcd_port=0x3F,
         ),
         ArduinoService(
             device="/dev/ttyUSB1",
