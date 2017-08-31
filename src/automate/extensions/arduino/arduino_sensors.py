@@ -42,6 +42,7 @@ class AbstractArduinoSensor(AbstractSensor):
 
     def setup(self, *args, **kwargs):
         super(AbstractArduinoSensor, self).setup(*args, **kwargs)
+        self.logger.debug('Arduino sensor setup')
         self._arduino = self.system.request_service('ArduinoService', self.service)
 
 

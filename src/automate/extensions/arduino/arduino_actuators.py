@@ -44,6 +44,7 @@ class AbstractArduinoActuator(AbstractActuator):
 
     def setup(self, *args, **kwargs):
         super(AbstractArduinoActuator, self).setup(*args, **kwargs)
+        self.logger.debug('Arduino actuator setup')
         self._arduino = self.system.request_service('ArduinoService', self.service)
 
 
