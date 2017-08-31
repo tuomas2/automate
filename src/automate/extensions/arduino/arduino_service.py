@@ -168,10 +168,10 @@ class ArduinoService(AbstractSystemService):
     lcd_port = CInt(0)
 
     #: LCD Columns
-    lcd_columns = 16
+    lcd_columns = CInt(16)
 
     #: LCD Rows
-    lcd_rows = 2
+    lcd_rows = CInt(2)
 
     #: Wakeup pin (0 to disable) that wakes Arduino from sleep mode. On Atmega328 based boards,
     #: possible values are 2 and 3
@@ -241,7 +241,7 @@ class ArduinoService(AbstractSystemService):
         if not self._board:
             return
         with self._lock:
-            self.logger.debug('Configuring wirtualwire')
+            self.logger.debug('Configuring virtualwire')
             self._board.send_sysex(SYSEX_SETUP_VIRTUALWIRE, [self.virtualwire_rx_pin,
                                                              self.virtualwire_tx_pin,
                                                              self.virtualwire_ptt_pin,
