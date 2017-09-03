@@ -104,15 +104,18 @@ class TemperatureSensor(AbstractPollingSensor):
         w1file = "/sys/bus/w1/devices/%s/w1_slave" % self.addr
         try:
             f = open(w1file)
+            self.logger.error("IO-error, can't open %s, not set", w1file)
         except IOError:
             return
 
         try:
             temp = float(f.read().split("\n")[1].split(" ")[9].split("=")[1]) / 1000.
         except IOError:
-            self.logger.error("IO-error in temperature sensor %s, not set", self.name)
+            self.logger.error("IO-error, cant' read %s, not set", w1file)
             return
-        if abs(temp-self.status) > self.max_jump and self._error_count < self.max_errors and not self._first_reading:
+        if (abs(temp-self.status) > self.max_jump
+                and self._error_count < self.max_errors
+                and not self._first_reading):
             self._error_count += 1
         else:
             self._first_reading = False
