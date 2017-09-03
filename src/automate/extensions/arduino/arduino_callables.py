@@ -45,6 +45,32 @@ class VirtualWireCommand(AbstractCallable):
         return arduino.send_virtualwire_command(*args)
 
 
+class LCDSetReporting(AbstractCallable):
+    """
+        Set LCD reporting on/off. If reporting is enabled,
+        Arduino will show PIN values on LCD screen (if LCD is configured).
+
+        Positional Arguments::
+
+          - reporting on/off value
+
+        Keyword arguments::
+
+          - service: Arduino service number (defaults to 0)
+    """
+
+    def call(self, caller, **kwargs):
+        if not caller:
+            return
+
+        args = [self.call_eval(i, caller, **kwargs) for i in self._args]
+        _kwargs = {k: self.call_eval(v, caller, **kwargs) for k, v in list(self._kwargs.items())}
+        service = _kwargs.pop('service', 0)
+        arduino = self.system.request_service('ArduinoService', service)
+
+        return arduino.lcd_set_reporting(bool(args[0]))
+
+
 class LCDSetBacklight(AbstractCallable):
     """
         Set LCD backlight on/off. Positional Arguments::

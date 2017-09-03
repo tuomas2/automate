@@ -59,6 +59,7 @@ LCD_SET_BACKLIGHT = 0x01
 LCD_PRINT = 0x02
 LCD_CLEAR = 0x03
 LCD_SET_CURSOR = 0x04
+LCD_SET_REPORTING = 0x05
 
 
 def float_to_bytes(value):
@@ -173,6 +174,9 @@ class ArduinoService(AbstractSystemService):
     #: LCD Rows
     lcd_rows = CInt(2)
 
+    #: Report pin values on LCD
+    lcd_reporting = CBool(False)
+
     #: Wakeup pin (0 to disable) that wakes Arduino from sleep mode. On Atmega328 based boards,
     #: possible values are 2 and 3
     wakeup_pin = CInt(0)
@@ -257,7 +261,7 @@ class ArduinoService(AbstractSystemService):
             return
         with self._lock:
             self.logger.debug('Configuring LCD in port %d cols %d rows %d', self.lcd_port, self.lcd_columns, self.lcd_rows)
-            self._board.send_sysex(SYSEX_SETUP_LCD, [self.lcd_port, self.lcd_columns, self.lcd_rows])
+            self._board.send_sysex(SYSEX_SETUP_LCD, [self.lcd_port, self.lcd_columns, self.lcd_rows, self.lcd_reporting])
 
     def lcd_set_cursor(self, col: int, row: int):
         if not self._board:
@@ -289,6 +293,14 @@ class ArduinoService(AbstractSystemService):
         for line_number, line in enumerate(lines):
             self.lcd_set_cursor(0, line_number)
             self._lcd_print_raw(line)
+
+    def lcd_set_reporting(self, value: bool):
+        if not self._board:
+            return
+        with self._lock:
+            self.logger.debug('Setting LCD backlight to %d', value)
+            self._board.send_sysex(SYSEX_LCD_COMMAND,
+                                   bytearray([LCD_SET_REPORTING, value]))
 
     def lcd_set_backlight(self, value: bool):
         if not self._board:
