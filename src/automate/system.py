@@ -248,7 +248,10 @@ class System(SystemBase):
             print('Creating new system')
             config = None
             if filename:
-                obj_list, config = load_pickle()
+                try:
+                    obj_list, config = load_pickle()
+                except FileNotFoundError:
+                    config = None
             return cls(filename=filename, load_config=config, **kwargs)
 
         if filename and os.path.isfile(filename):
