@@ -204,6 +204,12 @@ class Aquarium(commonmixin.CommonMixin, System):
             interval=60,
             default=25.123)
 
+        parveke_min = UserFloatSensor(default=3.5)
+        parveke_warning = UserBoolSensor(
+            active_condition=Or('parveke_warning', Value('parvekkeen_lampo') < parveke_min),
+            on_activate=Run(SetStatus('parveke_warning', True), 'push_sender'),
+        )
+
         ulko_lampo = TemperatureSensor(
             tags='temperature,analog',
             addr=ulko,
