@@ -98,6 +98,13 @@ ulko = "28-0417012c2bff"
 raspi2host = 'http://raspi2:3031/' if is_raspi() else 'http://localhost:3031/'
 
 
+def calc_ph(v4, v6, v):
+    p6 = 6.86
+    p4 = 4.00
+
+    a = (p6-p4)/(v6-v4)
+    b = p6 - v6*(p6-p4)/(v6-v4)
+    return a*v + b
 
 
 class IsRaspi(SystemObject, SortableMixin):
@@ -229,10 +236,26 @@ class Aquarium(commonmixin.CommonMixin, System):
             priority=2,
         )
 
-        ph = ArduinoAnalogSensor(
-            tags='analog,co2',
+        ph_v = ArduinoAnalogSensor(
+            tags='analog,ph',
             pin=arduino_analog_ports['ph'],
-            default=6.5,
+            default=0.5,
+        )
+
+        ph_4_v = UserFloatSensor(
+            tags='ph',
+            default=0.0,
+        )
+
+        ph_6_v = UserFloatSensor(
+            tags='ph',
+            default=1.0,
+        )
+
+        ph = FloatActuator(
+            tags='analog,co2,ph',
+            on_update=SetStatus('ph', Func(calc_ph, 'ph_4_v', 'ph_6_v', 'ph_v'))
+
         )
 
         veden_korkeus = ArduinoAnalogSensor(
