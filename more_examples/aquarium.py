@@ -11,6 +11,8 @@ import commonmixin
 from automate import *
 from automate.extensions.arduino import ArduinoDigitalActuator, \
     ArduinoDigitalSensor, ArduinoAnalogSensor, ArduinoService
+from automate.extensions.arduino.arduino_actuators import ArduinoLCDActuator
+from automate.extensions.arduino.arduino_callables import LCDPrint
 from automate.extensions.rpc import RpcService
 from automate.extensions.rpio import RpioSensor, TemperatureSensor, RpioActuator
 from automate.extensions.webui import WebService
@@ -421,6 +423,16 @@ class Aquarium(commonmixin.CommonMixin, System):
                                          lamppu2_manual,
                                          lamppu3_manual,
                                          'switch_manual_lamps_off'],[0]*4))
+        )
+
+    class LCD(Group):
+        lcd_act = ArduinoLCDActuator()
+
+        lcd_program = Program(
+            on_activate=SetStatus('lcd_act', 'Hello from\nAquarium!'),
+            on_update=SetStatus('lcd_act',
+                                ToStr('pH: {0:.2f} T: {1:.2f}⁰C\nulko:{2:.2f}⁰C',
+                                      'ph', 'aqua_temperature', 'ulko_lampo'))
         )
 
     class Ajastimet(Group):
