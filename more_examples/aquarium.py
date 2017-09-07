@@ -80,11 +80,12 @@ portmap = {
 # GPIO port 4 is reserved for temperature sensor
 #bread = [17, 27, 22, 10, 9, 11, 2, 3]
 
-sisa =  "28-000005502fec"
+# sisa =  "28-000005502fec"
 
-ulko =  "28-0000055162f1"
-akva_old =  "28-00000558263c" #old aquarium temp sensor
+parveke = "28-0000055162f1"
+#akva_old =  "28-00000558263c" #old aquarium temp sensor
 akva = "28-031702d25dff" #uppo
+ulko = "28-0417012c2bff"
 
 
 raspi2host = 'http://raspi2:3031/' if is_raspi() else 'http://localhost:3031/'
@@ -186,20 +187,14 @@ class Aquarium(commonmixin.CommonMixin, System):
             on_deactivate=Run('push_sender'),
         )
 
-        aqua_old_temperature = TemperatureSensor(
-            tags='temperature,analog',
-            addr=akva_old,
-            interval=60,
-            default=25.123,
-            max_jump=2.,
-            max_errors=7,
-            history_length=10000,
-            active_condition=Or(Value('aqua_old_temperature') > water_temp_max, Value('aqua_old_temperature') < water_temp_min),
-            on_activate=Run('push_sender'),
-            on_deactivate=Run('push_sender'),
-        )
-
         parvekkeen_lampo = TemperatureSensor(
+            tags='temperature,analog',
+            addr=parveke,
+            interval=60,
+            history_length=10000,
+            default=25.123)
+
+        ulko_lampo = TemperatureSensor(
             tags='temperature,analog',
             addr=ulko,
             interval=60,
