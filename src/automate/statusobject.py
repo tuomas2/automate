@@ -74,7 +74,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
     changing = Property(trait=Bool, transient=True, depends_on='_timed_action, _queued_job')
 
     # Deque of history, which consists of tuples (timestamp, status), read only
-    history = Any(transient=True)
+    history = Any()  # transient=True)
 
     #: Transpose of history (timesstamps, statuses)
     history_transpose = Property(transient=True)
@@ -239,7 +239,8 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
 
     def setup_system(self, *args, **kwargs):
         super(StatusObject, self).setup_system(*args, **kwargs)
-        self.history = collections.deque(maxlen=self.history_length)
+        if not self.history:
+            self.history = collections.deque(maxlen=self.history_length)
         self.data_type = self._status.__class__.__name__
 
     def set_status(self, new_status, origin=None, force=False):
@@ -306,8 +307,9 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
                     if self._last_changed - last_time < self.history_frequency:
                         self.history.pop()
                         change_time = last_time
-                self.history.append((change_time, status))
-                self.integral.cache_clear()
+                if status is not None:
+                    self.history.append((change_time, status))
+                    self.integral.cache_clear()
                 self._status = status
         except TraitError as e:
             self.logger.warning('Wrong type of status %s was passed to %s. Error: %s', status, self, e)
@@ -487,7 +489,7 @@ class AbstractSensor(StatusObject):
         load_state = kwargs.get('load_state', None)
         if not default is None and not load_state:
             self.set_status(default)
-        elif load_state:
+        elif load_state and self._status is not None:
             self.history.append((time.time(), self._status))
 
 
