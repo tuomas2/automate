@@ -171,17 +171,23 @@ class Aquarium(commonmixin.CommonMixin, System):
 
         kaapin_ulkosuodatin = ArduinoDigitalSensor(
             pin=arduino_ports['kaapin sensori'],
-            change_delay=1
+            change_delay=1,
+            pull_up_resistor=True,
+            inverted=True
         )
         lattiasensori_2 = ArduinoDigitalSensor(
             pin=arduino_ports['keski lattiasensori'],
             change_delay=1,
-            description='altaan alla oleva lattiasensori'
+            description='altaan alla oleva lattiasensori',
+            pull_up_resistor=True,
+            inverted=True
         )
 
         ala_varoitus = ArduinoDigitalSensor(
             pin=arduino_ports['ala varoitus'],
-            change_delay=1
+            change_delay=1,
+            pull_up_resistor=True,
+            inverted=True,
         )
 
         co2_stop_sensor = ArduinoDigitalSensor(
