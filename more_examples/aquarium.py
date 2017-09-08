@@ -52,11 +52,11 @@ arduino_ports = {
     'ala varoitus': 3,
     'keski lattiasensori': 4,
     'co2_stop': 5,
-    'unused5': 6,
+    'ala_altaat_alaraja': 6,
     'unused6': 7,
     'alarm': 8,
     'unused7': 11,
-    'ala_altaat_alaraja': 12,
+    'unused8': 12,
 }
 
 arduino_analog_ports = {
