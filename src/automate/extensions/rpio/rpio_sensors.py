@@ -104,8 +104,8 @@ class TemperatureSensor(AbstractPollingSensor):
         w1file = "/sys/bus/w1/devices/%s/w1_slave" % self.addr
         try:
             f = open(w1file)
-            self.logger.error("IO-error, can't open %s, not set", w1file)
         except IOError:
+            self.logger.error("IO-error, can't open %s, not set", w1file)
             return
 
         try:
