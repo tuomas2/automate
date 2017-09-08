@@ -433,7 +433,7 @@ class Aquarium(commonmixin.CommonMixin, System):
         lcd_program = Program(
             on_activate=SetStatus('lcd_act', 'Hello from\nAquarium!'),
             on_update=SetStatus('lcd_act',
-                                ToStr('pH: {0:.2f} T: {1:.2f}⁰C\nulko:{2:.2f}⁰C',
+                                ToStr('pH: {0:.2f} T: {1:.2f}C\nulko:{2:.2f}C',
                                       'ph', 'aqua_temperature', 'ulko_lampo'))
         )
 
@@ -650,7 +650,7 @@ if __name__ == '__main__':
 
     arduino_service = ArduinoService(
         device="/dev/ttyUSB0",
-        sample_rate=500,
+        sample_rate=5000,
         lcd_port=0x3F,
     )
 
