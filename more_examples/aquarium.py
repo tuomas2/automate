@@ -51,11 +51,11 @@ arduino_ports = {
     'kaapin sensori': 2,
     'ala varoitus': 3,
     'keski lattiasensori': 4,
-    'unused4': 5,
+    'co2_stop': 5,
     'unused5': 6,
     'unused6': 7,
     'alarm': 8,
-    'co2_stop': 11,
+    'unused7': 11,
     'ala_altaat_alaraja': 12,
 }
 
@@ -188,7 +188,9 @@ class Aquarium(commonmixin.CommonMixin, System):
             pin=arduino_ports['co2_stop'],
             safety_delay=300,
             safety_mode='falling',
-            change_delay=1
+            change_delay=1,
+            pull_up_resistor=True,
+            inverted=True,
         )
 
         water_temp_min = UserFloatSensor(default=20.0)
