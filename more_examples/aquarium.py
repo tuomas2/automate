@@ -539,6 +539,7 @@ class Aquarium(commonmixin.CommonMixin, System):
                 SetStatus('vesivahinko_kytkin', 1),
                 SetStatus('pumput', 0),
                 SetStatus('lammitin', 0),
+                SetStatus('co2', 0),
                 SetStatus('alarmtrigger', 1),
                 Run('push_sender_emergency')),
             on_deactivate=Run('push_sender'),
