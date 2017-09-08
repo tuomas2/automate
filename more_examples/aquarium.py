@@ -12,7 +12,7 @@ from automate import *
 from automate.extensions.arduino import ArduinoDigitalActuator, \
     ArduinoDigitalSensor, ArduinoAnalogSensor, ArduinoService
 from automate.extensions.arduino.arduino_actuators import ArduinoLCDActuator
-from automate.extensions.arduino.arduino_callables import LCDPrint
+from automate.extensions.arduino.arduino_callables import LCDPrint, LCDSetBacklight
 from automate.extensions.rpc import RpcService
 from automate.extensions.rpio import RpioSensor, TemperatureSensor, RpioActuator
 from automate.extensions.webui import WebService
@@ -439,8 +439,13 @@ class Aquarium(commonmixin.CommonMixin, System):
         lcd_program = Program(
             on_activate=SetStatus('lcd_act', 'Hello from\nAquarium!'),
             on_update=SetStatus('lcd_act',
-                                ToStr('pH: {0:.2f} T: {1:.2f}C\nulko:{2:.2f}C',
+                                ToStr('pH:{0:.2f} Ta:{1:.2f}C\nTu:{2:.2f}C',
                                       'ph', 'aqua_temperature', 'ulko_lampo'))
+        )
+        lcd_backlight = UserBoolSensor(
+            active_condition=Value('lcd_backlight'),
+            on_activate=LCDSetBacklight(True),
+            on_deactivate=LCDSetBacklight(False),
         )
 
     class Ajastimet(Group):
