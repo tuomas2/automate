@@ -83,7 +83,6 @@ class ArduinoAnalogSensor(AbstractArduinoSensor):
         Float-valued sensor object for analog Arduino input pins
     """
     _status = CFloat
-    history_frequency = CFloat(60.0)
 
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
