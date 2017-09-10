@@ -276,7 +276,7 @@ class Aquarium(commonmixin.CommonMixin, System):
 
         ph = FloatActuator(
             tags='analog,co2,ph',
-            on_update=SetStatus('ph', Mean('ph_raw', 15)),
+            on_update=SetStatus('ph', Mean('ph_raw', 30)),
             history_frequency=60,
         )
 
@@ -450,7 +450,7 @@ class Aquarium(commonmixin.CommonMixin, System):
         lcd_program = Program(
             on_activate=SetStatus('lcd_act', 'Hello from\nAquarium!'),
             on_update=SetStatus('lcd_act',
-                                ToStr('pH:{0:.1f} A:{1:.1f}\nP:{2:.1f} U:{3:.1f}',
+                                ToStr('pH:{0:.2f} A:{1:.1f}\nP:{2:.1f} U:{3:.1f}',
                                       'ph', 'aqua_temperature', 'parvekkeen_lampo', 'ulko_lampo'))
         )
         lcd_backlight = UserBoolSensor(
