@@ -68,9 +68,6 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
     #: Do not emit actuator status changes into logs
     silent = CBool(False)
 
-    #: Print more debugging information into logs
-    debug = CBool(False)
-
     #: (property) Is delayed change taking place at the moment?
     changing = Property(trait=Bool, transient=True, depends_on='_timed_action, _queued_job')
 
@@ -381,12 +378,11 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
 
         with self._status_lock:
             timenow = time.time()
-            logger = self.logger.info if self.debug else self.logger.debug
-            logger("_do_change_status prg:%s status:%s", getattr(self, 'program', None), status)
+            self.logger.debug("_do_change_status prg:%s status:%s", getattr(self, 'program', None), status)
 
             if self._timed_action:
                 if self._timed_action.is_alive():
-                    logger("Cancelling previous safety/change_delay action. Now changing to %s", status)
+                    self.logger.debug("Cancelling previous safety/change_delay action. Now changing to %s", status)
                     self._timed_action.cancel()
                 self._timed_action = None
 
@@ -400,7 +396,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
 
             if status == self._status and not force:
                 self._change_start = 0
-                logger('Status same %s, no need to change', status)
+                self.logger.debug('Status same %s, no need to change', status)
                 return
 
             orig_changedelay = self.change_delay if changedelay_active else 0
@@ -412,7 +408,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
                 changedelay = orig_changedelay
 
             if run_now or (changedelay <= 0. and (timenow - self._last_changed > safetydelay)):
-                logger("Adding status change to queue, about to change status to %s", status)
+                self.logger.debug("Adding status change to queue, about to change status to %s", status)
                 if self.system.two_phase_queue:
                     self._add_statuschange_to_queue(status, getattr(self, "program", None))
                 else:
@@ -422,7 +418,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
                 timesince = time.time() - self._last_changed
                 delaytime = max(0, safetydelay - timesince, changedelay)
                 time_after_delay = datetime.datetime.now() + datetime.timedelta(seconds=delaytime)
-                logger("Scheduling safety/change_delay timer for %f sek. Now %s. Going to change to %s.",
+                self.logger.debug("Scheduling safety/change_delay timer for %f sek. Now %s. Going to change to %s.",
                        delaytime, self._status, status)
                 self._timed_action = threading.Timer(delaytime, timer_func,
                                                      args=(self._add_statuschange_to_queue, status,
@@ -567,8 +563,7 @@ class AbstractActuator(StatusObject):
 
         with self._actuator_status_lock:
             self.logger.debug("set_status got through, program: %s", origin)
-            if self.debug:
-                self.logger.info("Set_status %s %s %s", self.name, origin, status)
+            self.logger.debug("Set_status %s %s %s", self.name, origin, status)
 
             if self.slave:
                 return self._do_change_status(status, force)
