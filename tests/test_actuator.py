@@ -43,11 +43,11 @@ AMOUNT = 20
 def mysys_old(request):
     if request.param == 0:
         class _mysys(System):
-            act = FloatActuator(default=LOW, debug=True)
-            slaveact = FloatActuator(default=LOW, debug=True, slave=True)
-            slavebinact = BoolActuator(default=False, debug=True, slave=True)
-            sens = UserBoolSensor(default=False, debug=True)
-            s1 = UserBoolSensor(default=False, debug=True)
+            act = FloatActuator(default=LOW)
+            slaveact = FloatActuator(default=LOW, slave=True)
+            slavebinact = BoolActuator(default=False, slave=True)
+            sens = UserBoolSensor(default=False)
+            s1 = UserBoolSensor(default=False)
             s2 = UserFloatSensor(default=HIGH)
             slaveprog = Program(active_condition=Value(s1),
                                 on_update=SetStatus(slaveact, s2))
@@ -61,11 +61,11 @@ def mysys_old(request):
             )
     elif request.param == 1:
         class _mysys(System):
-            act = FloatActuator(default=LOW, debug=True)
-            slaveact = FloatActuator(default=LOW, debug=True, slave=True)
-            slavebinact = BoolActuator(default=False, debug=True, slave=True)
-            sens = UserBoolSensor(default=False, debug=True)
-            s1 = UserBoolSensor(default=False, debug=True)
+            act = FloatActuator(default=LOW)
+            slaveact = FloatActuator(default=LOW, slave=True)
+            slavebinact = BoolActuator(default=False, slave=True)
+            sens = UserBoolSensor(default=False)
+            s1 = UserBoolSensor(default=False)
             s2 = UserFloatSensor(default=HIGH)
 
             slaveprog = Program(active_condition=Value('s1'),
@@ -82,13 +82,13 @@ def mysys_old(request):
         class _mysys(System):
 
             class group1(Group):
-                act = FloatActuator(default=LOW, debug=True)
-                slaveact = FloatActuator(default=LOW, debug=True, slave=True)
-                slavebinact = BoolActuator(default=False, debug=True, slave=True)
-                sens = UserBoolSensor(default=False, debug=True)
+                act = FloatActuator(default=LOW)
+                slaveact = FloatActuator(default=LOW, slave=True)
+                slavebinact = BoolActuator(default=False, slave=True)
+                sens = UserBoolSensor(default=False)
 
                 class group3(Group):
-                    s1 = UserBoolSensor(default=False, debug=True)
+                    s1 = UserBoolSensor(default=False)
                     s2 = UserFloatSensor(default=HIGH)
 
             class group2(Group):
@@ -139,7 +139,7 @@ def mysys_groups():
             class group3(Group):
                 s3 = UserFloatSensor()
 
-        act = FloatActuator(default=LOW, debug=True)
+        act = FloatActuator(default=LOW)
         p2 = Program(active_condition=Value('s1'),
                      on_activate=SetStatus('act', HIGH),
                      priority=2,
