@@ -59,6 +59,12 @@ class SystemObject(HasStrictTraits):
     #: Name property is determined by System namespace. Can be read/written.
     name = Property(trait=Unicode, depends_on='name_changed_event')
 
+    log_level = Int(logging.INFO)
+
+    def _log_level_changed(self, new_value):
+        if self.logger:
+            self.logger.setLevel(new_value)
+
     @cached_property
     def _get_name(self):
         try:
@@ -172,6 +178,7 @@ class SystemObject(HasStrictTraits):
         if not self in self.system.reverse:
             self.name = new_name
         self.logger = self.system.logger.getChild('%s.%s' % (self.__class__.__name__, self.name))
+        self.logger.setLevel(self.log_level)
         if name is None and 'name' in traits:  # Only __setstate__ sets name to None. Default is ''.
             del traits['name']
 
