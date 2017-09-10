@@ -23,6 +23,7 @@
 
 import logging
 import operator
+import statistics
 import threading
 import time
 import sys
@@ -84,6 +85,9 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
 
     #: How often new values are saved to history, in seconds
     history_frequency = CFloat(0)
+
+    #: Show stdev seconds (0 to disable)
+    show_stdev_seconds = CInt(0)
 
     @cached_property
     def _get_changing(self):
@@ -184,6 +188,15 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
             return 0.
         return self.integral(t_a, t_b) / (t_b-t_a)
 
+    def stdev(self, t: int=10) -> float:
+        values = []
+        now = time.time()
+        for t_, value in reversed(self.history):
+            if t_ < now - t:
+                break
+            values.append(value)
+        return statistics.stdev(values) if len(values) > 1 else 0.0
+
     def __init__(self, *args, **kwargs):
         self._status_lock = Lock('statuslock')
         super().__init__(*args, **kwargs)
@@ -220,7 +233,11 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
         else:
             value = self.status
 
-        return u"%s" % value
+        if self.show_stdev_seconds:
+            stdev = self.stdev(self.show_stdev_seconds)
+            return f'{value}±{stdev:2.2}'
+        else:
+            return str(value)
 
     def get_as_datadict(self):
         """
