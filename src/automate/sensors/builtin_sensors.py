@@ -314,8 +314,8 @@ class AbstractPollingSensor(AbstractSensor):
         pass
 
     def cleanup(self):
+        self._stop = True
         if self._pollthread:
-            self._stop = True
             self._pollthread.cancel()
 
 
