@@ -670,6 +670,7 @@ if __name__ == '__main__':
         device="/dev/ttyUSB0",
         sample_rate=5000,
         lcd_port=0x3F,
+        analog_reference=0,  # EXTERNAL
     )
 
     rpcs = RpcService(
