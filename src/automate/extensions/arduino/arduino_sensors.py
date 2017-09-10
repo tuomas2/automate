@@ -63,7 +63,10 @@ class ArduinoDigitalSensor(AbstractArduinoSensor):
         super(ArduinoDigitalSensor, self).setup(*args, **kwargs)
         self._arduino.subscribe_digital(self.pin, self)
         if self.pull_up_resistor:
-            self._arduino.set_pin_mode(self.pin, arduino_service.PIN_MODE_PULLUP)
+            self._enable_pullup()
+
+    def _enable_pullup(self):
+        self._arduino.set_pin_mode(self.pin, arduino_service.PIN_MODE_PULLUP)
 
     def set_status(self, status, **kwargs):
         if self.inverted:
