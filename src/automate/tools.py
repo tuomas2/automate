@@ -25,7 +25,7 @@ import platform
 from threading import Thread
 
 import time
-from traits.api import CUnicode, Unicode, CInt
+from traits.api import CUnicode, Unicode, CInt, CBool
 import requests
 
 from .common import threaded, SortableMixin
@@ -52,6 +52,8 @@ class PushOver(SortableMixin, SystemObject):
     #: Sound name in device
     sound = CUnicode
 
+    _stop = CBool(False, transient=True)
+
     def send(self, caller, trigger=None, action='-', **kwargs):
         try:
             url = self.system.services_by_name['WebService'][0].server_url
@@ -77,7 +79,7 @@ class PushOver(SortableMixin, SystemObject):
             data['sound'] = self.sound
 
         retries = 0
-        while retries < self.MAX_RETRIES:
+        while not self._stop and retries < self.MAX_RETRIES:
             try:
                 response = requests.post('https://api.pushover.net/1/messages.json', data=data)
                 try:
@@ -94,8 +96,10 @@ class PushOver(SortableMixin, SystemObject):
             except (requests.ConnectionError, requests.Timeout):
                 self.logger.exception('Network problem')
 
-            self.logger.warning('Message could not be delivered, trying again after %s seconds',
-                                self.SLEEP_TIME)
+            self.logger.warning('Message could not be delivered, trying again after %s seconds '
+                                'for %d times still',
+                                self.SLEEP_TIME,
+                                self.MAX_RETRIES-retries)
             time.sleep(self.SLEEP_TIME)
             retries += 1
 
@@ -105,6 +109,9 @@ class PushOver(SortableMixin, SystemObject):
         t = Thread(target=threaded(self.system, self.send, caller, **kwargs),
                    name='Notification sender thread')
         t.start()
+
+    def cleanup(self):
+        self._stop = True
 
 
 class EmailSender(SortableMixin, SystemObject):
