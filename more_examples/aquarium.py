@@ -217,13 +217,16 @@ class Aquarium(commonmixin.CommonMixin, System):
                                 Value('aqua_temperature') < water_temp_min),
             on_activate=Run('push_sender'),
             on_deactivate=Run('push_sender'),
+            history_length=5000,
         )
 
         parvekkeen_lampo = TemperatureSensor(
             tags='temperature,analog',
             addr=parveke,
             interval=60,
-            default=25.123)
+            default=25.123,
+            history_length=5000,
+        )
 
         parveke_min = UserFloatSensor(default=3.5)
         parveke_warning = UserBoolSensor(
@@ -235,7 +238,9 @@ class Aquarium(commonmixin.CommonMixin, System):
             tags='temperature,analog',
             addr=ulko,
             interval=60,
-            default=25.123)
+            default=25.123,
+            history_length=5000,
+        )
 
         cpu_lampo = PollingSensor(
             tags='temperature,analog',
