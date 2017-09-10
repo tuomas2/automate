@@ -45,6 +45,7 @@ SYSEX_KEEP_ALIVE = 0x01
 SYSEX_SETUP_VIRTUALWIRE = 0x02
 SYSEX_SETUP_LCD = 0x03
 SYSEX_LCD_COMMAND = 0x04
+SYSEX_SET_ANALOG_REFERENCE = 0x05
 
 VIRTUALWIRE_SET_PIN_MODE = 0x01
 VIRTUALWIRE_ANALOG_MESSAGE = 0x02
@@ -60,6 +61,11 @@ LCD_PRINT = 0x02
 LCD_CLEAR = 0x03
 LCD_SET_CURSOR = 0x04
 LCD_SET_REPORTING = 0x05
+
+# Analog references, as defined for ATmega328
+ANALOG_REFERENCE_DEFAULT = 0
+ANALOG_REFERENCE_EXTERNAL = 1
+ANALOG_REFERENCE_INTERNAL = 2
 
 
 def float_to_bytes(value):
@@ -189,6 +195,9 @@ class ArduinoService(AbstractSystemService):
     #: falling to power save mode.
     keep_alive = CBool(True)
 
+    #: Set analog reference (Note: Arduino platform dependent constants)
+    analog_reference = CInt(ANALOG_REFERENCE_DEFAULT)
+
     def __init__(self, *args, **kwargs):
         super(ArduinoService, self).__init__(*args, **kwargs)
 
@@ -255,6 +264,14 @@ class ArduinoService(AbstractSystemService):
                                                              self.device_address,
                                                              ])
             self.setup_virtualwire_input()
+
+    def configure_analog_reference(self):
+        if not self._board:
+            return
+        with self._lock:
+            self.logger.debug('Configuring Analog reference to setting %d', self.analog_reference)
+            self._board.send_sysex(SYSEX_SET_ANALOG_REFERENCE, [self.analog_reference])
+
 
     def configure_lcd(self):
         if not self._board:
