@@ -252,6 +252,8 @@ def info_panel(request, name):
                                         'history_frequency']
                           and (
                           getattr(obj, i, None) or type(getattr(obj, i, None)) in (int, float)))]
+        if hasattr(obj, 'stdev'):
+            info_items.append(('Stdev (30s)', obj.stdev(30)))
         if hasattr(obj, 'integral'):
             info_items.append(('Integral (full)', obj.integral()))
             info_items.append(('Integral (day)', obj.integral(datetime.now() - timedelta(hours=24))))
