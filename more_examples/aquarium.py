@@ -270,13 +270,8 @@ class Aquarium(commonmixin.CommonMixin, System):
 
         ph = FloatActuator(
             tags='analog,co2,ph',
-            on_update=SetStatus('ph', Func(calc_ph, 'ph_4_v', 'ph_6_v', 'ph_v')),
+            on_update=SetStatus('ph', Mean(Func(calc_ph, 'ph_4_v', 'ph_6_v', 'ph_v'), 15)),
             show_stdev_seconds=30,
-        )
-
-        ph_average = FloatActuator(
-            tags='analog,co2,ph',
-            on_update=SetStatus('ph_average', Average(ph, 30)),
         )
 
         sahkot = UserBoolSensor(

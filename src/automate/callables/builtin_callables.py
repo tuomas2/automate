@@ -25,11 +25,13 @@
 import datetime
 
 import re
+import statistics
 import threading
 import xmlrpc.client
 import socket
 import subprocess
 import time
+import collections
 
 from http.client import HTTPException
 
@@ -1029,6 +1031,31 @@ class Average(AbstractLogical):
         obj = self.obj
         avg = obj.average(t_a=now-t)
         return avg
+
+
+class Mean(AbstractLogical):
+
+    """Give mean value over last n entries
+
+    Usage::
+
+        Mean(x, 10)
+
+    """
+    _args = CList
+    _history = Any
+
+    def call(self, caller=None, **kwargs):
+        n = 10
+        if len(self._args) == 2:
+            n = self.call_eval(self._args[1], caller, **kwargs)
+
+        if self._history is None:
+            self._history = collections.deque(maxlen=n)
+
+        val = self.call_eval(self._args[0], caller, **kwargs)
+        self._history.append(val)
+        return statistics.mean(self._history)
 
 
 class AbstractQuery(AbstractCallable):
