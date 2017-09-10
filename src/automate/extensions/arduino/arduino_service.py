@@ -249,6 +249,7 @@ class ArduinoService(AbstractSystemService):
 
             self.configure_virtualwire()
             self.configure_lcd()
+            self.configure_analog_reference()
             self._keep_alive()
 
     def configure_virtualwire(self):
