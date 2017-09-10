@@ -273,6 +273,10 @@ class Aquarium(commonmixin.CommonMixin, System):
             on_update=SetStatus('ph', Func(calc_ph, 'ph_4_v', 'ph_6_v', 'ph_v')),
             show_stdev_seconds=30,
         )
+        ph_average = FloatActuator(
+            tags='analog,co2,ph',
+            on_update=SetStatus('ph_average', Average(ph, 30)),
+        )
 
         sahkot = UserBoolSensor(
             default=1,
@@ -329,7 +333,9 @@ class Aquarium(commonmixin.CommonMixin, System):
             default=False,
             active_condition=Or(Not('pumput'), 'co2_stop', 'co2_stop_sensor'),
             priority=5,
-            on_activate=SetStatus('co2', False))
+            on_activate=SetStatus('co2', False),
+            log_level=logging.WARNING,
+            )
 
         co2_force_on = UserBoolSensor(
             tags='co2',
@@ -373,7 +379,9 @@ class Aquarium(commonmixin.CommonMixin, System):
             port=portmap['co2input'],
             default=0,
             safety_delay=60 * 2,
-            safety_mode="rising")
+            safety_mode="rising",
+            log_level=logging.WARNING,
+            )
         lammitin = RelayActuator(
             port=portmap['heater'],
             default=1,
