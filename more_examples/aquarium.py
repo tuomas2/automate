@@ -273,6 +273,7 @@ class Aquarium(commonmixin.CommonMixin, System):
             on_update=SetStatus('ph', Func(calc_ph, 'ph_4_v', 'ph_6_v', 'ph_v')),
             show_stdev_seconds=30,
         )
+
         ph_average = FloatActuator(
             tags='analog,co2,ph',
             on_update=SetStatus('ph_average', Average(ph, 30)),
@@ -636,6 +637,11 @@ if __name__ == '__main__':
                 'level': 'WARNING',
                 'propagate': False,
             },
+            'traits': {
+                'handlers': ['console', 'sentry'],
+                'level': 'ERROR',
+                'propagate': False,
+            },
         },
     }
 
@@ -670,9 +676,9 @@ if __name__ == '__main__':
 
     arduino_service = ArduinoService(
         device="/dev/ttyUSB0",
-        sample_rate=5000,
+        sample_rate=1000,
         lcd_port=0x3F,
-        analog_reference=0,  # EXTERNAL
+        analog_reference=0 if is_raspi() else 1,  # EXTERNAL
     )
 
     rpcs = RpcService(

@@ -29,6 +29,7 @@ import threading
 import xmlrpc.client
 import socket
 import subprocess
+import time
 
 from http.client import HTTPException
 
@@ -1011,6 +1012,25 @@ class Value(AbstractLogical):
         return self.call_eval(self.obj, caller, **kwargs)
 
 
+class Average(AbstractLogical):
+
+    """Give average over last n seconds
+
+    Usage::
+
+        Average(x, 10)
+
+    """
+    _args = CList
+
+    def call(self, caller=None, **kwargs):
+        now = time.time()
+        t = self.call_eval(self._args[1], caller, **kwargs)
+        obj = self.obj
+        avg = obj.average(t_a=now-t)
+        return avg
+
+
 class AbstractQuery(AbstractCallable):
 
     """
@@ -1156,7 +1176,6 @@ class RegexMatch(AbstractCallable):
             return match.group(self._kwargs.get('group', 0))
         else:
             return ''
-
 
 
 class RemoteFunc(AbstractCallable):

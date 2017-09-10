@@ -164,20 +164,19 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
 
     @lru_cache()
     def integral(self, t_a=None, t_b=None):
-        with self._status_lock:
-            self.logger.debug('Calculating integral for %s', self)
-            t_a, t_b = self._convert_times(t_a, t_b)
-            history = ((t, s) for t, s in self.history if t_a <= t <= t_b and isinstance(s, Number))
-            t_prev = t_a
-            s_prev = self.status_at_time(t_a)
-            if not isinstance(s_prev, Number):
-                s_prev = 0.
-            s_sum = 0.
-            for t, s in history:
-                s_sum += s_prev * (t-t_prev)
-                s_prev, t_prev = s, t
-            s_sum += s_prev * (t_b-t_prev)
-            return s_sum
+        self.logger.debug('Calculating integral for %s', self)
+        t_a, t_b = self._convert_times(t_a, t_b)
+        history = ((t, s) for t, s in self.history if t_a <= t <= t_b and isinstance(s, Number))
+        t_prev = t_a
+        s_prev = self.status_at_time(t_a)
+        if not isinstance(s_prev, Number):
+            s_prev = 0.
+        s_sum = 0.
+        for t, s in history:
+            s_sum += s_prev * (t-t_prev)
+            s_prev, t_prev = s, t
+        s_sum += s_prev * (t_b-t_prev)
+        return s_sum
 
     def average(self, t_a=None, t_b=None):
         t_a, t_b = self._convert_times(t_a, t_b)
