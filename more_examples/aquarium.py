@@ -61,7 +61,6 @@ arduino_ports = {
 
 arduino_analog_ports = {
     'ph': 0,
-    'veden_korkeus': 1,
     # ports 4 and 5 reserved for i2c
 }
 
@@ -273,12 +272,6 @@ class Aquarium(commonmixin.CommonMixin, System):
             tags='analog,co2,ph',
             on_update=SetStatus('ph', Func(calc_ph, 'ph_4_v', 'ph_6_v', 'ph_v')),
             show_stdev_seconds=30,
-        )
-
-        veden_korkeus = ArduinoAnalogSensor(
-            tags='analog',
-            pin=arduino_analog_ports['veden_korkeus'],
-            log_level=logging.WARNING,
         )
 
         sahkot = UserBoolSensor(
