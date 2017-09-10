@@ -258,7 +258,7 @@ def test_back_and_forth_on_activate(mysys):
 
 def test_back_and_forth_on_activate_w_safety_delay(mysys):
     mysys.act.safety_delay = 5*DELAYTIME
-    mysys.act.debug = True
+    #mysys.act.debug = True
     assert mysys.act.status == LOW
     mysys.sens.set_status(True)
     mysys.sens.set_status(False)
@@ -520,17 +520,18 @@ def test_statuschange(mysys, caplog):
     for a in [mysys.s1, mysys.slavebinact]:
         a.change_delay = 5
         a.set_status(True)
+        a.log_level = logging.DEBUG
         mysys.flush()
         assert a.changing
         mysys.flush()
         assert a._status == False
         assert a._timed_action
-        assert not '%s:INFO:Cancelling previous safety/change_delay action. Now changing to False' % a.name in caplog.text()
+        assert not '%s:DEBUG:Cancelling previous safety/change_delay action. Now changing to False' % a.name in caplog.text()
         a.set_status(False)
         mysys.flush()
         assert not a.changing
         assert not a._timed_action
-        assert '%s:INFO:Cancelling previous safety/change_delay action. Now changing to False' % a.name in caplog.text()
+        assert '%s:DEBUG:Cancelling previous safety/change_delay action. Now changing to False' % a.name in caplog.text()
         assert a._status == False
         assert not a.changing
         assert not a._timed_action
