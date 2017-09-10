@@ -163,19 +163,15 @@ class Aquarium(commonmixin.CommonMixin, System):
         lattiasensori_1 = RpioSensor(port=portmap['vasen lattiasensori'], change_delay=1,
                                      description='Ylivalutuksen alla lattialla')
 
-        ala_altaat_alaraja = ArduinoDigitalSensor(
-            pin=arduino_ports['ala_altaat_alaraja'],
-            change_delay=1,
-            pull_up_resistor=True
-        )
-
         kaapin_ulkosuodatin = ArduinoDigitalSensor(
+            tags='arduino',
             pin=arduino_ports['kaapin sensori'],
             change_delay=1,
             pull_up_resistor=True,
             inverted=True
         )
         lattiasensori_2 = ArduinoDigitalSensor(
+            tags='arduino',
             pin=arduino_ports['keski lattiasensori'],
             change_delay=1,
             description='altaan alla oleva lattiasensori',
@@ -184,13 +180,22 @@ class Aquarium(commonmixin.CommonMixin, System):
         )
 
         ala_varoitus = ArduinoDigitalSensor(
+            tags='arduino',
             pin=arduino_ports['ala varoitus'],
             change_delay=1,
             pull_up_resistor=True,
             inverted=True,
         )
 
+        ala_altaat_alaraja = ArduinoDigitalSensor(
+            tags='arduino',
+            pin=arduino_ports['ala_altaat_alaraja'],
+            change_delay=1,
+            pull_up_resistor=True
+        )
+
         co2_stop_sensor = ArduinoDigitalSensor(
+            tags='arduino',
             pin=arduino_ports['co2_stop'],
             safety_delay=300,
             safety_mode='falling',
