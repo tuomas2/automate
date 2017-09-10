@@ -31,7 +31,7 @@ class CaptureLogHandler(logging.StreamHandler):
 
     def __init__(self, *args, **kwargs):
         """Creates a new log handler."""
-        super(CaptureLogHandler, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.reset()
 
     def reset(self):
@@ -41,14 +41,14 @@ class CaptureLogHandler(logging.StreamHandler):
     def close(self):
         """Close this log handler and its underlying stream."""
 
-        super(CaptureLogHandler, self).close()
+        super().close()
         self.stream.close()
 
     def emit(self, record):
         """Keep the log records in a list in addition to the log text."""
 
         self.records.append(record)
-        super(CaptureLogHandler, self).emit(record)
+        super().emit(record)
 
     def text(self):
         """Returns the log text."""

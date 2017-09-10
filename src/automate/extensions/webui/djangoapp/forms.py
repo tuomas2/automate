@@ -45,7 +45,7 @@ class TextForm(forms.Form):
                              required=False)
 
     def __init__(self, data=None, source='', **kwargs):
-        super(TextForm, self).__init__(data, **kwargs)
+        super().__init__(data, **kwargs)
         from crispy_forms.helper import FormHelper
         from crispy_forms.layout import Layout, Submit
         self.helper = FormHelper()
@@ -63,7 +63,7 @@ class QuickEdit(forms.Form):
     status = forms.BooleanField()
 
     def __init__(self, data=None, source='', sensor=None, **kwargs):
-        super(QuickEdit, self).__init__(data, **kwargs)
+        super().__init__(data, **kwargs)
         self.fields['status'].label = ''
         from crispy_forms.helper import FormHelper
         from crispy_forms.bootstrap import FieldWithButtons
@@ -80,7 +80,7 @@ class NumericQuickEdit(QuickEdit):
     def __init__(self, data=None, source='', sensor=None, **kwargs):
         from crispy_forms.bootstrap import FieldWithButtons
         from crispy_forms.layout import Layout, Submit, Field
-        super(NumericQuickEdit, self).__init__(data, source, sensor, **kwargs)
+        super().__init__(data, source, sensor, **kwargs)
         if sensor.is_finite_range:
             field = self.fields['status']
             field.sensor_name = sensor.name
@@ -126,7 +126,7 @@ class BaseForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop('request', None)
-        super(BaseForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         from crispy_forms.helper import FormHelper
         from crispy_forms.layout import Submit
         self.helper = FormHelper()
@@ -140,7 +140,7 @@ class LoginForm(BaseForm):
     password = forms.CharField(widget=forms.PasswordInput())
 
     def clean(self):
-        cleaned_data = super(LoginForm, self).clean()
+        cleaned_data = super().clean()
         if (cleaned_data.get('username') != self.auth[0]
             or cleaned_data.get('password') != self.auth[1]):
             raise forms.ValidationError('Username or password is not correct', code='invalid')
@@ -152,7 +152,7 @@ class CmdForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         textarea = kwargs.pop('textarea', False)
-        super(CmdForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         from crispy_forms.helper import FormHelper
         self.helper = FormHelper()
         from crispy_forms.bootstrap import FieldWithButtons
@@ -246,7 +246,7 @@ class ProgramForm(SystemObjectForm):
                 self.fields[key] = forms.CharField(
                     initial=val, required=False,
                     widget=forms.Textarea(attrs=dict(rows=val.count('\n') + 1)))
-        super(ProgramForm, self).load(programname)
+        super().load(programname)
 
     def clean(self):
         from automate.common import LogicStr
@@ -261,7 +261,7 @@ class ProgramForm(SystemObjectForm):
                     except TraitError:
                         self.add_error(key, 'Invalid value')
 
-        return super(ProgramForm, self).clean()
+        return super().clean()
 
     def new(self, progname):
         prog = Program(self.cleaned_data.pop('name'))
@@ -275,7 +275,7 @@ class ProgramForm(SystemObjectForm):
             if key in self.changed_data:
                 setattr(prog, key + '_str', self.cleaned_data.pop(key))
 
-        super(ProgramForm, self).save(prog.name)
+        super().save(prog.name)
 
 
 class StatusObjectForm(ProgramForm):
@@ -296,7 +296,7 @@ class StatusObjectForm(ProgramForm):
                     value_type = type(init_value)
                     self.fields[attr_name] = fieldtypes.get(
                         value_type, forms.CharField)(initial=init_value, required=False)
-        super(StatusObjectForm, self).load(objname)
+        super().load(objname)
 
     def new(self, name):
         type = self.cleaned_data.pop('object_type')

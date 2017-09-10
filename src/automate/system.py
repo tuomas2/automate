@@ -485,7 +485,7 @@ class System(SystemBase):
 
     def __init__(self, load_state: 'List[SystemObject]'=None, load_config: 'Dict[str, Any]'=None,
                  **traits):
-        super(System, self).__init__(**traits)
+        super().__init__(**traits)
         if not self.name:
             self.name = self.__class__.__name__
             if self.name == 'System':

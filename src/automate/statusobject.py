@@ -186,11 +186,11 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
 
     def __init__(self, *args, **kwargs):
         self._status_lock = Lock('statuslock')
-        super(StatusObject, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def __setstate__(self, *args, **kwargs):
         self._status_lock = Lock('statuslock')
-        super(StatusObject, self).__setstate__(*args, **kwargs)
+        super().__setstate__(*args, **kwargs)
 
     def _history_length_changed(self, new_value):
         self.history = collections.deque(list(self.history or [])[-new_value:], maxlen=new_value)
@@ -226,7 +226,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
         """
             Get data of this object as a data dictionary. Used by websocket service.
         """
-        d = super(StatusObject, self).get_as_datadict()
+        d = super().get_as_datadict()
         d.update(dict(status=self.status, data_type=self.data_type, editable=self.editable))
         return d
 
@@ -238,7 +238,7 @@ class StatusObject(AbstractStatusObject, ProgrammableSystemObject, CompareMixin)
         self.set_status(value)
 
     def setup_system(self, *args, **kwargs):
-        super(StatusObject, self).setup_system(*args, **kwargs)
+        super().setup_system(*args, **kwargs)
         if not self.history:
             self.history = collections.deque(maxlen=self.history_length)
         self.data_type = self._status.__class__.__name__
@@ -446,7 +446,7 @@ class AbstractSensor(StatusObject):
     simpleview = StatusObject.simple_view + ['_status']
 
     def get_as_datadict(self):
-        d = super(AbstractSensor, self).get_as_datadict()
+        d = super().get_as_datadict()
         d.update(dict(user_editable=self.user_editable))
         return d
 
@@ -485,7 +485,7 @@ class AbstractSensor(StatusObject):
     def setup_system(self, system, *args, **kwargs):
         name, traits = self._passed_arguments
         default = traits.get('default', None)
-        super(AbstractSensor, self).setup_system(system, *args, **kwargs)
+        super().setup_system(system, *args, **kwargs)
         load_state = kwargs.get('load_state', None)
         if not default is None and not load_state:
             self.set_status(default)
@@ -533,12 +533,12 @@ class AbstractActuator(StatusObject):
     def __init__(self, *args, **kwargs):
         self._actuator_status_lock = Lock("statuslock")
         self._program_lock = Lock("programlock")
-        super(AbstractActuator, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def __setstate__(self, *args, **kwargs):
         self._actuator_status_lock = Lock("statuslock")
         self._program_lock = Lock("programlock")
-        return super(AbstractActuator, self).__setstate__(*args, **kwargs)
+        return super().__setstate__(*args, **kwargs)
 
     def set_status(self, status, origin=None, force=False):
         """ For programs, to set current status of the actuator. Each
@@ -632,7 +632,7 @@ class AbstractActuator(StatusObject):
 
     def setup_system(self, system, *args, **kwargs):
         from automate.callables import SetStatus, Value, Empty
-        super(AbstractActuator, self).setup_system(system, *args, **kwargs)
+        super().setup_system(system, *args, **kwargs)
         actevent = SetStatus(self, Value(self.default))
         if self.slave:
             actevent = Empty()

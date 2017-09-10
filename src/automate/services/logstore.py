@@ -72,7 +72,7 @@ class LogStoreService(AbstractUserService):
                 del self.buffer[:int(.25 * self.capacity)]
 
             def emit(self, record):
-                super(MyBufferingHandler, self).emit(record)
+                super().emit(record)
                 service.most_recent_line = ansiconv.to_html(service.html_fix(html_formatter.format(record))) + '\n'
 
         service._loghandler = loghandler = MyBufferingHandler(service.log_length)

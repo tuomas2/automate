@@ -41,7 +41,7 @@ class AbstractArduinoSensor(AbstractSensor):
     _arduino = Instance(AbstractSystemService, transient=True)
 
     def setup(self, *args, **kwargs):
-        super(AbstractArduinoSensor, self).setup(*args, **kwargs)
+        super().setup(*args, **kwargs)
         self.logger.debug('Arduino sensor setup')
         self._arduino = self.system.request_service('ArduinoService', self.service)
 
@@ -60,7 +60,7 @@ class ArduinoDigitalSensor(AbstractArduinoSensor):
     inverted = CBool(False)
 
     def setup(self, *args, **kwargs):
-        super(ArduinoDigitalSensor, self).setup(*args, **kwargs)
+        super().setup(*args, **kwargs)
         self._arduino.subscribe_digital(self.pin, self)
         if self.pull_up_resistor:
             self._enable_pullup()
@@ -71,7 +71,7 @@ class ArduinoDigitalSensor(AbstractArduinoSensor):
     def set_status(self, status, **kwargs):
         if self.inverted:
             status = not status
-        return super(ArduinoDigitalSensor, self).set_status(status, **kwargs)
+        return super().set_status(status, **kwargs)
 
     def cleanup(self):
         self._arduino.unsubscribe_digital(self.pin)
@@ -86,7 +86,7 @@ class ArduinoAnalogSensor(AbstractArduinoSensor):
     history_frequency = CFloat(60.0)
 
     def setup(self, *args, **kwargs):
-        super(ArduinoAnalogSensor, self).setup(*args, **kwargs)
+        super().setup(*args, **kwargs)
         self._arduino.subscribe_analog(self.pin, self)
 
     def cleanup(self):
@@ -111,7 +111,7 @@ class ArduinoRemoteDigitalSensor(AbstractArduinoSensor):
     inverted = CBool(False)
 
     def setup(self, *args, **kwargs):
-        super(ArduinoRemoteDigitalSensor, self).setup(*args, **kwargs)
+        super().setup(*args, **kwargs)
         self._arduino.subscribe_virtualwire_digital_broadcast(self, self.device)
         self._arduino.send_virtualwire_command(self.device,
                                                arduino_service.VIRTUALWIRE_SET_PIN_MODE,
@@ -121,7 +121,7 @@ class ArduinoRemoteDigitalSensor(AbstractArduinoSensor):
     def set_status(self, status, **kwargs):
         if self.inverted:
             status = not status
-        return super(ArduinoRemoteDigitalSensor, self).set_status(status, **kwargs)
+        return super().set_status(status, **kwargs)
 
     def cleanup(self):
         self._arduino.unsubscribe_virtualwire_digital_broadcast(self, self.device)
@@ -142,7 +142,7 @@ class ArduinoRemoteAnalogSensor(AbstractArduinoSensor):
     device = CInt
 
     def setup(self, *args, **kwargs):
-        super(ArduinoRemoteAnalogSensor, self).setup(*args, **kwargs)
+        super().setup(*args, **kwargs)
         self._arduino.subscribe_virtualwire_analog_broadcast(self, self.device)
 
     def cleanup(self):

@@ -114,7 +114,7 @@ def patch_pyfirmata():
         def __init__(self, *args, **kwargs):
             self._command_handlers = {}
             self._stored_data = []
-            super(FixedBoard, self).__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
 
     pyfirmata.Board = FixedBoard
     pyfirmata.pyfirmata.Board = FixedBoard
@@ -199,7 +199,7 @@ class ArduinoService(AbstractSystemService):
     analog_reference = CInt(ANALOG_REFERENCE_DEFAULT)
 
     def __init__(self, *args, **kwargs):
-        super(ArduinoService, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self._sens_analog = {}
         self._sens_digital = {}
@@ -363,7 +363,7 @@ class ArduinoService(AbstractSystemService):
             self.unsubscribe_digital(pin_nr)
         for pin_nr, (sens, pin) in analog_sensors:
             self.unsubscribe_analog(pin_nr)
-        super(ArduinoService, self).reload()
+        super().reload()
         # Restore subscriptions
         for pin_nr, (sens, pin) in digital_sensors:
             self.subscribe_digital(pin_nr, sens)

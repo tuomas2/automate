@@ -81,7 +81,7 @@ class StatusWorkerThread(threading.Thread):
         self._stop_now = False
         self.system = system
         self.logger = system.logger.getChild('StatusWorkerThread')
-        super(StatusWorkerThread, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def manual_flush(self):
         if self.is_alive():

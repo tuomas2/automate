@@ -102,7 +102,7 @@ class AbstractCallable(SystemObject, CompareMixin):
     on_setup_callable = Event
 
     def setup_callables(self):
-        super(AbstractCallable, self).setup_callables()
+        super().setup_callables()
         self.setup_callable_system(self.system, init=True)
 
     @on_trait_change('_args, _args_items', post_init=True)
@@ -148,8 +148,8 @@ class AbstractCallable(SystemObject, CompareMixin):
     def __init__(self, *args, **kwargs):
         self._lock = Lock("Lock for callable " + self.__class__.__name__)
         self._kwargs = kwargs
-        super(AbstractCallable, self).__init__()
-        super(SystemObject, self).__init__()
+        super().__init__()
+        super().__init__()
         if not self.traits_inited():
             self.logger.error('Traits not inited!!!')
         if args:
@@ -160,7 +160,7 @@ class AbstractCallable(SystemObject, CompareMixin):
         self._passed_arguments = None, state.copy()
         self.logger = logging.getLogger('automate.%s' % self.__class__.__name__)
         state.pop('name', '')
-        super(SystemObject, self).__setstate__(state, trait_change_notify)
+        super().__setstate__(state, trait_change_notify)
 
     def call_eval(self, value, caller, return_value=True, **kwargs):
         """

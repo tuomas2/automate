@@ -228,7 +228,7 @@ class TagSet(CSet):
     def validate(self, object, name, value):
         if isinstance(value, str):
             return set((i.strip() for i in value.split(',')))
-        return super(TagSet, self).validate(object, name, value)
+        return super().validate(object, name, value)
 
 
 def is_iterable(y):

@@ -92,11 +92,11 @@ class ProgrammableSystemObject(SystemObject):
 
     def __init__(self, *args, **kwargs):
         self._trigger_lock = Lock('triggerlock')
-        super(ProgrammableSystemObject, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def __setstate__(self, *args, **kwargs):
         self._trigger_lock = Lock('triggerlock')
-        return super(ProgrammableSystemObject, self).__setstate__(*args, **kwargs)
+        return super().__setstate__(*args, **kwargs)
 
     #: (read-only property) Set of triggers, that cause this Program conditions to be checked
     #: (and actions to be executed). This data is updated from custom triggers list, conditions and actions.
@@ -277,7 +277,7 @@ class ProgrammableSystemObject(SystemObject):
         for key, value in list(c.items()):
             setattr(self, key, value)
 
-        super(ProgrammableSystemObject, self).setup_system(system, *args, **kwargs)
+        super().setup_system(system, *args, **kwargs)
         self.logger.debug('setup_system done for %s', self)
 
     def _priority_changed(self):
@@ -304,6 +304,6 @@ class DefaultProgram(ProgrammableSystemObject):
 
     def get_default_callables(self):
         from automate.callables import Value
-        callables = super(DefaultProgram, self).get_default_callables()
+        callables = super().get_default_callables()
         callables['active_condition'] = Value(False)
         return callables

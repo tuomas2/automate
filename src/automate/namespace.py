@@ -39,7 +39,7 @@ class Namespace(dict):
         self['reverse'] = self.reverse = {}
         self['logger'] = self.logger = system.logger.getChild('logger')
         self['__name__'] = self.system.name + '_namespace'
-        super(Namespace, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def give_systemobjects(self, system, tags=None):
         objs = []
@@ -115,7 +115,7 @@ class Namespace(dict):
             obj.setup_callables()
 
     def __repr__(self):
-        return "%s(%s)" % (type(self).__name__, super(Namespace, self).__repr__())
+        return "%s(%s)" % (type(self).__name__, super().__repr__())
 
     def __delitem__(self, key):
         o = self[key]
@@ -128,7 +128,7 @@ class Namespace(dict):
 
         if isinstance(o, SystemObject) and o in self.system.objects:
             self.system.objects.remove(o)
-        super(Namespace, self).__delitem__(key)
+        super().__delitem__(key)
 
     def update(self, d):
         for key, value in list(d.items()):
@@ -148,7 +148,7 @@ class Namespace(dict):
             if not str(e).startswith("unhashable type"):
                 raise
 
-        super(Namespace, self).__setitem__(name, value)
+        super().__setitem__(name, value)
 
         if name in self.allow_overwrite or is_alias:
             return

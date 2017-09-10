@@ -104,7 +104,7 @@ class WebService(TornadoService):
                 if not session_data.get('logged_in', False):
                     raise tornado.web.HTTPError(403, 'not logged in')
 
-                return super(MyFileHandler, self).validate_absolute_path(*args, **kwargs)
+                return super().validate_absolute_path(*args, **kwargs)
 
             def check_etag_header(self):
                 """ Disable etag_header checking (checks only modified time). Due to etag caching
@@ -115,7 +115,7 @@ class WebService(TornadoService):
     def get_tornado_handlers(self):
         if self.slave:
             return self.system.request_service('WebService').get_tornado_handlers()
-        super_handlers = super(WebService, self).get_tornado_handlers()
+        super_handlers = super().get_tornado_handlers()
         path = os.path.join(os.path.dirname(__file__), 'static')
         static = [('/static/(.*)', tornado.web.StaticFileHandler, {'path': path})]
         return static + super_handlers
@@ -146,7 +146,7 @@ class WebService(TornadoService):
             from automate.extensions.webui.djangoapp.views import set_globals
             set_globals(self, self.system)
 
-        super(WebService, self).setup()
+        super().setup()
         if not self.slave:
             self.system.request_service('LogStoreService').on_trait_change(self.push_log, 'most_recent_line')
 
@@ -168,7 +168,7 @@ class WebService(TornadoService):
                 self.last_message = None
                 self.logged_in = False
 
-                super(WebSocket, self).__init__(application, request, **kwargs)
+                super().__init__(application, request, **kwargs)
 
             def check_origin(self, origin):
                 return True

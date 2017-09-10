@@ -189,7 +189,7 @@ class SystemObject(HasStrictTraits):
             getattr(self, cname).setup_callable_system(self.system)
 
         if not self.traits_inited():
-            super(SystemObject, self).__init__(**traits)
+            super().__init__(**traits)
         self.name_changed_event = True
         self.setup()
 

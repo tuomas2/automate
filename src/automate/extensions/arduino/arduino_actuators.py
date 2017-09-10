@@ -43,7 +43,7 @@ class AbstractArduinoActuator(AbstractActuator):
     simple_view = AbstractActuator.simple_view + ["pin"]
 
     def setup(self, *args, **kwargs):
-        super(AbstractArduinoActuator, self).setup(*args, **kwargs)
+        super().setup(*args, **kwargs)
         self.logger.debug('Arduino actuator setup')
         self._arduino = self.system.request_service('ArduinoService', self.service)
 
@@ -55,7 +55,7 @@ class ArduinoDigitalActuator(AbstractArduinoActuator):
     _status = CBool(transient=True)
 
     def setup(self, *args, **kwargs):
-        super(ArduinoDigitalActuator, self).setup(*args, **kwargs)
+        super().setup(*args, **kwargs)
         self._arduino.setup_digital(self.pin)
 
     def _status_changed(self):
@@ -94,7 +94,7 @@ class ArduinoRemoteDigitalActuator(AbstractArduinoActuator):
     device = CInt
 
     def setup(self, *args, **kwargs):
-        super(ArduinoRemoteDigitalActuator, self).setup(*args, **kwargs)
+        super().setup(*args, **kwargs)
         self._arduino.send_virtualwire_command(self.device,
                                                arduino_service.VIRTUALWIRE_SET_PIN_MODE,
                                                self.pin,
@@ -120,7 +120,7 @@ class ArduinoRemotePWMActuator(AbstractArduinoActuator):
     device = CInt
 
     def setup(self, *args, **kwargs):
-        super(ArduinoRemotePWMActuator, self).setup(*args, **kwargs)
+        super().setup(*args, **kwargs)
         self._arduino.send_virtualwire_command(self.device,
                                                arduino_service.VIRTUALWIRE_SET_PIN_MODE,
                                                self.pin,
@@ -159,7 +159,7 @@ class ArduinoServoActuator(AbstractArduinoActuator):
             self.setup()
 
     def setup(self, *args, **kwargs):
-        super(ArduinoServoActuator, self).setup(*args, **kwargs)
+        super().setup(*args, **kwargs)
         self.logger.debug("setup_servo %s %s %s %s %s %s", self, self.service, self.pin, self.min_pulse, self.max_pulse,
                           int(round(self._status)))
         self._arduino.setup_servo(self.pin, self.min_pulse, self.max_pulse, int(round(self._status)))
@@ -180,7 +180,7 @@ class ArduinoPWMActuator(FloatActuator, AbstractArduinoActuator):
     """
 
     def setup(self, *args, **kwargs):
-        super(ArduinoPWMActuator, self).setup(*args, **kwargs)
+        super().setup(*args, **kwargs)
         self._arduino.setup_pwm(self.pin)
 
     def _status_changed(self):

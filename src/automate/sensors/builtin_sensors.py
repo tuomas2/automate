@@ -72,7 +72,7 @@ class UserEventSensor(UserBoolSensor):
         self.status = False
 
     def get_default_callables(self):
-        callables = super(UserEventSensor, self).get_default_callables()
+        callables = super().get_default_callables()
         callables['active_condition'] = Value(self)
         return callables
 
@@ -100,7 +100,7 @@ class AbstractNumericSensor(AbstractSensor):
         return self.value_max - self.value_min < float('inf')
 
     def get_as_datadict(self):
-        d = super(AbstractNumericSensor, self).get_as_datadict()
+        d = super().get_as_datadict()
         d.update(dict(value_min=self.value_min, value_max=self.value_max))
         return d
 
@@ -109,7 +109,7 @@ class AbstractNumericSensor(AbstractSensor):
             clipped_status = None
         else:
             clipped_status = max(min(float(status), self.value_max), self.value_min)
-        super(AbstractNumericSensor, self).set_status(clipped_status, **kwargs)
+        super().set_status(clipped_status, **kwargs)
 
 
 class UserIntSensor(AbstractNumericSensor):
@@ -180,7 +180,7 @@ class CronTimerSensor(AbstractSensor):
 
     def setup_system(self, *args, **traits):
         self._timerlock = Lock()
-        super(CronTimerSensor, self).setup_system(*args, **traits)
+        super().setup_system(*args, **traits)
         self.update_status()
 
     def _now(self):
@@ -249,7 +249,7 @@ class FileChangeSensor(AbstractSensor):
 
         def __init__(self, func, *args, **kwargs):
             self.func = func
-            super(FileChangeSensor.InotifyEventHandler, self).__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
 
         def process_default(self, event):
             self.func()
@@ -339,14 +339,14 @@ class PollingSensor(AbstractPollingSensor):
 
     def get_default_callables(self):
         from automate.callables import Empty
-        c = super(PollingSensor, self).get_default_callables()
+        c = super().get_default_callables()
         c['status_updater'] = Empty()
         return c
 
     def setup(self):
         self.status_updater.setup_callable_system(self.system)
         self.on_trait_change(lambda: self.status_updater.setup_callable_system(self.system), 'status_updater')
-        super(PollingSensor, self).setup()
+        super().setup()
 
     def update_status(self):
         if self.type is None:

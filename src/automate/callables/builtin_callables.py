@@ -557,7 +557,7 @@ class Delay(AbstractRunner):
                     timer.cancel()
             self.del_state(caller)
 
-        super(Delay, self).cancel(caller)
+        super().cancel(caller)
 
     def _run(self, caller, timer, **kwargs):
         self.logger.info("Time is up, running %s", self)
@@ -584,7 +584,7 @@ class Threaded(Delay):
     """
 
     def __init__(self, *args, **kwargs):
-        super(Threaded, self).__init__(0, *args, **kwargs)
+        super().__init__(0, *args, **kwargs)
 
 
 class If(AbstractCallable):
@@ -1239,7 +1239,7 @@ class WaitUntil(AbstractRunner):
             for cb in callbacks:
                 self.obj.on_trait_change(cb, 'status', remove=True)
             self.del_state(caller)
-        super(WaitUntil, self).cancel(caller)
+        super().cancel(caller)
 
     def _give_triggers(self):
         return None
@@ -1318,7 +1318,7 @@ class While(AbstractRunner):
             state = self.get_state(caller)
             for t in state.get('threads', []):
                 t._cancel_while = True
-        super(While, self).cancel(caller)
+        super().cancel(caller)
 
     def _give_triggers(self):
         return None
