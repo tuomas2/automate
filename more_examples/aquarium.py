@@ -268,9 +268,15 @@ class Aquarium(commonmixin.CommonMixin, System):
             default=1.0,
         )
 
+        ph_raw = FloatActuator(
+            tags='analog,co2,ph',
+            on_update=SetStatus('ph_raw', Func(calc_ph, 'ph_4_v', 'ph_6_v', 'ph_v')),
+            show_stdev_seconds=30,
+        )
+
         ph = FloatActuator(
             tags='analog,co2,ph',
-            on_update=SetStatus('ph', Mean(Func(calc_ph, 'ph_4_v', 'ph_6_v', 'ph_v'), 15)),
+            on_update=SetStatus('ph', Mean('ph_raw', 15)),
             show_stdev_seconds=30,
         )
 
