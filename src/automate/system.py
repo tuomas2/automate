@@ -433,6 +433,10 @@ class System(SystemBase):
         for ser in (i for i in self.services if isinstance(i, AbstractSystemService)):
             ser.cleanup_system()
         self.logger.debug('System services cleaned up')
+        threads = list(t.name for t in threading.enumerate() if t.is_alive() and not t.daemon)
+        if threads:
+            self.logger.info('After cleanup, we have still the following threads '
+                             'running: %s', ', '.join(threads))
 
     def cmd_exec(self, cmd):
         """
