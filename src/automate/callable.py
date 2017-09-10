@@ -160,7 +160,7 @@ class AbstractCallable(SystemObject, CompareMixin):
         self._passed_arguments = None, state.copy()
         self.logger = logging.getLogger('automate.%s' % self.__class__.__name__)
         state.pop('name', '')
-        super().__setstate__(state, trait_change_notify)
+        super(SystemObject, self).__setstate__(state, trait_change_notify)
 
     def call_eval(self, value, caller, return_value=True, **kwargs):
         """
