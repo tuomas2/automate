@@ -63,9 +63,10 @@ LCD_SET_CURSOR = 0x04
 LCD_SET_REPORTING = 0x05
 
 # Analog references, as defined for ATmega328
-ANALOG_REFERENCE_DEFAULT = 0
-ANALOG_REFERENCE_EXTERNAL = 1
-ANALOG_REFERENCE_INTERNAL = 2
+ANALOG_REFERENCE_UNSET = -1
+ANALOG_REFERENCE_DEFAULT = 1
+ANALOG_REFERENCE_EXTERNAL = 0
+ANALOG_REFERENCE_INTERNAL = 3
 
 
 def float_to_bytes(value):
@@ -196,7 +197,7 @@ class ArduinoService(AbstractSystemService):
     keep_alive = CBool(True)
 
     #: Set analog reference (Note: Arduino platform dependent constants)
-    analog_reference = CInt(ANALOG_REFERENCE_DEFAULT)
+    analog_reference = CInt(ANALOG_REFERENCE_UNSET)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -266,6 +267,8 @@ class ArduinoService(AbstractSystemService):
             self.setup_virtualwire_input()
 
     def configure_analog_reference(self):
+        if self.analog_reference == -1:
+            return
         if not self._board:
             return
         with self._lock:
