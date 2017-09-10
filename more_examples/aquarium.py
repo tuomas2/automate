@@ -255,6 +255,7 @@ class Aquarium(commonmixin.CommonMixin, System):
             tags='analog,ph',
             pin=arduino_analog_ports['ph'],
             default=0.5,
+            log_level=logging.WARNING
         )
 
         ph_4_v = UserFloatSensor(
@@ -275,7 +276,8 @@ class Aquarium(commonmixin.CommonMixin, System):
 
         veden_korkeus = ArduinoAnalogSensor(
             tags='analog',
-            pin=arduino_analog_ports['veden_korkeus']
+            pin=arduino_analog_ports['veden_korkeus'],
+            log_level=logging.WARNING,
         )
 
         sahkot = UserBoolSensor(
@@ -439,13 +441,13 @@ class Aquarium(commonmixin.CommonMixin, System):
         )
 
     class LCD(Group):
-        lcd_act = ArduinoLCDActuator()
+        lcd_act = ArduinoLCDActuator(log_level=logging.WARNING)
 
         lcd_program = Program(
             on_activate=SetStatus('lcd_act', 'Hello from\nAquarium!'),
             on_update=SetStatus('lcd_act',
-                                ToStr('pH:{0:.2f} Ta:{1:.2f}C\nTu:{2:.2f}C',
-                                      'ph', 'aqua_temperature', 'ulko_lampo'))
+                                ToStr('pH:{0:.1f} A:{1:.1f}\nP:{2:.1f} U:{3:.1f}',
+                                      'ph', 'aqua_temperature', 'parvekkeen_lampo', 'ulko_lampo'))
         )
         lcd_backlight = UserBoolSensor(
             active_condition=Value('lcd_backlight'),
