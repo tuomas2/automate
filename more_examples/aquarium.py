@@ -255,7 +255,8 @@ class Aquarium(commonmixin.CommonMixin, System):
             tags='analog,ph',
             pin=arduino_analog_ports['ph'],
             default=0.5,
-            log_level=logging.WARNING
+            log_level=logging.WARNING,
+            show_stdev_seconds=30,
         )
 
         ph_4_v = UserFloatSensor(
@@ -270,8 +271,8 @@ class Aquarium(commonmixin.CommonMixin, System):
 
         ph = FloatActuator(
             tags='analog,co2,ph',
-            on_update=SetStatus('ph', Func(calc_ph, 'ph_4_v', 'ph_6_v', 'ph_v'))
-
+            on_update=SetStatus('ph', Func(calc_ph, 'ph_4_v', 'ph_6_v', 'ph_v')),
+            show_stdev_seconds=30,
         )
 
         veden_korkeus = ArduinoAnalogSensor(
