@@ -47,7 +47,7 @@ def CSet_validate(self, object, name, value):
         except (ValueError, TypeError):
             value = {value}
 
-    return super().validate(object, name, value)
+    return super(ttypes.CSet, self).validate(object, name, value)
 
 ttypes.CSet.validate = CSet_validate
 

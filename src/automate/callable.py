@@ -149,7 +149,7 @@ class AbstractCallable(SystemObject, CompareMixin):
         self._lock = Lock("Lock for callable " + self.__class__.__name__)
         self._kwargs = kwargs
         super().__init__()
-        super().__init__()
+        super(SystemObject, self).__init__()
         if not self.traits_inited():
             self.logger.error('Traits not inited!!!')
         if args:
