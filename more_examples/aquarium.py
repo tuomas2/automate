@@ -263,6 +263,11 @@ class Aquarium(commonmixin.CommonMixin, System):
             show_stdev_seconds=30,
         )
 
+        ph_v_mean = FloatActuator(
+            tags='analog,ph',
+            on_update=SetStatus('ph_v_mean', Mean('ph_v', 30)),
+            history_frequency=60,
+        )
         ph_4_v = UserFloatSensor(
             tags='ph',
             default=0.0,
@@ -281,8 +286,9 @@ class Aquarium(commonmixin.CommonMixin, System):
 
         ph = FloatActuator(
             tags='analog,co2,ph',
-            on_update=SetStatus('ph', Mean('ph_raw', 30)),
+            on_update=SetStatus('ph', Mean('ph_raw', 240)),  # 4 minute smoothing
             history_frequency=60,
+            history_length=5000,
         )
 
         sahkot = UserBoolSensor(
