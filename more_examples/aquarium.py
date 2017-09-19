@@ -165,14 +165,12 @@ class Aquarium(commonmixin.CommonMixin, System):
         kaapin_ulkosuodatin = ArduinoDigitalSensor(
             tags='arduino',
             pin=arduino_ports['kaapin sensori'],
-            change_delay=1,
             pull_up_resistor=True,
             inverted=True
         )
         lattiasensori_2 = ArduinoDigitalSensor(
             tags='arduino',
             pin=arduino_ports['keski lattiasensori'],
-            change_delay=1,
             description='altaan alla oleva lattiasensori',
             pull_up_resistor=True,
             inverted=True
@@ -181,7 +179,6 @@ class Aquarium(commonmixin.CommonMixin, System):
         ala_varoitus = ArduinoDigitalSensor(
             tags='arduino',
             pin=arduino_ports['ala varoitus'],
-            change_delay=1,
             pull_up_resistor=True,
             inverted=True,
         )
@@ -189,7 +186,6 @@ class Aquarium(commonmixin.CommonMixin, System):
         ala_altaat_alaraja = ArduinoDigitalSensor(
             tags='arduino',
             pin=arduino_ports['ala_altaat_alaraja'],
-            change_delay=1,
             pull_up_resistor=True
         )
 
@@ -198,13 +194,13 @@ class Aquarium(commonmixin.CommonMixin, System):
             pin=arduino_ports['co2_stop'],
             safety_delay=300,
             safety_mode='falling',
-            change_delay=1,
             pull_up_resistor=True,
             inverted=True,
         )
 
         water_temp_min = UserFloatSensor(default=20.0)
         water_temp_max = UserFloatSensor(default=30.5)
+        aqua_temperature_triggered = UserBoolSensor(default=False)
 
         aqua_temperature = TemperatureSensor(
             tags='temperature,analog',
@@ -214,9 +210,10 @@ class Aquarium(commonmixin.CommonMixin, System):
             max_jump=2.,
             max_errors=7,
             active_condition=Or(Value('aqua_temperature') > water_temp_max,
-                                Value('aqua_temperature') < water_temp_min),
-            on_activate=Run('push_sender'),
-            on_deactivate=Run('push_sender'),
+                                Value('aqua_temperature') < water_temp_min,
+                                Value('aqua_temperature_triggered')
+                                ),
+            on_activate=Run(SetStatus('aqua_temperature_triggered', 1), 'push_sender'),
             history_length=5000,
         )
 
@@ -278,9 +275,11 @@ class Aquarium(commonmixin.CommonMixin, System):
             default=1.0,
         )
 
+        v_offset = UserFloatSensor(tags='ph', default=0.0)
+
         ph_raw = FloatActuator(
             tags='analog,co2,ph',
-            on_update=SetStatus('ph_raw', Func(calc_ph, 'ph_4_v', 'ph_6_v', 'ph_v')),
+            on_update=SetStatus('ph_raw', Func(calc_ph, 'ph_4_v', 'ph_6_v', Sum('ph_v', 'v_offset'))),
             show_stdev_seconds=30,
         )
 
@@ -288,7 +287,7 @@ class Aquarium(commonmixin.CommonMixin, System):
             tags='analog,co2,ph',
             on_update=SetStatus('ph', Mean('ph_raw', 240)),  # 4 minute smoothing
             history_frequency=60,
-            history_length=5000,
+            history_length=10000,
         )
 
         sahkot = UserBoolSensor(
@@ -688,8 +687,9 @@ if __name__ == '__main__':
 
     arduino_service = ArduinoService(
         device="/dev/ttyUSB0",
-        sample_rate=1000,
+        sample_rate=2500,
         lcd_port=0x3F,
+        instant_digital_reporting=False,
         analog_reference=0 if is_raspi() else 1,  # EXTERNAL
     )
 
