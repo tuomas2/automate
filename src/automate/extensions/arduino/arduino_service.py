@@ -46,6 +46,7 @@ SYSEX_SETUP_VIRTUALWIRE = 0x02
 SYSEX_SETUP_LCD = 0x03
 SYSEX_LCD_COMMAND = 0x04
 SYSEX_SET_ANALOG_REFERENCE = 0x05
+SYSEX_SET_INSTANT_DIGITAL_REPORTING = 0x06
 
 VIRTUALWIRE_SET_PIN_MODE = 0x01
 VIRTUALWIRE_ANALOG_MESSAGE = 0x02
@@ -199,6 +200,10 @@ class ArduinoService(AbstractSystemService):
     #: Set analog reference (Note: Arduino platform dependent constants)
     analog_reference = CInt(ANALOG_REFERENCE_UNSET)
 
+    #: Report digital ports instantly? If disabled, digital ports are reported only
+    #: periodically with sample rate.
+    instant_digital_reporting = CBool(True)
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -243,10 +248,9 @@ class ArduinoService(AbstractSystemService):
             it.name = "PyFirmata thread for {dev}".format(dev=self.device)
             it.start()
 
-            self.write(pyfirmata.SYSTEM_RESET)
-            self._board.send_sysex(pyfirmata.SAMPLING_INTERVAL,
-                                   pyfirmata.util.to_two_bytes(self.sample_rate))
-
+            self.reset()
+            self.configure_sample_rate()
+            self.configure_instant_digital_reporting()
             self.configure_virtualwire()
             self.configure_lcd()
             self.configure_analog_reference()
@@ -266,6 +270,22 @@ class ArduinoService(AbstractSystemService):
                                                              self.device_address,
                                                              ])
             self.setup_virtualwire_input()
+
+    def reset(self):
+        if not self._board:
+            return
+        self.write(pyfirmata.SYSTEM_RESET)
+
+    def configure_sample_rate(self):
+        if not self._board:
+            return
+        self._board.send_sysex(pyfirmata.SAMPLING_INTERVAL,
+                               pyfirmata.util.to_two_bytes(self.sample_rate))
+
+    def configure_instant_digital_reporting(self):
+        if not self._board:
+            return
+        self._board.send_sysex(SYSEX_SET_INSTANT_DIGITAL_REPORTING, [self.instant_digital_reporting])
 
     def configure_analog_reference(self):
         if self.analog_reference == -1:
