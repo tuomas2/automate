@@ -88,13 +88,6 @@ class System(SystemBase):
     #: Name of the file where logs are stored
     logfile = CUnicode
 
-    #: Log level for the handler that writes to stdout
-    print_level = CInt(logging.INFO, transient=True)
-
-    @on_trait_change('print_level', post_init=True)
-    def print_level_changed(self, new):
-        self.print_handler.setLevel(new)
-
     #: Reference to logger instance (read-only)
     logger = Instance(logging.Logger)
 
@@ -110,15 +103,12 @@ class System(SystemBase):
     #: Format string of the log handler that writes to logfile
     logfile_format = Str('%(process)d:%(threadName)s:%(name)s:%(asctime)s:%(levelname)s:%(message)s')
 
-    #: Log level of the handler that writes to logfile
-    log_level = CInt(logging.DEBUG, transient=True)
+    #: Log level of System logger
+    log_level = CInt(logging.INFO, transient=True)
 
     @on_trait_change('log_level', post_init=True)
     def log_level_changed(self, new):
-        if not self.logfile:
-            self.logger.error('No logfile specified')
-            return
-        self.log_handler.setLevel(new)
+        self.logger.setLevel(new)
 
     # SERVICES
     ###########
@@ -530,7 +520,8 @@ class System(SystemBase):
             return
 
         root_logger.propagate = False
-        root_logger.setLevel(logging.DEBUG)
+        root_logger.setLevel(self.log_level)
+        self.logger.setLevel(self.log_level)
 
         if self.raven_client:
             sentry_handler = SentryHandler(client=self.raven_client, level=logging.ERROR)
@@ -539,12 +530,10 @@ class System(SystemBase):
         if self.logfile:
             formatter = logging.Formatter(fmt=self.logfile_format)
             log_handler = logging.FileHandler(self.logfile)
-            log_handler.setLevel(self.log_level)
             log_handler.setFormatter(formatter)
             root_logger.addHandler(log_handler)
 
         stream_handler = logging.StreamHandler()
-        stream_handler.setLevel(self.print_level)
 
         from colorlog import ColoredFormatter, default_log_colors
         colors = default_log_colors.copy()
