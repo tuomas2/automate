@@ -23,7 +23,7 @@
 
 import logging
 
-from traits.api import HasTraits, HasStrictTraits, Instance, CBool
+from traits.api import HasTraits, HasStrictTraits, Instance, CBool, CInt
 
 from .common import SystemBase
 
@@ -39,6 +39,7 @@ class AbstractService(HasTraits):
     autoload = False
     system = Instance(SystemBase)
     logger = Instance(logging.Logger, transient=True)
+    log_level = CInt(logging.INFO)
     is_mocked = CBool(False, transient=True)
     _id = 0
 
@@ -50,6 +51,10 @@ class AbstractService(HasTraits):
     def name(self):
         return '%s.%s' % (self.__class__.__name__, self._id)
 
+    def _log_level_changed(self, new_value):
+        if self.logger:
+            self.logger.setLevel(new_value)
+
     @property
     def initialized(self):
         return bool(self.system)
@@ -58,6 +63,7 @@ class AbstractService(HasTraits):
         self.system = system
         self._id = id
         self.logger = self.system.logger.getChild(self.name)
+        self.logger.setLevel(self.log_level)
         self.logger.info('Setup')
         self.system.register_service(self)
         self.setup()
