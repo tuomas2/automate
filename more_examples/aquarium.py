@@ -164,38 +164,39 @@ class Aquarium(commonmixin.CommonMixin, System):
 
         kaapin_ulkosuodatin = ArduinoDigitalSensor(
             tags='arduino',
-            pin=arduino_ports['kaapin sensori'],
-            pull_up_resistor=True,
-            inverted=True
-        )
-        lattiasensori_2 = ArduinoDigitalSensor(
-            tags='arduino',
-            pin=arduino_ports['keski lattiasensori'],
-            description='altaan alla oleva lattiasensori',
+            pin=arduino_ports['kaapin sensori'], #2
             pull_up_resistor=True,
             inverted=True
         )
 
         ala_varoitus = ArduinoDigitalSensor(
             tags='arduino',
-            pin=arduino_ports['ala varoitus'],
+            pin=arduino_ports['ala varoitus'], #3
+            pull_up_resistor=True,
+            inverted=True,
+        )
+
+        lattiasensori_2 = ArduinoDigitalSensor(
+            tags='arduino',
+            pin=arduino_ports['keski lattiasensori'], #4
+            description='altaan alla oleva lattiasensori',
+            pull_up_resistor=True,
+            inverted=True
+        )
+
+        co2_stop_sensor = ArduinoDigitalSensor(
+            tags='arduino',
+            pin=arduino_ports['co2_stop'], #5
+            safety_delay=300,
+            safety_mode='falling',
             pull_up_resistor=True,
             inverted=True,
         )
 
         ala_altaat_alaraja = ArduinoDigitalSensor(
             tags='arduino',
-            pin=arduino_ports['ala_altaat_alaraja'],
+            pin=arduino_ports['ala_altaat_alaraja'], #6
             pull_up_resistor=True
-        )
-
-        co2_stop_sensor = ArduinoDigitalSensor(
-            tags='arduino',
-            pin=arduino_ports['co2_stop'],
-            safety_delay=300,
-            safety_mode='falling',
-            pull_up_resistor=True,
-            inverted=True,
         )
 
         water_temp_min = UserFloatSensor(default=20.0)
@@ -285,7 +286,7 @@ class Aquarium(commonmixin.CommonMixin, System):
 
         ph = FloatActuator(
             tags='analog,co2,ph',
-            on_update=SetStatus('ph', Mean('ph_raw', 240)),  # 4 minute smoothing
+            on_update=SetStatus('ph', Mean('ph_raw', 30)),
             history_frequency=60,
             history_length=10000,
         )
@@ -691,6 +692,7 @@ if __name__ == '__main__':
         lcd_port=0x3F,
         instant_digital_reporting=False,
         analog_reference=0 if is_raspi() else 1,  # EXTERNAL
+        #log_level=logging.DEBUG,
     )
 
     rpcs = RpcService(
