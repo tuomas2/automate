@@ -566,6 +566,7 @@ class Aquarium(commonmixin.CommonMixin, System):
                                     'palkit',
                                     'lattiasensori_1',
                                     'lattiasensori_2',
+                                    'kaapin_ulkosuodatin',
                                     'vesivahinko_kytkin'),
                                  Not('testimoodi')),
             on_activate=Run(
