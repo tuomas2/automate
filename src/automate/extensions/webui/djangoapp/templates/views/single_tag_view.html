@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 {% load automate_tags %}
+
+{% block title %}{{ system.name }} : tag : {{tag}}{% endblock %}
 {% block content %}
   {% block info %}
     <h1>Tag {{ tag }}</h1><br>
