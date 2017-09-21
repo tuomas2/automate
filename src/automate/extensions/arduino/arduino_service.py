@@ -377,25 +377,28 @@ class ArduinoService(AbstractSystemService):
         digital_sensors = list(self._sens_digital.items())
         analog_sensors = list(self._sens_analog.items())
         digital_actuators = list(self._act_digital.items())
-        #virt_analog = list(self._sens_virtualwire_analog.items())
-        #virt_digital = list(self._sens_virtualwire_digital.items())
 
         for pin_nr, (_type, pin) in digital_actuators:
+            # actuator.cleanup() would be better approach ... 
             self.cleanup_digital_actuator(pin_nr)
 
         for pin_nr, (sens, pin) in digital_sensors:
-            self.unsubscribe_digital(pin_nr)
+            sens.cleanup()
         for pin_nr, (sens, pin) in analog_sensors:
-            self.unsubscribe_analog(pin_nr)
+            sens.cleanup()
         super().reload()
         # Restore subscriptions
         for pin_nr, (sens, pin) in digital_sensors:
-            self.subscribe_digital(pin_nr, sens)
+            sens.setup()
         for pin_nr, (sens, pin) in analog_sensors:
-            self.subscribe_analog(pin_nr, sens)
+            sens.setup()
 
         for pin_nr, (_type, pin) in digital_actuators:
+            # Perhaps it would be cleaner to do these too via act.setup()?
+            # But we should store actuator instance here then.
+
             setup_func = {'p': self.setup_pwm, 'o': self.setup_digital}.get(_type)
+
             # TODO: servo reload not implemented
             if setup_func:
                 setup_func(pin_nr)
