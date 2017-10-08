@@ -96,8 +96,9 @@ class PushOver(SortableMixin, SystemObject):
             except (requests.ConnectionError, requests.Timeout):
                 self.logger.exception('Network problem')
 
-            self.logger.warning('Message could not be delivered, trying again after %s seconds '
+            self.logger.warning('Message "%s": "%s" could not be delivered, trying again after %s seconds '
                                 'for %d times still',
+                                data['message'], data['title'],
                                 self.SLEEP_TIME,
                                 self.MAX_RETRIES-retries)
             time.sleep(self.SLEEP_TIME)
