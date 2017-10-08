@@ -7,23 +7,21 @@
 ansiconv==1.0.0
 certifi==2017.7.27.1      # via requests
 chardet==3.0.4            # via requests
-colorlog==3.0.1
-contextlib2==0.5.5        # via raven
+colorlog==3.1.0
 coverage==4.4.1           # via pytest-cov
-croniter==0.3.17
+croniter==0.3.19
 decorator==4.1.2          # via ipython, traitlets
 django-crispy-forms==1.6.1
-django==1.11.4
-idna==2.5                 # via requests
+django==1.11.6
+idna==2.6                 # via requests
 ipython-genutils==0.2.0   # via traitlets
-ipython==6.1.0
-jedi==0.10.2              # via ipython
-mock==2.0.0
-pbr==3.1.1                # via mock
+ipython==6.2.1
+jedi==0.11.0              # via ipython
+parso==0.1.0              # via jedi
 pexpect==4.2.1            # via ipython
 pickleshare==0.7.4        # via ipython
 prompt-toolkit==1.0.15    # via ipython
-psutil==5.2.2
+psutil==5.3.1
 ptyprocess==0.5.2         # via pexpect
 py==1.4.34                # via pytest
 pyfirmata==1.0.3
@@ -32,15 +30,15 @@ pyinotify==0.9.6
 pyserial==3.4             # via pyfirmata
 pytest-cov==2.5.1
 pytest-pycharm==0.4.0
-pytest==3.2.1
+pytest==3.2.3
 python-dateutil==2.6.1    # via croniter
 pytz==2017.2              # via django
-raven==6.1.0
-requests==2.18.3
+raven==6.2.1
+requests==2.18.4
 rpio==0.10.0
 simplegeneric==0.8.1      # via ipython
-six==1.10.0               # via mock, prompt-toolkit, python-dateutil, traitlets
-tornado==4.5.1
+six==1.11.0               # via prompt-toolkit, python-dateutil, traitlets
+tornado==4.5.2
 traitlets==4.3.2          # via ipython
 traits==4.6.0
 urllib3==1.22             # via requests
