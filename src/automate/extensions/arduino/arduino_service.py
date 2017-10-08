@@ -360,9 +360,14 @@ class ArduinoService(AbstractSystemService):
         self._keepalive_thread.name = "Arduino keepalive (60s)"
         self._keepalive_thread.start()
 
-
     def _string_data_handler(self, *data):
-        self.logger.debug('String data: %s', bytearray(data[::2]).decode('ascii'))
+        str_data = bytearray(data[::2]).decode('ascii')
+        my_logger = self.logger.debug
+        if str_data.startswith('E:'):
+            my_logger = self.logger.error
+        elif str_data.startswith('W:'):
+            my_logger = self.logger.warning
+        my_logger('String data: %s', str_data)
 
     def cleanup(self):
         self.logger.debug("Cleaning up Arduino subsystem. ")
