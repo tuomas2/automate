@@ -128,11 +128,18 @@ class ArduinoSystem(System):
                                               on_update=SetStatus('remote_pwm', 'remote_pwm_set'))
 
         source_sens1 = ArduinoDigitalSensor(service=0, pull_up_resistor=True, pin=2)
-        source_sens1_2 = ArduinoDigitalSensor(service=1, pull_up_resistor=True, pin=2)
-        source_sens2 = ArduinoAnalogSensor(service=0, pin=0,
-            on_update=LCDPrint(ToStr('Value: {}\n{}', 'source_sens2', 'my_str'))
-        )
+        source_sens1b = ArduinoDigitalSensor(service=0, pull_up_resistor=True, pin=8)
 
+        source_sens1_2 = ArduinoDigitalSensor(service=1, pull_up_resistor=True, pin=2)
+
+        #source_sens2 = ArduinoAnalogSensor(service=0, pin=0,
+        #    on_update=LCDPrint(ToStr('Value: {}\n{}', 'source_sens2', 'my_str'))
+        #)
+        source_a0 = ArduinoAnalogSensor(service=0, pin=0)
+        source_a1 = ArduinoAnalogSensor(service=0, pin=1)
+        source_a2 = ArduinoAnalogSensor(service=0, pin=2)
+        source_a3 = ArduinoAnalogSensor(service=0, pin=3)
+        source_a4 = ArduinoAnalogSensor(service=0, pin=4)
     class Remote(Group):
         awds1 = ArduinoRemoteDigitalSensor(service=1, device=source_dev, pin=2) # receives via VW
         awds2 = ArduinoRemoteAnalogSensor(service=1, device=source_dev, pin=0) # receives via VW
@@ -143,15 +150,16 @@ s = ArduinoSystem(
     services=[
         ArduinoService(
             device="/dev/ttyUSB0",
-            sample_rate=8000,
+            sample_rate=500,
             home_address=source_home,
             device_address=source_dev,
             #virtualwire_ptt_pin=9,
-            virtualwire_tx_pin=11,
+#            virtualwire_tx_pin=11,
             keep_alive=True,
-            wakeup_pin=2,
+            #wakeup_pin=2,
             virtualwire_speed=vw_speed,
-            lcd_port=0x3F,
+            #lcd_port=0x3F,
+            #lcd_reporting=True,
         ),
         ArduinoService(
             device="/dev/ttyUSB1",

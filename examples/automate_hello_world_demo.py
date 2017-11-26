@@ -30,5 +30,4 @@ class mysys(System):
 
 
 s = mysys(services=[ WebService() ],
-          print_level=logging.INFO,
 )

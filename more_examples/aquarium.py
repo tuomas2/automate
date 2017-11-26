@@ -78,9 +78,9 @@ portmap = {
     'alarm': 9,
     'uvc_filter': relays[0],
     'allpumps': relays[1],
-    'NOT_YET_IN_USE': relays[2],
+    'NOT_YET_IN_USE_1': relays[2],
     'co2input': relays[3],
-    'heater': relays[4],
+    'NOT_YET_IN_USE_2': relays[4], # was heater
     'lamp1': relays[5],
     'lamp2': relays[6],
     'lamp3': relays[7],
@@ -185,7 +185,7 @@ class Aquarium(commonmixin.CommonMixin, System):
         )
 
         co2_stop_sensor = ArduinoDigitalSensor(
-            tags='arduino',
+            tags='arduino,co2',
             pin=arduino_ports['co2_stop'], #5
             safety_delay=300,
             safety_mode='falling',
@@ -371,6 +371,7 @@ class Aquarium(commonmixin.CommonMixin, System):
             on_activate=SetStatus('uvc', True))
 
         reload_arduino = UserEventSensor(
+            tags='quick',
             on_activate=ReloadService('ArduinoService'),
         )
 
@@ -395,11 +396,11 @@ class Aquarium(commonmixin.CommonMixin, System):
             safety_mode="rising",
             log_level=logging.WARNING,
             )
-        lammitin = RelayActuator(
-            port=portmap['heater'],
-            default=1,
-            safety_delay=60 * 3,
-            safety_mode="both")
+        #lammitin = RelayActuator(
+        #    port=portmap['heater'],
+        #    default=1,
+        #    safety_delay=60 * 3,
+        #    safety_mode="both")
 
     class Lamppuryhma(Group):
         lamp_safety_delay = 30 * 60
@@ -572,7 +573,7 @@ class Aquarium(commonmixin.CommonMixin, System):
             on_activate=Run(
                 SetStatus('vesivahinko_kytkin', 1),
                 SetStatus('pumput', 0),
-                SetStatus('lammitin', 0),
+                #SetStatus('lammitin', 0),
                 SetStatus('co2', 0),
                 SetStatus('alarmtrigger', 1),
                 Run('push_sender_emergency')),
@@ -693,7 +694,7 @@ if __name__ == '__main__':
         lcd_port=0x3F,
         instant_digital_reporting=False,
         analog_reference=0 if is_raspi() else 1,  # EXTERNAL
-        #log_level=logging.DEBUG,
+        log_level=logging.DEBUG,
     )
 
     rpcs = RpcService(

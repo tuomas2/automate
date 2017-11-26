@@ -7,7 +7,7 @@ from automate.extensions.webui import WebService
 
 
 class PlantLamp(System):
-    fan = ArduinoPWMActuator(pin=9)
+    fan = ArduinoDigitalActuator(pin=3)
     light = ArduinoDigitalActuator(pin=8)
 
     light_intensity = ArduinoAnalogSensor(pin=3)
@@ -24,7 +24,7 @@ s = PlantLamp(
             virtualwire_tx_pin=11,
             keep_alive=True,
             #wakeup_pin=2,
-            virtualwire_speed=7,
+            virtualwire_speed=4,
         ),
         TextUIService(),
         WebService(read_only=False),

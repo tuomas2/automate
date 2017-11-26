@@ -136,6 +136,8 @@ def iterate_serial(board):
             if e.errno == 9:
                 break
             logger.exception('Exception in iterate_serial: %s', e)
+        except TypeError:
+            break
         except Exception as e:
             logger.exception('Exception in iterate_serial: %s', e)
         time.sleep(0.01)

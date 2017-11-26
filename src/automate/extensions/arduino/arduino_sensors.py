@@ -62,7 +62,7 @@ class ArduinoDigitalSensor(AbstractArduinoSensor):
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
         # TODO this is temporary message to aid debugging
-        self.logger.warning('Setup digital sensor (pull_up: %s)', self.pull_up_resistor)
+        self.logger.warning('Setup digital sensor %d (pull_up: %s)', self.pin, self.pull_up_resistor)
         self._arduino.subscribe_digital(self.pin, self)
         if self.pull_up_resistor:
             self._enable_pullup()
