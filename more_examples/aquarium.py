@@ -581,10 +581,11 @@ class Aquarium(commonmixin.CommonMixin, System):
             priority=5,
         )
 
+        vedenvaihtomoodi = UserBoolSensor('vedenvaihtomoodi', tags='quick')
         alaraja_saavutettu = UserBoolSensor('alaraja_saavutettu', tags='quick')
 
         waterchange1 = Program(
-            active_condition=Or('alaraja_saavutettu', 'ala_altaat_alaraja'),
+            active_condition=And('vedenvaihtomoodi', Or('alaraja_saavutettu', 'ala_altaat_alaraja')),
             on_activate=Run(SetStatus('pumput', 0), SetStatus('alaraja_saavutettu', 1), 'push_sender'),
             priority=5,
         )
