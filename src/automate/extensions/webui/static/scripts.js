@@ -104,7 +104,7 @@ function plot(object_name) {
 
             $("#tooltip-" + object_name).html(
                 t.getDate().pad(2) + '.'
-                + t.getMonth().pad(2) + ' '
+                + (t.getMonth()+1).pad(2) + ' '
                 + t.getHours().pad(2) + ':'
                 + t.getMinutes().pad(2) + ':'
                 + t.getSeconds().pad(2) + " &ndash; " + y)
