@@ -44,20 +44,24 @@ def read_cpu_temp(caller):
 # GPIO pin configuration
 relays = [7, 8, 25, 24, 23, 18, 3, 2]
 
-# inputboard_new = [17, 27, 22, 10, 11, 14, 15, a2,a3,a4,a5,a6,a7,a8]  # 9 on alarmille
+inputboard = [17, 27, 22, 10, 11, 14, 15,
+              5, 6, 13, 19, 13, 20,  #new rpi3 pins
+              ]
 
-inputboard = [17, 27, 22, 10, 11, 14, 15]  # 9 on alarmille
-arduino_ports = {
-    'kaapin sensori': 2,
-    'ala varoitus': 3,
-    'keski lattiasensori': 4,
-    'co2_stop': 5,
-    'ala_altaat_alaraja': 6,
-    'unused6': 7,
-    'alarm': 8,
-    'unused7': 11,
-    'unused8': 12,
-}
+inputpins = [12, 16, 21]
+outputpins = [9]
+
+#arduino_ports = {
+#    'kaapin sensori': 2,
+#    'ala varoitus': 3,
+#    'keski lattiasensori': 4,
+#    'co2_stop': 5,
+#    'ala_altaat_alaraja': 6,
+#    'unused6': 7,
+#    'alarm': 8,
+#    'unused7': 11,
+#    'unused8': 12,
+#}
 
 arduino_analog_ports = {
     'ph': 0,
@@ -74,8 +78,15 @@ portmap = {
     'ala-altaiden yläraja': inputboard[5],  # ei vielä aktivoitu (--what -- kai nyt sentään on?)
     'vasen lattiasensori': inputboard[6],  # ei vielä aktivoitu
 
+    # siirretty arduinosta:
+    'kaapin_sensori': inputboard[7],
+    'ala_varoitus': inputboard[8],
+    'keski_lattiasensori': inputboard[9],
+    'ala_altaat_alaraja': inputpins[0],
+    'co2_stop': inputpins[1],
+
     # outputs:
-    'alarm': 9,
+    'alarm': outputpins[0],
     'uvc_filter': relays[0],
     'allpumps': relays[1],
     'NOT_YET_IN_USE_1': relays[2],
@@ -162,42 +173,62 @@ class Aquarium(commonmixin.CommonMixin, System):
         lattiasensori_1 = RpioSensor(port=portmap['vasen lattiasensori'], change_delay=1,
                                      description='Ylivalutuksen alla lattialla')
 
-        kaapin_ulkosuodatin = ArduinoDigitalSensor(
-            tags='arduino',
-            pin=arduino_ports['kaapin sensori'], #2
-            pull_up_resistor=True,
-            inverted=True
-        )
+        kaapin_ulkosuodatin = RpioSensor(port=portmap['kaapin_sensori'], change_delay=1)
 
-        ala_varoitus = ArduinoDigitalSensor(
-            tags='arduino',
-            pin=arduino_ports['ala varoitus'], #3
-            pull_up_resistor=True,
-            inverted=True,
-        )
+        #ArduinoDigitalSensor(
+        #    tags='arduino',
+        #    pin=arduino_ports['kaapin sensori'], #2
+        #    pull_up_resistor=True,
+        #    inverted=True
+        #)
 
-        lattiasensori_2 = ArduinoDigitalSensor(
-            tags='arduino',
-            pin=arduino_ports['keski lattiasensori'], #4
-            description='altaan alla oleva lattiasensori',
-            pull_up_resistor=True,
-            inverted=True
-        )
+        ala_varoitus = RpioSensor(port=portmap['ala_varoitus'])
 
-        co2_stop_sensor = ArduinoDigitalSensor(
-            tags='arduino,co2',
-            pin=arduino_ports['co2_stop'], #5
-            safety_delay=300,
-            safety_mode='falling',
-            pull_up_resistor=True,
-            inverted=True,
-        )
+        #ArduinoDigitalSensor(
+        #    tags='arduino',
+        #    pin=arduino_ports['ala varoitus'], #3
+        #    pull_up_resistor=True,
+        #    inverted=True,
+        #)
 
-        ala_altaat_alaraja = ArduinoDigitalSensor(
-            tags='arduino',
-            pin=arduino_ports['ala_altaat_alaraja'], #6
-            pull_up_resistor=True
-        )
+        lattiasensori_2 = RpioSensor(port=portmap['keski_lattiasensori'],
+                                     description='altaan alla oleva lattiasensori',
+                                     change_delay=1)
+
+        #ArduinoDigitalSensor(
+        #    tags='arduino',
+        #    pin=arduino_ports['keski lattiasensori'], #4
+        #    description='altaan alla oleva lattiasensori',
+        #    pull_up_resistor=True,
+        #    inverted=True
+        #)
+
+        co2_stop_sensor = RpioSensor(tags='co2',
+                                     button_type='up',
+                                     port=portmap['co2_stop'],
+                                     safety_delay=300,
+                                     safety_mode='falling',
+                                     inverted=True,
+                                     )
+
+        #ArduinoDigitalSensor(
+        #    tags='arduino,co2',
+        #    pin=arduino_ports['co2_stop'], #5
+        #    safety_delay=300,
+        #    safety_mode='falling',
+        #    pull_up_resistor=True,
+        #    inverted=True,
+        #)
+
+        ala_altaat_alaraja = RpioSensor(port=portmap['ala_altaat_alaraja'],
+                                        button_type='up',
+                                        change_delay=1)
+
+        #ala_altaat_alaraja = ArduinoDigitalSensor(
+        #    tags='arduino',
+        #    pin=arduino_ports['ala_altaat_alaraja'], #6
+        #    pull_up_resistor=True
+        #)
 
         water_temp_min = UserFloatSensor(default=20.0)
         water_temp_max = UserFloatSensor(default=30.5)
@@ -544,7 +575,8 @@ class Aquarium(commonmixin.CommonMixin, System):
             tags='quick',
         )
         if is_raspi():
-            alarm = ArduinoDigitalActuator(service=0, pin=arduino_ports['alarm'], default=False, silent=True)
+            alarm = RpioActuator(port=portmap['alarm'], default=False, silent=True)
+            #alarm = ArduinoDigitalActuator(service=0, pin=arduino_ports['alarm'], default=False, silent=True)
         else:
             alarm = ArduinoDigitalActuator(service=0, pin=13, default=False, silent=True,
                                             active_condition=Value('alarm'),
