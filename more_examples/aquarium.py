@@ -727,7 +727,7 @@ if __name__ == '__main__':
         lcd_port=0x3F,
         instant_digital_reporting=False,
         analog_reference=0 if is_raspi() else 1,  # EXTERNAL
-        log_level=logging.DEBUG,
+        log_level=logging.INFO,
     )
 
     rpcs = RpcService(
