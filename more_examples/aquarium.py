@@ -158,11 +158,14 @@ class Aquarium(commonmixin.CommonMixin, System):
 
         vetta_yli_altaan_warning = RpioSensor(port=portmap['pääallas yläraja warning'],
                                               change_delay=1,
-                                              active_condition=And(Or(
-                                                  'vetta_yli_altaan_warning',
-                                                  # keittion_vesivahinko
+                                              active_condition=And(
+                                                  Or(
+                                                      'vetta_yli_altaan_warning',
+                                                      # keittion_vesivahinko
+                                                  ),
+                                                  Not('testimoodi'),
+                                                  Not('vedenvaihtomoodi')
                                               ),
-            Not('testimoodi')),
             on_activate=Run('push_sender',
                             SetStatus('alarmtrigger', 1),
                             ),
@@ -601,7 +604,9 @@ class Aquarium(commonmixin.CommonMixin, System):
                                     'lattiasensori_2',
                                     'kaapin_ulkosuodatin',
                                     'vesivahinko_kytkin'),
-                                 Not('testimoodi')),
+                                 Not('testimoodi'),
+                                 Not('vedenvaihtomoodi')
+                                 ),
             on_activate=Run(
                 SetStatus('vesivahinko_kytkin', 1),
                 SetStatus('pumput', 0),
