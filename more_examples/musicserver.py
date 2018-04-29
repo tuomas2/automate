@@ -246,8 +246,9 @@ class MusicServer(commonmixin.CommonMixin, lamps.LampGroupsMixin, System):
         read_volume = UserEventSensor(
             on_activate=Run(
                 SetStatus('volume', Func(float, RegexSearch(r'\[([-\.\d]+)dB\]', Shell('amixer sget Master 2>/dev/null', output=True)))),
-                SetStatus('volume_piano_only', Func(float, RegexSearch(r'\[([-\.\d]+)dB\]', Shell('amixer sget "Matrix 03 Mix A" 2>/dev/null', output=True)))),
                 SetStatus('volume_pcm_only', Func(float, RegexSearch(r'\[([-\.\d]+)dB\]', Shell('amixer sget "Matrix 01 Mix A" 2>/dev/null', output=True)))),
+                SetStatus('volume_piano_only', Func(float, RegexSearch(r'\[([-\.\d]+)dB\]', Shell('amixer sget "Matrix 03 Mix A" 2>/dev/null', output=True)))),
+                SetStatus('volume_ext_only', Func(float, RegexSearch(r'\[([-\.\d]+)dB\]', Shell('amixer sget "Matrix 05 Mix A" 2>/dev/null', output=True)))),
                 ),
             tags='quick_music,adj',
         )
@@ -257,6 +258,18 @@ class MusicServer(commonmixin.CommonMixin, lamps.LampGroupsMixin, System):
             value_min=-50,
             value_max=0,
             on_update=Shell(ToStr('amixer -- sset "Master" {}dB', Value('volume')))
+        )
+
+
+
+        volume_pcm_only = UserIntSensor(tags={'quick_music'},
+            default=-12,
+            value_min=-50,
+            value_max=0,
+            on_update=Run(
+                    Shell(ToStr('amixer -- sset "Matrix 01 Mix A" {}dB', Value('volume_pcm_only'))),
+                    Shell(ToStr('amixer -- sset "Matrix 02 Mix B" {}dB', Value('volume_pcm_only'))),
+            )
         )
 
         volume_piano_only = UserIntSensor(
@@ -270,15 +283,17 @@ class MusicServer(commonmixin.CommonMixin, lamps.LampGroupsMixin, System):
             )
         )
 
-        volume_pcm_only = UserIntSensor(tags={'quick_music'},
-            default=-12,
+        volume_ext_only = UserIntSensor(
+            tags={'quick_music'},
+            default=0,
             value_min=-50,
             value_max=0,
             on_update=Run(
-                    Shell(ToStr('amixer -- sset "Matrix 01 Mix A" {}dB', Value('volume_pcm_only'))),
-                    Shell(ToStr('amixer -- sset "Matrix 02 Mix B" {}dB', Value('volume_pcm_only'))),
+                Shell(ToStr('amixer -- sset "Matrix 05 Mix A" {}dB', Value('volume_ext_only'))),
+                Shell(ToStr('amixer -- sset "Matrix 06 Mix B" {}dB', Value('volume_ext_only'))),
             )
         )
+
 
         current = PollingSensor(
             interval=basetime,
@@ -347,8 +362,9 @@ class MusicServer(commonmixin.CommonMixin, lamps.LampGroupsMixin, System):
             active_condition=Value('soundcard_ready'),
             on_activate=Run(
                 SetStatus('volume', 'volume', force=True),
-                SetStatus('volume_piano_only', 'volume_piano_only', force=True),
                 SetStatus('volume_pcm_only', 'volume_pcm_only', force=True),
+                SetStatus('volume_piano_only', 'volume_piano_only', force=True),
+                SetStatus('volume_ext_only', 'volume_ext_only', force=True),
             )
         )
 
