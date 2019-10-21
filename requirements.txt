@@ -12,7 +12,7 @@ coverage==4.4.1           # via pytest-cov
 croniter==0.3.19
 decorator==4.1.2          # via ipython, traitlets
 django-crispy-forms==1.6.1
-django==1.11.6
+django==1.11.23
 idna==2.6                 # via requests
 ipython-genutils==0.2.0   # via traitlets
 ipython==6.2.1
