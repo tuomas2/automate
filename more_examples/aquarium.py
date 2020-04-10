@@ -87,9 +87,9 @@ portmap = {
 
     # outputs:
     'alarm': outputpins[0],
-    'uvc_filter': relays[0],
+    'uvc_filter': relays[0], #DISABLED NOW
     'allpumps': relays[1],
-    'NOT_YET_IN_USE_1': relays[2],
+    'co2pump': relays[2],
     'co2input': relays[3],
     'NOT_YET_IN_USE_2': relays[4], # was heater
     'lamp1': relays[5],
@@ -330,7 +330,7 @@ class Aquarium(commonmixin.CommonMixin, System):
             active_condition=Not('sahkot'),
             on_activate=Run(SetStatus('lamppu1', 0), SetStatus('lamppu2', 0), SetStatus('lamppu3', 0),
                             Delay(5 * 60,
-                                  Run(SetStatus('pumput', 0), SetStatus('co2', 0))),
+                                  Run(SetStatus('pumput', 0), SetStatus("co2pump", 0), SetStatus('co2', 0))),
                             'push_sender'),
             on_deactivate=Run('push_sender'),
             priority=4,
@@ -378,7 +378,7 @@ class Aquarium(commonmixin.CommonMixin, System):
         co2_stop = UserBoolSensor(
             tags='co2',
             default=False,
-            active_condition=Or(Not('pumput'), 'co2_stop', 'co2_stop_sensor'),
+            active_condition=Or(Not('pumput'), Not('co2pump'), 'co2_stop', 'co2_stop_sensor'),
             priority=5,
             on_activate=SetStatus('co2', False),
             log_level=logging.WARNING,
@@ -417,11 +417,19 @@ class Aquarium(commonmixin.CommonMixin, System):
             port=portmap['uvc_filter'],
             default=0,
             safety_delay=30)
+
         pumput = RelayActuator(
             port=portmap['allpumps'],
             default=1,
             safety_delay=30,
             safety_mode="rising")
+
+        co2pump = RelayActuator(
+            port=portmap['co2pump'],
+            default=1,
+            safety_delay=30,
+            safety_mode="rising")
+
         co2 = RelayActuator(
             tags='co2',
             port=portmap['co2input'],
@@ -513,8 +521,18 @@ class Aquarium(commonmixin.CommonMixin, System):
 
         co2_ajastin_loma = CronTimerSensor(
             tags='co2, holiday',
-            timer_on="30 15 * * *",
+            timer_on="55 15 * * *",
             timer_off="0 18 * * *")
+
+        co2_pumppu_ajastin = CronTimerSensor(
+            tags='co2',
+            timer_on="55 15 * * *",
+            timer_off="0 22 * * *")
+
+        co2_pumppu_ajastin_loma = CronTimerSensor(
+            tags='co2, holiday',
+            timer_on="55 15 * * *",
+            timer_off="0 22 * * *")
 
         # Muista: tämä kontrolloi (myös) UVC:ta!
         lamput_ajastin = CronTimerSensor(
@@ -556,11 +574,14 @@ class Aquarium(commonmixin.CommonMixin, System):
 
         ajastinohjelma = Program(
             on_update=IfElse('lomamoodi',
-                             Run(SetStatus('lamput', lamput_ajastin_loma),
-                                 SetStatus(
-                                     'co2', co2_ajastin_loma),
+                             Run(
+                                 SetStatus('co2pump', co2_pumppu_ajastin),
+                                 SetStatus('lamput', lamput_ajastin_loma),
+                                 SetStatus('co2', co2_ajastin_loma),
                                  Delay(30, SetStatus('uvc', lamput_ajastin_loma))),
-                             Run(SetStatus('lamput', lamput_ajastin),
+                             Run(
+                                 SetStatus('co2pump', co2_pumppu_ajastin),
+                                 SetStatus('lamput', lamput_ajastin),
                                  SetStatus('co2', co2_ajastin),
                                  Delay(30, SetStatus('uvc', lamput_ajastin)))),
             priority=1.5,
@@ -609,6 +630,7 @@ class Aquarium(commonmixin.CommonMixin, System):
                                  ),
             on_activate=Run(
                 SetStatus('vesivahinko_kytkin', 1),
+                SetStatus('co2pump', 0),
                 SetStatus('pumput', 0),
                 #SetStatus('lammitin', 0),
                 SetStatus('co2', 0),
@@ -623,7 +645,7 @@ class Aquarium(commonmixin.CommonMixin, System):
 
         waterchange1 = Program(
             active_condition=And('vedenvaihtomoodi', Or('alaraja_saavutettu', 'ala_altaat_alaraja')),
-            on_activate=Run(SetStatus('pumput', 0), SetStatus('alaraja_saavutettu', 1), 'push_sender'),
+            on_activate=Run(SetStatus('pumput', 0), SetStatus("co2pump", 0), SetStatus('alaraja_saavutettu', 1), 'push_sender'),
             priority=5,
         )
 
