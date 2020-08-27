@@ -229,10 +229,13 @@ class MusicServer(commonmixin.CommonMixin, lamps.LampGroupsMixin, System):
                                SetStatus('start', True))
         )
 
-        restart_mpd = UserEventSensor(
-            on_activate=Shell('service mpd restart'),
-        )
+        #restart_mpd = UserEventSensor(
+        #    on_activate=Shell('service mpd restart'),
+        #)
 
+        restart_blue = UserEventSensor(
+            on_activate=Shell('sudo /bin/systemctl restart aplay'),
+        )
         prev = UserEventSensor(
             tags='quick_music',
             on_activate=Shell(ToStr('mpc -p 660{} prev', Value('mpc_instance'))),
@@ -365,6 +368,7 @@ class MusicServer(commonmixin.CommonMixin, lamps.LampGroupsMixin, System):
                 SetStatus('volume_pcm_only', 'volume_pcm_only', force=True),
                 SetStatus('volume_piano_only', 'volume_piano_only', force=True),
                 SetStatus('volume_ext_only', 'volume_ext_only', force=True),
+                SetStatus('restart_blue', True),
             )
         )
 
