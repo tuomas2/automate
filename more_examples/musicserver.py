@@ -334,27 +334,27 @@ class MusicServer(commonmixin.CommonMixin, lamps.LampGroupsMixin, System):
     #    )
 
     class In(Group):
-        lirc_sensor = ShellSensor(cmd='irw', filter=lirc_filter, default='', reset_delay=0.5,
-            active_condition=Value(True),
-            triggers={'lirc_sensor'},
-            exclude_triggers={'preset1', 'preset2', 'preset3', 'start', 'radiodei',
-                              'radiopatmos', 'volume', 'switch_off', 'fade_out'},
-            on_update=Switch('lirc_sensor',
-                    {'KEY_GREEN': SetStatus('start', 1),
-                     'KEY_YELLOW': SetStatus('radiodei', 1),
-                     'KEY_BLUE': SetStatus('radiopatmos', 1),
-                     'KEY_RED': SetStatus('stop', 1),
-                     'KEY_7': SetStatus('preset1', 1),
-                     'KEY_8': SetStatus('preset2', 1),
-                     'KEY_9': SetStatus('preset3', 1),
-                     'KEY_VOLUMEUP': SetStatus('volume', Value('volume')+1),
-                     'KEY_VOLUMEDOWN': SetStatus('volume', Value('volume')-1),
-                     'KEY_0': SetStatus('switch_off', 1),
-                     'KEY_SHUFFLE': SetStatus('fade_out', 1),
-                     'F_POWER': Shell('reboot'),
-                    }
-                ),
-        )
+#        lirc_sensor = ShellSensor(cmd='irw', filter=lirc_filter, default='', reset_delay=0.5,
+#            active_condition=Value(True),
+#            triggers={'lirc_sensor'},
+#            exclude_triggers={'preset1', 'preset2', 'preset3', 'start', 'radiodei',
+#                              'radiopatmos', 'volume', 'switch_off', 'fade_out'},
+#            on_update=Switch('lirc_sensor',
+#                    {'KEY_GREEN': SetStatus('start', 1),
+#                     'KEY_YELLOW': SetStatus('radiodei', 1),
+#                     'KEY_BLUE': SetStatus('radiopatmos', 1),
+#                     'KEY_RED': SetStatus('stop', 1),
+#                     'KEY_7': SetStatus('preset1', 1),
+#                     'KEY_8': SetStatus('preset2', 1),
+#                     'KEY_9': SetStatus('preset3', 1),
+#                     'KEY_VOLUMEUP': SetStatus('volume', Value('volume')+1),
+#                     'KEY_VOLUMEDOWN': SetStatus('volume', Value('volume')-1),
+#                     'KEY_0': SetStatus('switch_off', 1),
+#                     'KEY_SHUFFLE': SetStatus('fade_out', 1),
+#                     'F_POWER': Shell('reboot'),
+#                    }
+#                ),
+#        )
 
         soundcard_ready = PollingSensor(
             interval=basetime,

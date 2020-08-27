@@ -67,12 +67,22 @@ class LampGroupsMixin:
         warm_preset3 = UserFloatSensor(value_min=0., value_max=1., default=.1)
         cold_preset3 = UserFloatSensor(value_min=0., value_max=1., default=.1)
 
+        warm_preset4 = UserFloatSensor(value_min=0., value_max=1., default=.05)
+        cold_preset4 = UserFloatSensor(value_min=0., value_max=1., default=.05)
+
+        warm_preset5 = UserFloatSensor(value_min=0., value_max=1., default=.01)
+        cold_preset5 = UserFloatSensor(value_min=0., value_max=1., default=.01)
+
+
+
     class Lamps(Group):
         tags = 'web'
         _toggler = IfElse('preset1', SetStatus('preset2', 1),
                           IfElse('preset2', SetStatus('preset3', 1),
                                  IfElse('preset3', SetStatus('preset3', 0),
-                                        SetStatus('preset1', 1))))
+                                        IfElse('preset4', SetStatus('preset4', 0),
+                                               IfElse('preset5', SetStatus('preset5', 0),
+                                                      SetStatus('preset1', 1))))))
 
 
         preset1 = UserBoolSensor(tags={'quick_lamps'},
@@ -82,6 +92,8 @@ class LampGroupsMixin:
                                                SetStatus('cold_lamp_out', 'cold_preset1'),
                                                SetStatus('preset2', 0),
                                                SetStatus('preset3', 0),
+                                               SetStatus('preset4', 0),
+                                               SetStatus('preset5', 0),
                                                ))
 
         preset2 = UserBoolSensor(tags={'quick_lamps'}, priority=2.,
@@ -90,6 +102,8 @@ class LampGroupsMixin:
                                                SetStatus('cold_lamp_out', 'cold_preset2'),
                                                SetStatus('preset1', 0),
                                                SetStatus('preset3', 0),
+                                               SetStatus('preset4', 0),
+                                               SetStatus('preset5', 0),
                                                ))
 
         preset3 = UserBoolSensor(tags={'quick_lamps'}, priority=2.,
@@ -98,9 +112,31 @@ class LampGroupsMixin:
                                                SetStatus('cold_lamp_out', 'cold_preset3'),
                                                SetStatus('preset1', 0),
                                                SetStatus('preset2', 0),
-                                                ))
+                                               SetStatus('preset4', 0),
+                                               SetStatus('preset5', 0),
+                                               ))
 
-        switch_off = UserEventSensor(tags={'quick_lamps'}, on_activate=SetStatus(['fade_out', 'preset1', 'preset2', 'preset3'], [0]*4))
+        preset4 = UserBoolSensor(tags={'quick_lamps'}, priority=2.,
+                                 active_condition=Value('preset4'),
+                                 on_update=Run(SetStatus('warm_lamp_out', 'warm_preset4'),
+                                               SetStatus('cold_lamp_out', 'cold_preset4'),
+                                               SetStatus('preset1', 0),
+                                               SetStatus('preset2', 0),
+                                               SetStatus('preset3', 0),
+                                               SetStatus('preset5', 0),
+                                               ))
+
+        preset5 = UserBoolSensor(tags={'quick_lamps'}, priority=2.,
+                                 active_condition=Value('preset5'),
+                                 on_update=Run(SetStatus('warm_lamp_out', 'warm_preset5'),
+                                               SetStatus('cold_lamp_out', 'cold_preset5'),
+                                               SetStatus('preset1', 0),
+                                               SetStatus('preset2', 0),
+                                               SetStatus('preset3', 0),
+                                               SetStatus('preset4', 0),
+                                               ))
+
+        switch_off = UserEventSensor(tags={'quick_lamps'}, on_activate=SetStatus(['fade_out', 'preset1', 'preset2', 'preset3', 'preset4', 'preset5'], [0]*6))
 
         _count = UserIntSensor(default=0)
         _max = UserIntSensor(default=100)
@@ -117,7 +153,7 @@ class LampGroupsMixin:
                   SetStatus('warm_lamp_out', Func(calc_val_reverse, _count, _max) * _fade_in_warm_start),
                   SetStatus('cold_lamp_out', Func(calc_val_reverse, _count, _max) * _fade_in_cold_start),
                   Func(time.sleep, fade_out_time / _max),
-                  do_after=SetStatus(['preset1', 'preset2', 'preset3', 'fade_out', '_count'], [0]*5)
+                  do_after=SetStatus(['preset1', 'preset2', 'preset3', 'preset4', 'preset5', 'fade_out', '_count'], [0]*5)
                   )
         )
 
