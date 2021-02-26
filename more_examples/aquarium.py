@@ -255,8 +255,8 @@ class Aquarium(commonmixin.CommonMixin, System):
         water_temp_adj = UserFloatSensor(default=24)
 
         lammitin_prog = Program(
-            active_condition=Value('aqua_temperature') < water_temp_adj,
-            on_activate=SetStatus('lammitin', 1)
+            active_condition=Value(True),
+            on_activate=SetStatus('lammitin', And(Not('vedenvaihtomoodi', Value('aqua_temperature') < water_temp_adj)))
         )
 
         parvekkeen_lampo = TemperatureSensor(
