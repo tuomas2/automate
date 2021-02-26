@@ -91,7 +91,7 @@ portmap = {
     'allpumps': relays[1],
     'co2pump': relays[2],
     'co2input': relays[3],
-    'NOT_YET_IN_USE_2': relays[4], # was heater
+    'heater': relays[4],
     'lamp1': relays[5],
     'lamp2': relays[6],
     'lamp3': relays[7],
@@ -250,6 +250,13 @@ class Aquarium(commonmixin.CommonMixin, System):
                                 ),
             on_activate=Run(SetStatus('aqua_temperature_triggered', 1), 'push_sender'),
             history_length=5000,
+        )
+
+        water_temp_adj = UserFloatSensor(default=24)
+
+        lammitin_prog = Program(
+            active_condition=Value('aqua_temperature') < water_temp_adj,
+            on_activate=SetStatus('lammitin', 1)
         )
 
         parvekkeen_lampo = TemperatureSensor(
@@ -438,11 +445,11 @@ class Aquarium(commonmixin.CommonMixin, System):
             safety_mode="rising",
             log_level=logging.WARNING,
             )
-        #lammitin = RelayActuator(
-        #    port=portmap['heater'],
-        #    default=1,
-        #    safety_delay=60 * 3,
-        #    safety_mode="both")
+        lammitin = RelayActuator(
+            port=portmap['heater'],
+            default=1,
+            safety_delay=60 * 3,
+            safety_mode="both")
 
     class Lamppuryhma(Group):
         lamp_safety_delay = 30 * 60
@@ -632,7 +639,7 @@ class Aquarium(commonmixin.CommonMixin, System):
                 SetStatus('vesivahinko_kytkin', 1),
                 SetStatus('co2pump', 0),
                 SetStatus('pumput', 0),
-                #SetStatus('lammitin', 0),
+                SetStatus('lammitin', 0),
                 SetStatus('co2', 0),
                 SetStatus('alarmtrigger', 1),
                 Run('push_sender_emergency')),
