@@ -538,8 +538,8 @@ class Aquarium(commonmixin.CommonMixin, System):
 
         co2_pumppu_ajastin_loma = CronTimerSensor(
             tags='co2, holiday',
-            timer_on="55 15 * * *",
-            timer_off="0 22 * * *")
+            timer_on="0 0 * * *",
+            timer_off="0 0 * * *")
 
         # Muista: tämä kontrolloi (myös) UVC:ta!
         lamput_ajastin = CronTimerSensor(
@@ -582,7 +582,7 @@ class Aquarium(commonmixin.CommonMixin, System):
         ajastinohjelma = Program(
             on_update=IfElse('lomamoodi',
                              Run(
-                                 SetStatus('co2pump', co2_pumppu_ajastin),
+                                 SetStatus('co2pump', co2_pumppu_ajastin_loma),
                                  SetStatus('lamput', lamput_ajastin_loma),
                                  SetStatus('co2', co2_ajastin_loma),
                                  Delay(30, SetStatus('uvc', lamput_ajastin_loma))),
