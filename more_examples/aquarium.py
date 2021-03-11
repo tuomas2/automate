@@ -223,9 +223,14 @@ class Aquarium(commonmixin.CommonMixin, System):
         #    inverted=True,
         #)
 
-        ala_altaat_alaraja = RpioSensor(port=portmap['ala_altaat_alaraja'],
-                                        button_type='up',
-                                        change_delay=1)
+        ala_altaat_alaraja = RpioSensor(
+            port=portmap['ala_altaat_alaraja'],
+            button_type='up',
+            change_delay=1,
+            active_condition=And(Not("vedenvaihtomoodi"), Value("ala_altaat_alaraja")),
+            on_activate=Run('push_sender', SetStatus('alarmtrigger', 1)),
+            on_deactivate=Run('push_sender'),
+        )
 
         #ala_altaat_alaraja = ArduinoDigitalSensor(
         #    tags='arduino',
