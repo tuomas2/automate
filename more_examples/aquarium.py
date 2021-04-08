@@ -228,7 +228,7 @@ class Aquarium(commonmixin.CommonMixin, System):
             button_type='up',
             change_delay=1,
             active_condition=And(Not("vedenvaihtomoodi"), Value("ala_altaat_alaraja")),
-            on_activate=Run('push_sender', SetStatus('alarmtrigger', 1)),
+            on_activate=Run('push_sender'),
             on_deactivate=Run('push_sender'),
         )
 
@@ -261,7 +261,7 @@ class Aquarium(commonmixin.CommonMixin, System):
 
         lammitin_prog = Program(
             active_condition=Value(True),
-            on_activate=SetStatus('lammitin', And(Not('vedenvaihtomoodi', Value('aqua_temperature') < water_temp_adj)))
+            on_update=SetStatus('lammitin', And(Not('ala_altaat_alaraja'), Not('vedenvaihtomoodi'), Value('aqua_temperature') < water_temp_adj))
         )
 
         parvekkeen_lampo = TemperatureSensor(
