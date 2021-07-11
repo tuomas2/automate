@@ -89,12 +89,12 @@ portmap = {
     'alarm': outputpins[0],
     'uvc_filter': relays[0], #DISABLED NOW
     'allpumps': relays[1],
-    'co2pump': relays[2],
+    'lamp3': relays[2], #lamppu3
     'co2input': relays[3],
     'heater': relays[4],
     'lamp1': relays[5],
     'lamp2': relays[6],
-    'lamp3': relays[7],
+    'rikki1': relays[7], #rikki
 }
 # GPIO port 4 is reserved for temperature sensor
 #bread = [17, 27, 22, 10, 9, 11, 2, 3]
@@ -143,12 +143,12 @@ class Aquarium(commonmixin.CommonMixin, System):
         priority=2,
     )
 
-    raspi2_alive = PollingSensor(
-        interval=10.,
-        status_updater=RemoteFunc(raspi2host, 'is_alive'),
-        active_condition=Value('raspi2_alive'),
-        on_deactivate=If(israspi, push_sender),
-    )
+    #raspi2_alive = PollingSensor(
+    #    interval=10.,
+    #    status_updater=RemoteFunc(raspi2host, 'is_alive'),
+    #    active_condition=Value('raspi2_alive'),
+    #    on_deactivate=If(israspi, push_sender),
+    #)
 
     class Sensors(Group):
         valutusputki = RpioSensor(port=portmap['valutusputki'], change_delay=1)
@@ -299,43 +299,43 @@ class Aquarium(commonmixin.CommonMixin, System):
             priority=2,
         )
 
-        ph_v = ArduinoAnalogSensor(
-            tags='analog,ph',
-            pin=arduino_analog_ports['ph'],
-            default=0.5,
-            log_level=logging.WARNING,
-            show_stdev_seconds=30,
-        )
+        #ph_v = ArduinoAnalogSensor(
+        #    tags='analog,ph',
+        #    pin=arduino_analog_ports['ph'],
+        #    default=0.5,
+        #    log_level=logging.WARNING,
+        #    show_stdev_seconds=30,
+        #)
 
-        ph_v_mean = FloatActuator(
-            tags='analog,ph',
-            on_update=SetStatus('ph_v_mean', Mean('ph_v', 30)),
-            history_frequency=60,
-        )
-        ph_4_v = UserFloatSensor(
-            tags='ph',
-            default=0.0,
-        )
+        #ph_v_mean = FloatActuator(
+        #    tags='analog,ph',
+        #    on_update=SetStatus('ph_v_mean', Mean('ph_v', 30)),
+        #    history_frequency=60,
+        #)
+        #ph_4_v = UserFloatSensor(
+        #    tags='ph',
+        #    default=0.0,
+        #)
 
-        ph_6_v = UserFloatSensor(
-            tags='ph',
-            default=1.0,
-        )
+        #ph_6_v = UserFloatSensor(
+        #    tags='ph',
+        #    default=1.0,
+        #)
 
-        v_offset = UserFloatSensor(tags='ph', default=0.0)
+        #v_offset = UserFloatSensor(tags='ph', default=0.0)
 
-        ph_raw = FloatActuator(
-            tags='analog,co2,ph',
-            on_update=SetStatus('ph_raw', Func(calc_ph, 'ph_4_v', 'ph_6_v', Sum('ph_v', 'v_offset'))),
-            show_stdev_seconds=30,
-        )
+        #ph_raw = FloatActuator(
+        #    tags='analog,co2,ph',
+        #    on_update=SetStatus('ph_raw', Func(calc_ph, 'ph_4_v', 'ph_6_v', Sum('ph_v', 'v_offset'))),
+        #    show_stdev_seconds=30,
+        #)
 
-        ph = FloatActuator(
-            tags='analog,co2,ph',
-            on_update=SetStatus('ph', Mean('ph_raw', 30)),
-            history_frequency=60,
-            history_length=10000,
-        )
+        #ph = FloatActuator(
+        #    tags='analog,co2,ph',
+        #    on_update=SetStatus('ph', Mean('ph_raw', 30)),
+        #    history_frequency=60,
+        #    history_length=10000,
+        #)
 
         sahkot = UserBoolSensor(
             default=1,
@@ -437,7 +437,7 @@ class Aquarium(commonmixin.CommonMixin, System):
             safety_mode="rising")
 
         co2pump = RelayActuator(
-            port=portmap['co2pump'],
+            port=portmap['rikki1'],
             default=1,
             safety_delay=30,
             safety_mode="rising")
@@ -510,20 +510,20 @@ class Aquarium(commonmixin.CommonMixin, System):
                                          'switch_manual_lamps_off'],[0]*4))
         )
 
-    class LCD(Group):
-        lcd_act = ArduinoLCDActuator(log_level=logging.WARNING)
+    #class LCD(Group):
+        #lcd_act = ArduinoLCDActuator(log_level=logging.WARNING)
 
-        lcd_program = Program(
-            on_activate=SetStatus('lcd_act', 'Hello from\nAquarium!'),
-            on_update=SetStatus('lcd_act',
-                                ToStr('pH:{0:.2f} A:{1:.1f}\nP:{2:.1f} U:{3:.1f}',
-                                      'ph', 'aqua_temperature', 'parvekkeen_lampo', 'ulko_lampo'))
-        )
-        lcd_backlight = UserBoolSensor(
-            active_condition=Value('lcd_backlight'),
-            on_activate=LCDSetBacklight(True),
-            on_deactivate=LCDSetBacklight(False),
-        )
+        #lcd_program = Program(
+        #    on_activate=SetStatus('lcd_act', 'Hello from\nAquarium!'),
+        #    on_update=SetStatus('lcd_act',
+        #                        ToStr('pH:{0:.2f} A:{1:.1f}\nP:{2:.1f} U:{3:.1f}',
+        #                              'ph', 'aqua_temperature', 'parvekkeen_lampo', 'ulko_lampo'))
+        #)
+        #lcd_backlight = UserBoolSensor(
+        #    active_condition=Value('lcd_backlight'),
+        #    on_activate=LCDSetBacklight(True),
+        #    on_deactivate=LCDSetBacklight(False),
+        #)
 
     class Ajastimet(Group):
         co2_ajastin = CronTimerSensor(
@@ -572,12 +572,12 @@ class Aquarium(commonmixin.CommonMixin, System):
             on_activate=SetStatus('lamppu3', 1),
         )
 
-        dimmer_ajastin = CronTimerSensor(
-            timer_on="5 21 * * *",
-            timer_off="10 21 * * *",
-            active_condition=Value('dimmer_ajastin'),
-            on_activate=If('lamput_ajastin2_k', Delay(50, RemoteFunc(raspi2host, 'set_status', 'akvadimmer', 1)))
-        )
+        #dimmer_ajastin = CronTimerSensor(
+        #    timer_on="5 21 * * *",
+        #    timer_off="10 21 * * *",
+        #    active_condition=Value('dimmer_ajastin'),
+        #    on_activate=If('lamput_ajastin2_k', Delay(50, RemoteFunc(raspi2host, 'set_status', 'akvadimmer', 1)))
+        #)
 
         lamput_ajastin_loma = CronTimerSensor(
             timer_on="0 16 * * *",
@@ -760,14 +760,14 @@ if __name__ == '__main__':
                                },
         )
 
-    arduino_service = ArduinoService(
-        device="/dev/ttyUSB0",
-        sample_rate=2500,
-        lcd_port=0x3F,
-        instant_digital_reporting=False,
-        analog_reference=0 if is_raspi() else 1,  # EXTERNAL
-        log_level=logging.INFO,
-    )
+    #arduino_service = ArduinoService(
+    #    device="/dev/ttyUSB0",
+    #    sample_rate=2500,
+    #    lcd_port=0x3F,
+    #    instant_digital_reporting=False,
+    #    analog_reference=0 if is_raspi() else 1,  # EXTERNAL
+    #    log_level=logging.INFO,
+    #)
 
     rpcs = RpcService(
         http_port=3030,
@@ -780,7 +780,7 @@ if __name__ == '__main__':
         services=[
             web,
             rpcs,
-            arduino_service,
+            #arduino_service,
             StatusSaverService(),
         ],
         no_input=not is_raspi(),
