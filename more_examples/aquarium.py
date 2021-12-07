@@ -257,12 +257,18 @@ class Aquarium(commonmixin.CommonMixin, System):
             history_length=5000,
         )
 
-        water_temp_adj = UserFloatSensor(default=24)
+        water_temp_adj = UserFloatSensor(tags="temperature", default=24)
 
         lammitin_prog = Program(
+            tags="temperature",
             active_condition=Value(True),
-            on_update=SetStatus('lammitin', And(Not('ala_altaat_alaraja'), Not('vedenvaihtomoodi'), Value('aqua_temperature') < water_temp_adj))
+            on_update=SetStatus(Value('lammitin'), And(Not('lammitin_ajastin'), Not('ala_altaat_alaraja'), Not('vedenvaihtomoodi'), Value('aqua_temperature') < water_temp_adj))
         )
+
+        lammitin_ajastin = CronTimerSensor(
+            tags="temperature",
+            timer_on="0 15 * * *",
+            timer_off="5 30 * * *")
 
         parvekkeen_lampo = TemperatureSensor(
             tags='temperature,analog',
@@ -451,6 +457,7 @@ class Aquarium(commonmixin.CommonMixin, System):
             log_level=logging.WARNING,
             )
         lammitin = RelayActuator(
+            tags="temperature",
             port=portmap['heater'],
             default=1,
             safety_delay=60 * 3,
