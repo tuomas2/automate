@@ -580,8 +580,8 @@ class Aquarium(commonmixin.CommonMixin, System):
         #)
 
         lamput_ajastin_loma = CronTimerSensor(
-            timer_on="0 16 * * *",
-            timer_off="0 22 * * *",
+            timer_on="0 15 * * *",
+            timer_off="0 20 * * *",
             tags="holiday")
 
         ajastinohjelma = Program(
