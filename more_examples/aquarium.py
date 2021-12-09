@@ -267,8 +267,8 @@ class Aquarium(commonmixin.CommonMixin, System):
 
         lammitin_ajastin = CronTimerSensor(
             tags="temperature",
-            timer_on="0 15 * * *",
-            timer_off="5 30 * * *")
+            timer_on="15 0 * * *",
+            timer_off="30 5 * * *")
 
         parvekkeen_lampo = TemperatureSensor(
             tags='temperature,analog',
