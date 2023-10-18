@@ -265,7 +265,7 @@ class Aquarium(commonmixin.CommonMixin, System):
             on_update=SetStatus(
                 'lammitin',
                 And(
-                    Not('lammitin_ajastin'),
+                    Value('lammitin_ajastin'),
                     Not('ala_altaat_alaraja'),
                     Not('vedenvaihtomoodi'),
                     Value('aqua_temperature') < water_temp_adj)
