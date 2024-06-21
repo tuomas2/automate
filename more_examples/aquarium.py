@@ -101,10 +101,10 @@ portmap = {
 
 # sisa =  "28-000005502fec"
 
-parveke = "28-0000055162f1"
+#parveke = "28-0000055162f1"
 #akva_old =  "28-00000558263c" #old aquarium temp sensor
-akva = "28-031702d25dff" #uppo
-ulko = "28-0417012c2bff"
+akva = "28-3ce1d443276a" #uppo
+#ulko = "28-0417012c2bff"
 
 
 raspi2host = 'http://raspi2:3031/' if is_raspi() else 'http://localhost:3031/'
@@ -238,12 +238,12 @@ class Aquarium(commonmixin.CommonMixin, System):
         #    pull_up_resistor=True
         #)
 
-        water_temp_min = UserFloatSensor(default=20.0)
+        water_temp_min = UserFloatSensor(default=26.0)
         water_temp_max = UserFloatSensor(default=30.5)
         aqua_temperature_triggered = UserBoolSensor(default=False)
 
         aqua_temperature = TemperatureSensor(
-            tags='temperature,analog',
+            tags='temperature,analog,quick',
             addr=akva,
             interval=60,
             default=25.123,
@@ -257,7 +257,7 @@ class Aquarium(commonmixin.CommonMixin, System):
             history_length=5000,
         )
 
-        water_temp_adj = UserFloatSensor(tags="temperature", default=24)
+        water_temp_adj = UserFloatSensor(tags="temperature,quick", default=27.0)
 
         lammitin_prog = Program(
             tags="temperature",
@@ -277,27 +277,27 @@ class Aquarium(commonmixin.CommonMixin, System):
             timer_on="01 1 * * *",
             timer_off="59 5 * * *")
 
-        parvekkeen_lampo = TemperatureSensor(
-            tags='temperature,analog',
-            addr=parveke,
-            interval=60,
-            default=25.123,
-            history_length=5000,
-        )
+        #parvekkeen_lampo = TemperatureSensor(
+        #    tags='temperature,analog',
+        #    addr=parveke,
+        #    interval=60,
+        #    default=25.123,
+        #    history_length=5000,
+        #)
 
-        parveke_min = UserFloatSensor(default=3.5)
-        parveke_warning = UserBoolSensor(
-            active_condition=Or('parveke_warning', Value('parvekkeen_lampo') < parveke_min),
-            on_activate=Run(SetStatus('parveke_warning', True), 'push_sender'),
-        )
+        #parveke_min = UserFloatSensor(default=3.5)
+        #parveke_warning = UserBoolSensor(
+        #    active_condition=Or('parveke_warning', Value('parvekkeen_lampo') < parveke_min),
+        #    on_activate=Run(SetStatus('parveke_warning', True), 'push_sender'),
+        #)
 
-        ulko_lampo = TemperatureSensor(
-            tags='temperature,analog',
-            addr=ulko,
-            interval=60,
-            default=25.123,
-            history_length=5000,
-        )
+        #ulko_lampo = TemperatureSensor(
+        #    tags='temperature,analog',
+        #    addr=ulko,
+        #    interval=60,
+        #    default=25.123,
+        #    history_length=5000,
+        #)
 
         cpu_lampo = PollingSensor(
             tags='temperature,analog',
@@ -483,8 +483,8 @@ class Aquarium(commonmixin.CommonMixin, System):
                                 safety_delay=lamp_safety_delay,
                                 safety_mode="rising")
 
-        lamp_on_delay = UserFloatSensor(default=2*60)
-        lamp_off_delay = UserFloatSensor(default=2*60)
+        lamp_on_delay = UserFloatSensor(default=15)
+        lamp_off_delay = UserFloatSensor(default=15)
 
 
         lamput = BoolActuator(
