@@ -70,7 +70,7 @@ portmap = {
 
     # outputs:
     'alarm': outputpins[0],
-    'uvc_filter': relays[0], #DISABLED NOW
+    'led': relays[0], #DISABLED NOW
     'allpumps': relays[1],
     'lamp3': relays[2], #lamppu3
     #'co2input': relays[3],
@@ -231,6 +231,18 @@ class Aquarium(commonmixin.CommonMixin, System):
         )
 
         valot_kytkin = UserBoolSensor(default=0, tags='quick')
+
+        led_manuaalimoodi = UserBoolSensor(
+            default=0,
+            tags="quick",
+            active_condition=Value('led_manuaalimoodi'),
+            on_update=SetStatus('led', 'led_kytkin'),
+            priority=3
+        )
+
+        led_kytkin = UserBoolSensor(default=0, tags='quick')
+ 
+
         lomamoodi = UserBoolSensor(default=True, tags="quick")
 
         tstacts_disable = OfType(AbstractActuator, exclude=['alarm', 'alarmtrigger'])
@@ -307,10 +319,10 @@ class Aquarium(commonmixin.CommonMixin, System):
         lamppu3 = RelayActuator(port=portmap['lamp3'],
                                 safety_delay=lamp_safety_delay,
                                 safety_mode="rising")
+        led = RelayActuator(port=portmap['led'])
 
         lamp_on_delay = UserFloatSensor(default=15)
         lamp_off_delay = UserFloatSensor(default=15)
-
 
         lamput = BoolActuator(
             active_condition=Value('lamput_ajastin1_k'),
@@ -374,6 +386,13 @@ class Aquarium(commonmixin.CommonMixin, System):
             timer_on="0 15 * * *",
             timer_off="0 20 * * *",
             tags="holiday")
+
+        led_ajastin = CronTimerSensor(
+            timer_on="0 8 * * *",
+            timer_off="0 21 * * *",
+            active_condition=Status('led_ajastin'),
+            on_activate=SetStatus('led', 1),
+        )
 
         ajastinohjelma = Program(
             on_update=IfElse('lomamoodi',
