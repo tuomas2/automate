@@ -70,7 +70,7 @@ portmap = {
 
     # outputs:
     'alarm': outputpins[0],
-    'led': relays[0], #DISABLED NOW
+    'led': relays[0],
     'allpumps': relays[1],
     'lamp3': relays[2], #lamppu3
     #'co2input': relays[3],
@@ -389,7 +389,7 @@ class Aquarium(commonmixin.CommonMixin, System):
 
         led_ajastin = CronTimerSensor(
             timer_on="0 8 * * *",
-            timer_off="0 21 * * *",
+            timer_off="0 22 * * *",
             active_condition=Status('led_ajastin'),
             on_activate=SetStatus('led', 1),
         )
