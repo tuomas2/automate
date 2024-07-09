@@ -166,7 +166,7 @@ class Aquarium(commonmixin.CommonMixin, System):
 
         water_temp_min = UserFloatSensor(default=26.0)
         water_temp_max = UserFloatSensor(default=30.5)
-        aqua_temperature_triggered = UserBoolSensor(default=False)
+        aqua_temperature_triggered = UserBoolSensor(default=False, tags="quick,temperature")
 
         aqua_temperature = TemperatureSensor(
             tags='temperature,analog,quick',
