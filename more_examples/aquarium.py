@@ -77,7 +77,7 @@ portmap = {
     'heater': relays[4],
     'lamp1': relays[5],
     'lamp2': relays[6],
-    'rikki1': relays[7], #rikki
+    'uvc_filter': relays[7], #rikki
 }
 # GPIO port 4 is reserved for temperature sensor
 #bread = [17, 27, 22, 10, 9, 11, 2, 3]
@@ -390,7 +390,7 @@ class Aquarium(commonmixin.CommonMixin, System):
         led_ajastin = CronTimerSensor(
             timer_on="0 8 * * *",
             timer_off="0 22 * * *",
-            active_condition=Status('led_ajastin'),
+            active_condition=Value('led_ajastin'),
             on_activate=SetStatus('led', 1),
         )
 
