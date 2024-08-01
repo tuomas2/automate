@@ -291,15 +291,15 @@ class Aquarium(commonmixin.CommonMixin, System):
 
         kv_manual_mode = UserBoolSensor(
             active_condition=Value('kv_manual_mode'),
-            on_activate=SetStatus("kv_pumppu", 0),
+            on_activate=SetStatus("kv_pumppu", 1),
             priority=3,
             default=False,
             tags="quick",
         )
         kv_switch_delay = 60 * 60 * 2 # 2 hours
-        kv_switch = UserBoolSensor(
-            active_condition=And(Value('kv_manual_mode'), Value("kv_switch")),
-            on_activate=Run(SetStatus("kv_pumppu", 1), Delay(kv_switch_delay, SetStatus("kv_switch", 0))),
+        kv_pause_switch = UserBoolSensor(
+            active_condition=And(Value('kv_manual_mode'), Value("kv_pause_switch")),
+            on_activate=Run(SetStatus("kv_pumppu", 0), Delay(kv_switch_delay, SetStatus("kv_pause_switch", 1))),
             priority = 4,
             default = False,
             tags="quick"
