@@ -420,7 +420,7 @@ class Aquarium(commonmixin.CommonMixin, System):
             timer_on="00 10,22 * * *",
             timer_off="0 18 * * *;30 7 * * *",
             active_condition=Value(True),
-            on_activate=SetStatus('kv_pumppu', "kv_pumppu_ajastin"),
+            on_update=SetStatus('kv_pumppu', "kv_pumppu_ajastin"),
             priority=2,
         )
 
