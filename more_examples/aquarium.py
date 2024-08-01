@@ -73,6 +73,7 @@ portmap = {
     'led': relays[0],
     'allpumps': relays[1],
     'lamp3': relays[2], #lamppu3
+    'kv_pumppu': relays[3],
     #'co2input': relays[3],
     'heater': relays[4],
     'lamp1': relays[5],
@@ -288,6 +289,22 @@ class Aquarium(commonmixin.CommonMixin, System):
         lamput_ajastin1_k = UserBoolSensor(default=True)
         lamput_ajastin2_k = UserBoolSensor(default=False)
 
+        kv_manual_mode = UserBoolSensor(
+            active_condition=Value('kv_manual_mode'),
+            on_activate=SetStatus("kv_pumppu", 0),
+            priority=3,
+            default=False,
+            tags="quick",
+        )
+        kv_switch_delay = 60 * 60 * 2 # 2 hours
+        kv_switch = UserBoolSensor(
+            active_condition=And(Value('kv_manual_mode'), Value("kv_switch")),
+            on_activate=Run(SetStatus("kv_pumppu", 1), Delay(kv_switch_delay, SetStatus("kv_switch", 0))),
+            priority = 4,
+            default = False,
+            tags="quick"
+        )
+
     class Vesiaktuaattorit(Group):
         uvc = RelayActuator(
             port=portmap['uvc_filter'],
@@ -298,6 +315,12 @@ class Aquarium(commonmixin.CommonMixin, System):
             port=portmap['allpumps'],
             default=1,
             safety_delay=30,
+            safety_mode="rising")
+
+        kv_pumppu = RelayActuator(
+            port=portmap['kv_pumppu'],
+            default=1,
+            safety_delay=5,
             safety_mode="rising")
 
         lammitin = RelayActuator(
@@ -328,8 +351,7 @@ class Aquarium(commonmixin.CommonMixin, System):
             active_condition=Value('lamput_ajastin1_k'),
             on_update=Run(
                           SetStatus(lamppu1, 'lamput'),
-                          Delay(IfElse('lamput', lamp_on_delay, lamp_off_delay),
-                              SetStatus(lamppu3, 'lamput')),
+                          Delay(IfElse('lamput', lamp_on_delay, lamp_off_delay), SetStatus(lamppu3, 'lamput')),
                           Delay(IfElse('lamput', Value(2) * lamp_on_delay, Value(2) * lamp_off_delay),
                                    SetStatus(lamppu2, 'lamput')),
                                ),
@@ -388,11 +410,21 @@ class Aquarium(commonmixin.CommonMixin, System):
             tags="holiday")
 
         led_ajastin = CronTimerSensor(
-            timer_on="0 8 * * *",
+            timer_on="30 7 * * *",
             timer_off="0 22 * * *",
             active_condition=Value('led_ajastin'),
             on_activate=SetStatus('led', 1),
         )
+
+        kv_pumppu_ajastin = CronTimerSensor(
+            timer_on="00 10,22 * * *",
+            timer_off="0 18 * * *;30 7 * * *",
+            active_condition=Value(True),
+            on_activate=SetStatus('kv_pumppu', "kv_pumppu_ajastin"),
+            priority=2,
+        )
+
+
 
         ajastinohjelma = Program(
             on_update=IfElse('lomamoodi',
@@ -448,6 +480,7 @@ class Aquarium(commonmixin.CommonMixin, System):
             on_activate=Run(
                 SetStatus('vesivahinko_kytkin', 1),
                 SetStatus('pumput', 0),
+                SetStatus('kv_pumppu', 0),
                 SetStatus('lammitin', 0),
                 SetStatus('alarmtrigger', 1),
                 Run('push_sender_emergency')),
@@ -462,6 +495,7 @@ class Aquarium(commonmixin.CommonMixin, System):
             active_condition=And('vedenvaihtomoodi', Or('alaraja_saavutettu', 'ala_altaat_alaraja')),
             on_activate=Run(
                 SetStatus('pumput', 0),
+                SetStatus('kv_pumppu', 0),
                 SetStatus('alaraja_saavutettu', 1),
                 'push_sender'),
             priority=5,
