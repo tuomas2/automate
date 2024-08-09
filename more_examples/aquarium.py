@@ -244,7 +244,7 @@ class Aquarium(commonmixin.CommonMixin, System):
         led_kytkin = UserBoolSensor(default=0, tags='quick')
  
 
-        lomamoodi = UserBoolSensor(default=True, tags="quick")
+        lomamoodi = UserBoolSensor(default=True)
 
         tstacts_disable = OfType(AbstractActuator, exclude=['alarm', 'alarmtrigger'])
 
@@ -282,7 +282,6 @@ class Aquarium(commonmixin.CommonMixin, System):
             on_activate=SetStatus('uvc', True))
 
         reload_arduino = UserEventSensor(
-            tags='quick',
             on_activate=ReloadService('ArduinoService'),
         )
 
@@ -359,17 +358,17 @@ class Aquarium(commonmixin.CommonMixin, System):
 
         lamppu1_manual = UserBoolSensor(active_condition=Value('lamppu1_manual'),
                                         on_activate=SetStatus(lamppu1, 1),
-                                        priority=2, tags='quick')
+                                        priority=2)
         lamppu2_manual = UserBoolSensor(active_condition=Value('lamppu2_manual'),
                                         on_activate=SetStatus(lamppu2, 1),
-                                        priority=2, tags='quick')
+                                        priority=2)
         lamppu3_manual = UserBoolSensor(active_condition=Value('lamppu3_manual'),
                                         on_activate=SetStatus(lamppu3, 1),
-                                        priority=2, tags='quick')
+                                        priority=2)
 
-        switch_off_delay = UserFloatSensor(description='in minutes', default=15, tags='quick')
+        switch_off_delay = UserFloatSensor(description='in minutes', default=15)
 
-        switch_manual_lamps_off = UserBoolSensor(tags={'quick'},
+        switch_manual_lamps_off = UserBoolSensor(
             active_condition=Value('switch_manual_lamps_off'),
             on_activate=Delay(switch_off_delay*60,
                               SetStatus([lamppu1_manual,
@@ -410,14 +409,14 @@ class Aquarium(commonmixin.CommonMixin, System):
             tags="holiday")
 
         led_ajastin = CronTimerSensor(
-            timer_on="30 7 * * *",
+            timer_on="0 7 * * *",
             timer_off="0 22 * * *",
             active_condition=Value('led_ajastin'),
             on_activate=SetStatus('led', 1),
         )
 
         kv_pumppu_ajastin = CronTimerSensor(
-            timer_on="00 10,22 * * *",
+            timer_on="00 9,21 * * *",
             timer_off="30 19 * * *;30 7 * * *",
             active_condition=Value(True),
             on_update=SetStatus('kv_pumppu', "kv_pumppu_ajastin"),
@@ -446,7 +445,6 @@ class Aquarium(commonmixin.CommonMixin, System):
             active_condition=Value('silence_alarm'),
             on_activate=SetStatus('alarm', False),
             priority=6,
-            tags='quick',
         )
         if is_raspi():
             alarm = RpioActuator(port=portmap['alarm'], default=False, silent=True)
