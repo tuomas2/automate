@@ -11,8 +11,7 @@ import commonmixin
 from automate import *
 from automate.extensions.arduino import ArduinoDigitalActuator, \
     ArduinoDigitalSensor, ArduinoAnalogSensor, ArduinoService
-from automate.extensions.arduino.arduino_actuators import ArduinoLCDActuator
-from automate.extensions.arduino.arduino_callables import LCDPrint, LCDSetBacklight
+from automate.extensions.arduino import ArduinoPWMActuator
 from automate.extensions.rpc import RpcService
 from automate.extensions.rpio import RpioSensor, TemperatureSensor, RpioActuator
 from automate.extensions.webui import WebService
@@ -70,7 +69,7 @@ portmap = {
 
     # outputs:
     'alarm': outputpins[0],
-    'led': relays[0],
+    #'led': relays[0], #unused
     'allpumps': relays[1],
     'lamp3': relays[2], #lamppu3
     'kv_pumppu': relays[3],
@@ -295,10 +294,17 @@ class Aquarium(commonmixin.CommonMixin, System):
             default=False,
             tags="quick",
         )
-        kv_switch_delay = 60 * 60 * 2 # 2 hours
+        one_hour = 60 * 60 * 1
         kv_pause_switch = UserBoolSensor(
             active_condition=Value("kv_pause_switch"),
-            on_activate=Run(SetStatus("kv_pumppu", 0), Delay(kv_switch_delay, SetStatus("kv_pause_switch", 0))),
+            on_activate=Run(
+                SetStatus("kv_pumppu", 0),
+                Delay(one_hour, Run(
+                    SetStatus("kv_pumppu", 1),
+                    Delay(5*one_hour,
+                          SetStatus("kv_pause_switch", 0)
+                          )
+                ))),
             priority = 4,
             default = False,
             tags="quick"
@@ -341,7 +347,17 @@ class Aquarium(commonmixin.CommonMixin, System):
         lamppu3 = RelayActuator(port=portmap['lamp3'],
                                 safety_delay=lamp_safety_delay,
                                 safety_mode="rising")
-        led = RelayActuator(port=portmap['led'])
+        led = BoolActuator(
+            #port=portmap['led'],
+            active_condition=Value(True),
+            on_update = SetStatus("led_pwm", IfElse(Value("led"), Value("led_day"), Value("led_night"))),
+            triggers = ["led"]
+        )
+
+        led_day = UserFloatSensor(value_min=0., value_max=1., default=1., tags="quick")
+        led_night = UserFloatSensor(value_min=0., value_max=1., default=0.01, tags="quick")
+
+        led_pwm = ArduinoPWMActuator(service=0, pin=11, default=0., history_length=1000)
 
         lamp_on_delay = UserFloatSensor(default=15)
         lamp_off_delay = UserFloatSensor(default=15)
@@ -411,13 +427,13 @@ class Aquarium(commonmixin.CommonMixin, System):
         led_ajastin = CronTimerSensor(
             timer_on="0 7 * * *",
             timer_off="0 22 * * *",
-            active_condition=Value('led_ajastin'),
-            on_activate=SetStatus('led', 1),
+            active_condition=Value(True),
+            on_update=SetStatus('led', Value("led_ajastin")),
         )
 
         kv_pumppu_ajastin = CronTimerSensor(
-            timer_on="00 9,21 * * *",
-            timer_off="30 19 * * *;30 7 * * *",
+            timer_on="30 8,20 * * *",
+            timer_off="30 7,19 * * *",
             active_condition=Value(True),
             on_update=SetStatus('kv_pumppu', "kv_pumppu_ajastin"),
             priority=2,
