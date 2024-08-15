@@ -354,8 +354,8 @@ class Aquarium(commonmixin.CommonMixin, System):
             triggers = ["led"]
         )
 
-        led_day = UserFloatSensor(value_min=0., value_max=1., default=1., tags="quick")
-        led_night = UserFloatSensor(value_min=0., value_max=1., default=0.01, tags="quick")
+        led_day = UserFloatSensor(value_min=0., value_max=1., default=1.)
+        led_night = UserFloatSensor(value_min=0., value_max=1., default=0.01)
 
         led_pwm = ArduinoPWMActuator(service=0, pin=11, default=0., history_length=1000)
 
