@@ -69,7 +69,7 @@ portmap = {
 
     # outputs:
     'alarm': outputpins[0],
-    #'led': relays[0], #unused
+    'led': relays[0], #unused
     'allpumps': relays[1],
     'lamp3': relays[2], #lamppu3
     'kv_pumppu': relays[3],
@@ -183,7 +183,7 @@ class Aquarium(commonmixin.CommonMixin, System):
             history_length=5000,
         )
 
-        water_temp_adj = UserFloatSensor(tags="temperature,quick", default=27.0)
+        water_temp_adj = UserFloatSensor(tags="temperature", default=27.0)
 
         lammitin_prog = Program(
             tags="temperature",
@@ -250,7 +250,6 @@ class Aquarium(commonmixin.CommonMixin, System):
         testimoodi = UserBoolSensor(
             default=0,
             hide_in_uml=True,
-            tags="quick",
             active_condition=Value('testimoodi'),
             on_activate=Run(SetStatus(tstacts_disable, tstacts_disable),
                             #muistutuspiippi minuutin välein
@@ -292,7 +291,6 @@ class Aquarium(commonmixin.CommonMixin, System):
             on_activate=SetStatus("kv_pumppu", 1),
             priority=3,
             default=False,
-            tags="quick",
         )
         one_hour = 60 * 60 * 1
         kv_pause_switch = UserBoolSensor(
@@ -347,8 +345,8 @@ class Aquarium(commonmixin.CommonMixin, System):
         lamppu3 = RelayActuator(port=portmap['lamp3'],
                                 safety_delay=lamp_safety_delay,
                                 safety_mode="rising")
-        led = BoolActuator(
-            #port=portmap['led'],
+        led = RelayActuator(
+            port=portmap['led'],
             active_condition=Value(True),
             on_update = SetStatus("led_pwm", IfElse(Value("led"), Value("led_day"), Value("led_night"))),
             triggers = ["led"]
