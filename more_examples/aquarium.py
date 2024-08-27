@@ -502,7 +502,7 @@ class Aquarium(commonmixin.CommonMixin, System):
 
         vedenvaihtomoodi = UserBoolSensor('vedenvaihtomoodi',
             active_condition=Value('vedenvaihtomoodi'),
-            on_activate=SetStatus('kv_pumppu', 0),
+            # on_activate=SetStatus('kv_pumppu', 0),
             priority=5,
             tags='quick'
         )
