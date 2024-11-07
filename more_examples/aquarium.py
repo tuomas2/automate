@@ -21,6 +21,8 @@ import time
 
 import socket
 
+one_hour = 60 * 60 * 1
+
 socket.setdefaulttimeout(30) # Do not keep waiting forever for RemoteFuncs
 
 def is_raspi():
@@ -164,7 +166,7 @@ class Aquarium(commonmixin.CommonMixin, System):
             on_deactivate=Run('push_sender'),
         )
 
-        water_temp_min = UserFloatSensor(default=26.0)
+        water_temp_min = UserFloatSensor(default=24.8)
         water_temp_max = UserFloatSensor(default=30.5)
         aqua_temperature_triggered = UserBoolSensor(default=False, tags="quick,temperature")
 
@@ -191,11 +193,16 @@ class Aquarium(commonmixin.CommonMixin, System):
             on_update=SetStatus(
                 'lammitin',
                 And(
-                    Value('lammitin_ajastin'),
+                    Or(Value("lammitin_force"), Value('lammitin_ajastin')),
                     Not('ala_altaat_alaraja'),
                     Not('vedenvaihtomoodi'),
                     Value('aqua_temperature') < water_temp_adj)
             )
+        )
+        lammitin_force = UserBoolSensor(
+            tags = "quick",
+            on_update=Delay(5*one_hour, SetStatus("lammitin_force", 0)),
+            triggers= ['lammitin_force']
         )
 
         lammitin_ajastin = CronTimerSensor(
@@ -292,7 +299,6 @@ class Aquarium(commonmixin.CommonMixin, System):
             priority=3,
             default=False,
         )
-        one_hour = 60 * 60 * 1
         kv_pause_switch = UserBoolSensor(
             active_condition=Value("kv_pause_switch"),
             on_activate=Run(
@@ -506,7 +512,12 @@ class Aquarium(commonmixin.CommonMixin, System):
             priority=5,
             tags='quick'
         )
-        alaraja_saavutettu = UserBoolSensor('alaraja_saavutettu', tags='quick')
+        # Jos kytkin laitetaan pois päältä, salli se vain jos alarajasensori on false myös.
+        alaraja_saavutettu = UserBoolSensor(
+            'alaraja_saavutettu',
+            tags='quick',
+            on_update=SetStatus("alaraja_saavutettu", IfElse("ala_altaat_alaraja", 1, "alaraja_saavutettu"))
+        )
 
         waterchange1 = Program(
             active_condition=And('vedenvaihtomoodi', Or('alaraja_saavutettu', 'ala_altaat_alaraja')),
