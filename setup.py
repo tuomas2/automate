@@ -9,7 +9,7 @@ rpc_requirements = [
 ]
 
 web_requirements = [
-    "Django~=1.11.0",
+    "Django>=1.11,<2.3",
     "django-crispy-forms~=1.6.0",
     # "whitenoise",
 ] + rpc_requirements
