@@ -79,7 +79,7 @@ portmap = {
     'heater': relays[4],
     'lamp1': relays[5],
     'lamp2': relays[6],
-    'uvc_filter': relays[7], #rikki
+    'uvc_filter': relays[7], #joskus tuomittu rikkonaiseksi mutta ehkä ei rikki
 }
 # GPIO port 4 is reserved for temperature sensor
 #bread = [17, 27, 22, 10, 9, 11, 2, 3]
@@ -161,6 +161,7 @@ class Aquarium(commonmixin.CommonMixin, System):
             port=portmap['ala_altaat_alaraja'],
             button_type='up',
             change_delay=1,
+            inverted=True,
             active_condition=And(Not("vedenvaihtomoodi"), Value("ala_altaat_alaraja")),
             on_activate=Run('push_sender'),
             on_deactivate=Run('push_sender'),
@@ -174,7 +175,7 @@ class Aquarium(commonmixin.CommonMixin, System):
             tags='temperature,analog,quick',
             addr=akva,
             interval=60,
-            default=25.123,
+            default=28.1, # We should not add any more heat if sensor is broken!
             max_jump=2.,
             max_errors=7,
             active_condition=Or(Value('aqua_temperature') > water_temp_max,
@@ -185,7 +186,7 @@ class Aquarium(commonmixin.CommonMixin, System):
             history_length=5000,
         )
 
-        water_temp_adj = UserFloatSensor(tags="temperature", default=27.0)
+        water_temp_adj = UserFloatSensor(tags="temperature", default=28.0)
 
         lammitin_prog = Program(
             tags="temperature",
@@ -194,7 +195,6 @@ class Aquarium(commonmixin.CommonMixin, System):
                 'lammitin',
                 And(
                     Or(Value("lammitin_force"), Value('lammitin_ajastin')),
-                    Not('ala_altaat_alaraja'),
                     Not('vedenvaihtomoodi'),
                     Value('aqua_temperature') < water_temp_adj)
             )
@@ -207,8 +207,8 @@ class Aquarium(commonmixin.CommonMixin, System):
 
         lammitin_ajastin = CronTimerSensor(
             tags="temperature",
-            timer_on="01 1 * * *",
-            timer_off="59 5 * * *")
+            timer_on="01 0 * * *",
+            timer_off="59 6 * * *")
 
         cpu_lampo = PollingSensor(
             tags='temperature,analog',
@@ -248,7 +248,7 @@ class Aquarium(commonmixin.CommonMixin, System):
         )
 
         led_kytkin = UserBoolSensor(default=0, tags='quick')
- 
+
 
         lomamoodi = UserBoolSensor(default=True)
 
