@@ -59,7 +59,7 @@ def get_price_for_datetime(dt, prices):
 def get_next_refresh_time():
     tz = pytz.timezone("Europe/Helsinki")
     now_local = datetime.now(tz)
-    refresh_time = now_local.replace(hour=18, minute=0, second=0, microsecond=0)
+    refresh_time = now_local.replace(hour=1, minute=0, second=5, microsecond=0)
 
     if now_local >= refresh_time:
         refresh_time += timedelta(days=1)
