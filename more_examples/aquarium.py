@@ -41,6 +41,10 @@ def read_cpu_temp(caller):
             return
     return temp
 
+import spotprice
+
+def spot_threshold():
+    return spotprice.get_threshold_for_hours(4)
 
 # GPIO pin configuration
 relays = [7, 8, 25, 24, 23, 18, 3, 2]
@@ -194,7 +198,7 @@ class Aquarium(commonmixin.CommonMixin, System):
             on_update=SetStatus(
                 'lammitin',
                 And(
-                    Or(Value("lammitin_force"), Value('lammitin_ajastin')),
+                    Or(Value("lammitin_force"), Value('spot_cheap')),
                     Not('vedenvaihtomoodi'),
                     Value('aqua_temperature') < water_temp_adj)
             )
@@ -222,7 +226,23 @@ class Aquarium(commonmixin.CommonMixin, System):
             on_deactivate=Run('push_sender'),
             priority=2,
         )
-
+        spot_price = PollingSensor(
+            tags='electricity',
+            interval=5,
+            history_length=1000,
+            status_updater=Func(spotprice.get_current_spot_price),
+        )
+        spot_price_limit = PollingSensor(
+            tags='electricity',
+            interval=5,
+            history_length=1000,
+            status_updater=Func(spot_threshold),
+        )
+        spot_cheap = BoolActuator(
+            tags='electricity',
+            active_condition=Value(True),
+            on_update=SetStatus("spot_cheap", spot_price<spot_price_limit),
+        )
     class Kytkimet(Group):
         vesivahinko_kytkin = UserBoolSensor(
             default=0, tags="quick",
@@ -297,7 +317,7 @@ class Aquarium(commonmixin.CommonMixin, System):
             active_condition=Value('kv_manual_mode'),
             on_activate=SetStatus("kv_pumppu", 1),
             priority=3,
-            default=False,
+            default=True,
         )
         kv_pause_switch = UserBoolSensor(
             active_condition=Value("kv_pause_switch"),
