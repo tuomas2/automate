@@ -57,26 +57,20 @@ def get_price_for_datetime(dt, prices):
 
 
 def get_next_refresh_time():
-    """
-    Palauttaa seuraavan (tulevan) päivitysajankohdan datetime-oliona
-    Suomen ajassa (Europe/Helsinki). Tässä oletuksena klo 14:00.
-    """
     tz = pytz.timezone("Europe/Helsinki")
     now_local = datetime.now(tz)
-    # Rakennetaan päivämäärälle klo 14:00.
-    today_14 = now_local.replace(hour=14, minute=0, second=0, microsecond=0)
+    refresh_time = now_local.replace(hour=18, minute=0, second=0, microsecond=0)
 
-    # Jos kello on jo yli 14:00, asetetaan päivitysaika huomiseen klo 14:00
-    if now_local >= today_14:
-        today_14 += timedelta(days=1)
+    if now_local >= refresh_time:
+        refresh_time += timedelta(days=1)
 
-    return today_14
+    return refresh_time
 
 
 def get_current_spot_price() -> float:
     """
     Palauttaa (nykyhetkeä vastaavan) spot-hinnan snt/kWh.
-    Päivittää tarvittaessa cachet, jos kello on ylittänyt 14:00 (Helsingin aikaa).
+    Päivittää tarvittaessa cachet, jos kello on ylittänyt 16:00 (Helsingin aikaa).
     """
     global _cached_prices, _next_refresh_time
 
