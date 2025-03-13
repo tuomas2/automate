@@ -319,6 +319,7 @@ class Aquarium(commonmixin.CommonMixin, System):
             on_activate=SetStatus("kv_pumppu", 1),
             priority=3,
             default=True,
+            tags="quick",
         )
         kv_pause_switch = UserBoolSensor(
             active_condition=Value("kv_pause_switch"),
