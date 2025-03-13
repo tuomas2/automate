@@ -245,19 +245,19 @@ class Aquarium(commonmixin.CommonMixin, System):
         )
     class Kytkimet(Group):
         vesivahinko_kytkin = UserBoolSensor(
-            default=0, tags="quick",
+            default=0,
+            tags="quick",
             active_condition=Value('vesivahinko_kytkin'),
             on_deactivate=SetStatus('silence_alarm', 0),
         )
         valot_manuaalimoodi = UserBoolSensor(
             default=1,
-            tags="quick",
             active_condition=Value('valot_manuaalimoodi'),
             on_update=SetStatus('lamput', 'valot_kytkin'),
             priority=3
         )
 
-        valot_kytkin = UserBoolSensor(default=0, tags='quick')
+        valot_kytkin = UserBoolSensor(default=0)
 
         led_manuaalimoodi = UserBoolSensor(
             default=0,
@@ -291,6 +291,7 @@ class Aquarium(commonmixin.CommonMixin, System):
             on_update=Run(
                 SetStatus('alarmtrigger', 1), Delay(2, SetStatus('alarmtrigger', 0))),
             priority=10,
+            tags='quick',
         )
 
         uvc_stop = UserBoolSensor(
@@ -535,8 +536,8 @@ class Aquarium(commonmixin.CommonMixin, System):
         # Jos kytkin laitetaan pois päältä, salli se vain jos alarajasensori on false myös.
         alaraja_saavutettu = UserBoolSensor(
             'alaraja_saavutettu',
-            tags='quick',
-            on_update=SetStatus("alaraja_saavutettu", IfElse("ala_altaat_alaraja", 1, "alaraja_saavutettu"))
+            on_update=SetStatus("alaraja_saavutettu", IfElse("ala_altaat_alaraja", 1, "alaraja_saavutettu")),
+            default=True,
         )
 
         waterchange1 = Program(
