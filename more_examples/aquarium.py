@@ -44,7 +44,7 @@ def read_cpu_temp(caller):
 import spotprice
 
 def spot_threshold():
-    return spotprice.get_threshold_for_hours(4)
+    return spotprice.get_threshold_for_hours(3)
 
 # GPIO pin configuration
 relays = [7, 8, 25, 24, 23, 18, 3, 2]
@@ -227,21 +227,21 @@ class Aquarium(commonmixin.CommonMixin, System):
             priority=2,
         )
         spot_price = PollingSensor(
-            tags='electricity',
+            tags='electricity,temperature',
             interval=5,
             history_length=1000,
             status_updater=Func(spotprice.get_current_spot_price),
         )
         spot_price_limit = PollingSensor(
-            tags='electricity',
+            tags='electricity,temperature',
             interval=5,
             history_length=1000,
             status_updater=Func(spot_threshold),
         )
         spot_cheap = BoolActuator(
-            tags='electricity',
+            tags='electricity,temperature',
             active_condition=Value(True),
-            on_update=SetStatus("spot_cheap", spot_price<spot_price_limit),
+            on_update=SetStatus("spot_cheap", Or(spot_price<spot_price_limit, spot_price == spot_price_limit)),
         )
     class Kytkimet(Group):
         vesivahinko_kytkin = UserBoolSensor(
@@ -325,11 +325,9 @@ class Aquarium(commonmixin.CommonMixin, System):
             active_condition=Value("kv_pause_switch"),
             on_activate=Run(
                 SetStatus("kv_pumppu", 0),
-                Delay(one_hour, Run(
+                Delay(3*one_hour, Run(
                     SetStatus("kv_pumppu", 1),
-                    Delay(5*one_hour,
                           SetStatus("kv_pause_switch", 0)
-                          )
                 ))),
             priority = 4,
             default = False,
