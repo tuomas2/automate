@@ -1,4 +1,8 @@
-from typing import TypedDict, Optional, List, Dict, Any
+try:
+    from typing import TypedDict
+except ImportError:
+    from typing_extensions import TypedDict
+from typing import Optional, List, Dict, Any
 import requests
 from datetime import datetime, timedelta, timezone
 import pytz
