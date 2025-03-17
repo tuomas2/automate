@@ -1,15 +1,21 @@
+from typing import TypedDict, Optional, List, Dict, Any
 import requests
 from datetime import datetime, timedelta, timezone
 import pytz
 
+class PriceEntry(TypedDict):
+    startDate: datetime
+    endDate: datetime
+    price: float
+
 LATEST_PRICES_ENDPOINT = "https://api.porssisahko.net/v1/latest-prices.json"
 
 # Globaali välimuisti (cache)
-_cached_prices = None
-_next_refresh_time = None
+_cached_prices: Optional[List[PriceEntry]] = None
+_next_refresh_time: Optional[datetime] = None
 
 
-def parse_iso_zulu(dt_string):
+def parse_iso_zulu(dt_string: str) -> datetime:
     """
     Parsii esim. "2022-11-14T22:00:00.000Z" Python-datetimeksi (UTC).
     Toimii Python 3.6 -ympäristössä, jossa ei ole datetime.fromisoformat().
@@ -27,7 +33,7 @@ def parse_iso_zulu(dt_string):
     return dt.replace(tzinfo=timezone.utc)  # asetetaan UTC-aikavyöhyke
 
 
-def fetch_latest_price_data():
+def fetch_latest_price_data() -> Dict[str, Any]:
     """
     Hakee rajapinnasta viimeisimmät 48 tunnin hinnat (snt/kWh).
     Palauttaa vastauksen JSON-muodossa.
@@ -36,13 +42,13 @@ def fetch_latest_price_data():
     response.raise_for_status()  # Heittää virheen, jos pyyntö epäonnistuu
     return response.json()
 
-def convert_price_data(prices):
+def convert_price_data(prices: List[Dict[str, Any]]) -> List[PriceEntry]:
     for price_info in prices:
         price_info['startDate'] = parse_iso_zulu(price_info['startDate'])
         price_info['endDate'] = parse_iso_zulu(price_info['endDate'])
-    return prices
+    return prices  # type: ignore
 
-def get_price_for_datetime(dt, prices):
+def get_price_for_datetime(dt: datetime, prices: List[PriceEntry]) -> float:
     """
     Palauttaa hinnan annetulle ajankohdalle dt (datetime-oliona, UTC).
     prices on lista, jossa jokaisella alkioilla on:
@@ -59,7 +65,7 @@ def get_price_for_datetime(dt, prices):
     raise ValueError("Hintaa ei löytynyt annetulle ajanhetkelle.")
 
 
-def get_next_refresh_time():
+def get_next_refresh_time() -> datetime:
     tz = pytz.timezone("Europe/Helsinki")
     now_local = datetime.now(tz)
     refresh_time = now_local.replace(hour=1, minute=0, second=5, microsecond=0)
@@ -98,18 +104,18 @@ def get_current_spot_price() -> float:
 
 
 
-def get_threshold_for_hours(hours=3) -> float:
+def get_threshold_for_hours(hours: int = 3) -> float:
     """
     Etsii listasta (prices) hinnan raja-arvon ainoastaan kuluvalta vuorokaudelta, jolla voidaan ajaa
     laitetta 'hours' tuntia vuorokaudessa halvimmilla tunneilla.
     Palauttaa sen suurimman hinnan (snt/kWh), joka sisältyy halvimpiin 'hours' tunnin hintoihin.
     """
     get_current_spot_price()  # päivitetään cache
-    prices = _cached_prices
+    prices = _cached_prices  # type: ignore
     # Suodatetaan vain tämän päivän hinnat
     tz = pytz.timezone("Europe/Helsinki")
     today = datetime.now(tz).date()
-    todays_prices = []
+    todays_prices: List[Dict[str, Any]] = []
     for price_info in prices:
         start_local = price_info['startDate'].astimezone(tz)
         if start_local.date() == today:
