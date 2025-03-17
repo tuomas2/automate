@@ -97,31 +97,30 @@ def get_current_spot_price() -> float:
 
 def get_threshold_for_hours(hours=3) -> float:
     """
-    Etsii listasta (prices) hinnan raja-arvon, jolla voidaan ajaa
+    Etsii listasta (prices) hinnan raja-arvon ainoastaan kuluvalta vuorokaudelta, jolla voidaan ajaa
     laitetta 'hours' tuntia vuorokaudessa halvimmilla tunneilla.
-
-    Palauttaa sen suurimman hinnan (snt/kWh), joka sisältyy halvimpiin 'hours' tunteihin.
-    Käytännössä:
-      1) Sorttaa listan hintatunnit 'price'-kentän mukaan (nouseva).
-      2) Ota halvimman 'hours' tunnin hinnat.
-      3) Raja-arvo = näiden halvimman 'hours' tunnin hintojen maksimi.
+    Palauttaa sen suurimman hinnan (snt/kWh), joka sisältyy halvimpiin 'hours' tunnin hintoihin.
     """
-    get_current_spot_price()
+    get_current_spot_price()  # päivitetään cache
     prices = _cached_prices
-    if not prices:
-        raise ValueError("prices-lista on tyhjä, ei voida määrittää raja-arvoa.")
+    # Suodatetaan vain tämän päivän hinnat
+    tz = pytz.timezone("Europe/Helsinki")
+    today = datetime.now(tz).date()
+    todays_prices = []
+    for price_info in prices:
+        start_utc = parse_iso_zulu(price_info['startDate'])
+        start_local = start_utc.astimezone(tz)
+        if start_local.date() == today:
+            todays_prices.append(price_info)
+    if not todays_prices:
+        raise ValueError("Ei hintadataa tälle päivälle.")
     if hours <= 0:
         raise ValueError("hours on oltava positiivinen kokonaisluku.")
 
-    # Järjestetään hintarivi halvimmasta kalleimpaan
-    sorted_prices = sorted(prices, key=lambda p: p['price'])
-
+    sorted_prices = sorted(todays_prices, key=lambda p: p['price'])
     if hours > len(sorted_prices):
-        raise ValueError(f"Dataa on vain {len(sorted_prices)} tuntia, pyydettiin {hours} tuntia.")
-
-    # Poimitaan halvimman 'hours' tunnin hinnat
+        raise ValueError(f"Dataa on vain {len(sorted_prices)} tuntia tälle päivälle, pyydettiin {hours} tuntia.")
     cheapest_hours = sorted_prices[:hours]
-    # Raja-arvoksi halvimman hours-tunnin hintojen maksimi
     threshold_price = max(h['price'] for h in cheapest_hours)
     return threshold_price
 
