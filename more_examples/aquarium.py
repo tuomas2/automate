@@ -327,7 +327,7 @@ class Aquarium(commonmixin.CommonMixin, System):
                 SetStatus("kv_pumppu", 0),
                 Delay(3*one_hour, Run(
                     SetStatus("kv_pumppu", 1),
-                          SetStatus("kv_pause_switch", 0)
+                    SetStatus("kv_pause_switch", 0)
                 ))),
             priority = 4,
             default = False,
