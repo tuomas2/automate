@@ -8,6 +8,11 @@ class PriceEntry(TypedDict):
     endDate: datetime
     price: float
 
+class RawPriceEntry(TypedDict):
+    startDate: str
+    endDate: str
+    price: float
+
 LATEST_PRICES_ENDPOINT = "https://api.porssisahko.net/v1/latest-prices.json"
 
 # Globaali välimuisti (cache)
@@ -42,11 +47,16 @@ def fetch_latest_price_data() -> Dict[str, Any]:
     response.raise_for_status()  # Heittää virheen, jos pyyntö epäonnistuu
     return response.json()
 
-def convert_price_data(prices: List[Dict[str, Any]]) -> List[PriceEntry]:
+def convert_price_data(prices: List[RawPriceEntry]) -> List[PriceEntry]:
+    # Create and return a new list without modifying input inline
+    converted_prices: List[PriceEntry] = []
     for price_info in prices:
-        price_info['startDate'] = parse_iso_zulu(price_info['startDate'])
-        price_info['endDate'] = parse_iso_zulu(price_info['endDate'])
-    return prices  # type: ignore
+        converted_prices.append({
+            "startDate": parse_iso_zulu(price_info["startDate"]),
+            "endDate": parse_iso_zulu(price_info["endDate"]),
+            "price": price_info["price"]
+        })
+    return converted_prices
 
 def get_price_for_datetime(dt: datetime, prices: List[PriceEntry]) -> float:
     """
@@ -111,11 +121,11 @@ def get_threshold_for_hours(hours: int = 3) -> float:
     Palauttaa sen suurimman hinnan (snt/kWh), joka sisältyy halvimpiin 'hours' tunnin hintoihin.
     """
     get_current_spot_price()  # päivitetään cache
-    prices = _cached_prices  # type: ignore
+    prices: List[PriceEntry] = _cached_prices  # type: ignore
     # Suodatetaan vain tämän päivän hinnat
     tz = pytz.timezone("Europe/Helsinki")
     today = datetime.now(tz).date()
-    todays_prices: List[Dict[str, Any]] = []
+    todays_prices: List[PriceEntry] = []
     for price_info in prices:
         start_local = price_info['startDate'].astimezone(tz)
         if start_local.date() == today:
