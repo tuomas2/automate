@@ -36,6 +36,11 @@ def fetch_latest_price_data():
     response.raise_for_status()  # Heittää virheen, jos pyyntö epäonnistuu
     return response.json()
 
+def convert_price_data(prices):
+    for price_info in prices:
+        price_info['startDate'] = parse_iso_zulu(price_info['startDate'])
+        price_info['endDate'] = parse_iso_zulu(price_info['endDate'])
+    return prices
 
 def get_price_for_datetime(dt, prices):
     """
@@ -48,9 +53,7 @@ def get_price_for_datetime(dt, prices):
        }
     """
     for price_info in prices:
-        start_utc = parse_iso_zulu(price_info['startDate'])
-        end_utc = parse_iso_zulu(price_info['endDate'])
-        if start_utc <= dt < end_utc:
+        if price_info['startDate'] <= dt < price_info['endDate']:
             return price_info['price']
 
     raise ValueError("Hintaa ei löytynyt annetulle ajanhetkelle.")
@@ -77,7 +80,7 @@ def get_current_spot_price() -> float:
     if _cached_prices is None or _next_refresh_time is None:
         # Ei ole vielä dataa, haetaan heti ja asetetaan seuraava päivitysaika
         data = fetch_latest_price_data()
-        _cached_prices = data["prices"]
+        _cached_prices = convert_price_data(data["prices"])
         _next_refresh_time = get_next_refresh_time()
     else:
         # Tarkista, onko nykyhetki ylittänyt seuraavan päivitysajankohdan
@@ -86,7 +89,7 @@ def get_current_spot_price() -> float:
         if now_local >= _next_refresh_time:
             # Päivitetään data
             data = fetch_latest_price_data()
-            _cached_prices = data["prices"]
+            _cached_prices = convert_price_data(data["prices"])
             _next_refresh_time = get_next_refresh_time()
 
     # Etsitään hinta nykyhetkelle UTC-ajassa
@@ -108,8 +111,7 @@ def get_threshold_for_hours(hours=3) -> float:
     today = datetime.now(tz).date()
     todays_prices = []
     for price_info in prices:
-        start_utc = parse_iso_zulu(price_info['startDate'])
-        start_local = start_utc.astimezone(tz)
+        start_local = price_info['startDate'].astimezone(tz)
         if start_local.date() == today:
             todays_prices.append(price_info)
     if not todays_prices:
