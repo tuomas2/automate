@@ -23,6 +23,7 @@ LATEST_PRICES_ENDPOINT = "https://api.porssisahko.net/v1/latest-prices.json"
 _cached_prices: Optional[List[PriceEntry]] = None
 _next_refresh_time: Optional[datetime] = None
 
+tz = pytz.timezone("Europe/Helsinki")
 
 def parse_iso_zulu(dt_string: str) -> datetime:
     """
@@ -39,7 +40,8 @@ def parse_iso_zulu(dt_string: str) -> datetime:
     # .%f = fractional second (microseconds), e.g. .000
     # Z is a literal at the end
     dt = datetime.strptime(dt_string, "%Y-%m-%dT%H:%M:%S.%fZ")
-    return dt.replace(tzinfo=timezone.utc)  # set UTC timezone
+    dt = dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(tz)
 
 
 def fetch_latest_price_data() -> Dict[str, Any]:
@@ -74,7 +76,6 @@ def get_price_for_datetime(dt: datetime, prices: List[PriceEntry]) -> float:
 
 
 def get_next_refresh_time() -> datetime:
-    tz = pytz.timezone("Europe/Helsinki")
     now_local = datetime.now(tz)
     refresh_time = now_local.replace(hour=1, minute=0, second=5, microsecond=0)
 
@@ -98,7 +99,6 @@ def get_current_spot_price() -> float:
         _next_refresh_time = get_next_refresh_time()
     else:
         # Check if the current time has passed the next refresh time
-        tz = pytz.timezone("Europe/Helsinki")
         now_local = datetime.now(tz)
         if now_local >= _next_refresh_time:
             # Update data
@@ -106,9 +106,9 @@ def get_current_spot_price() -> float:
             _cached_prices = convert_price_data(data["prices"])
             _next_refresh_time = get_next_refresh_time()
 
-    # Find the price for the current time in UTC
-    now_utc = datetime.now(timezone.utc)
-    return get_price_for_datetime(now_utc, _cached_prices)
+    # Find the price for the current time in Helsinki
+    now_local = datetime.now(tz)
+    return get_price_for_datetime(now_local, _cached_prices)
 
 
 
@@ -119,19 +119,16 @@ def get_threshold_for_hours(hours: int = 3) -> float:
     """
     get_current_spot_price()  # update cache
     prices: List[PriceEntry] = _cached_prices  # type: ignore
-    tz = pytz.timezone("Europe/Helsinki")
     today = datetime.now(tz).date()
     
-    # Compute today's boundaries in UTC
+    # Compute today's boundaries in local time
     start_local = tz.localize(datetime.combine(today, time.min))
     end_local = start_local + timedelta(days=1)
-    start_utc = start_local.astimezone(timezone.utc)
-    end_utc = end_local.astimezone(timezone.utc)
     
-    # Filter prices within today's UTC boundaries
+    # Filter prices within today's local boundaries
     todays_prices: List[PriceEntry] = []
     for price_info in prices:
-        if start_utc <= price_info['startDate'] < end_utc:
+        if start_local <= price_info['startDate'] < end_local:
             todays_prices.append(price_info)
     if not todays_prices:
         raise ValueError("No price data for today.")
