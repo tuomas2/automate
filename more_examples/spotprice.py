@@ -19,36 +19,36 @@ class RawPriceEntry(TypedDict):
 
 LATEST_PRICES_ENDPOINT = "https://api.porssisahko.net/v1/latest-prices.json"
 
-# Globaali välimuisti (cache)
+# Global cache
 _cached_prices: Optional[List[PriceEntry]] = None
 _next_refresh_time: Optional[datetime] = None
 
 
 def parse_iso_zulu(dt_string: str) -> datetime:
     """
-    Parsii esim. "2022-11-14T22:00:00.000Z" Python-datetimeksi (UTC).
-    Toimii Python 3.6 -ympäristössä, jossa ei ole datetime.fromisoformat().
+    Parses e.g. "2022-11-14T22:00:00.000Z" to a Python datetime object (UTC).
+    Works in Python 3.6 environments where datetime.fromisoformat() is not available.
     """
-    # %Y = 4-numeroa vuodelle
-    # %m = 2-numeroa kuukaudelle
-    # %d = 2-numeroa päivälle
-    # T = merkkijono "T"
-    # %H = 2-numeroa tunnille (00..23)
-    # %M = 2-numeroa minuuteille (00..59)
-    # %S = 2-numeroa sekunneille (00..59)
-    # .%f = sekuntien murto-osa (mikrosekuntia), esim. .000
-    # Z on merkkijono lopussa
+    # %Y = 4-digit year
+    # %m = 2-digit month
+    # %d = 2-digit day
+    # T = literal "T"
+    # %H = 2-digit hour (00..23)
+    # %M = 2-digit minute (00..59)
+    # %S = 2-digit second (00..59)
+    # .%f = fractional second (microseconds), e.g. .000
+    # Z is a literal at the end
     dt = datetime.strptime(dt_string, "%Y-%m-%dT%H:%M:%S.%fZ")
-    return dt.replace(tzinfo=timezone.utc)  # asetetaan UTC-aikavyöhyke
+    return dt.replace(tzinfo=timezone.utc)  # set UTC timezone
 
 
 def fetch_latest_price_data() -> Dict[str, Any]:
     """
-    Hakee rajapinnasta viimeisimmät 48 tunnin hinnat (snt/kWh).
-    Palauttaa vastauksen JSON-muodossa.
+    Fetches the latest 48 hours prices (cents/kWh) from the API.
+    Returns the response in JSON format.
     """
     response = requests.get(LATEST_PRICES_ENDPOINT)
-    response.raise_for_status()  # Heittää virheen, jos pyyntö epäonnistuu
+    response.raise_for_status()  # Raises an error if the request fails
     return response.json()
 
 def convert_price_data(prices: List[RawPriceEntry]) -> List[PriceEntry]:
@@ -64,19 +64,13 @@ def convert_price_data(prices: List[RawPriceEntry]) -> List[PriceEntry]:
 
 def get_price_for_datetime(dt: datetime, prices: List[PriceEntry]) -> float:
     """
-    Palauttaa hinnan annetulle ajankohdalle dt (datetime-oliona, UTC).
-    prices on lista, jossa jokaisella alkioilla on:
-       {
-         "price": <float, snt/kWh>,
-         "startDate": <ISO8601 UTC-string esim. '2022-11-14T22:00:00.000Z'>,
-         "endDate": <ISO8601 UTC-string esim. '2022-11-14T23:00:00.000Z'>
-       }
+    Returns the price for the given datetime dt (UTC).
     """
     for price_info in prices:
         if price_info['startDate'] <= dt < price_info['endDate']:
             return price_info['price']
 
-    raise ValueError("Hintaa ei löytynyt annetulle ajanhetkelle.")
+    raise ValueError("No price found for the given datetime.")
 
 
 def get_next_refresh_time() -> datetime:
@@ -92,27 +86,27 @@ def get_next_refresh_time() -> datetime:
 
 def get_current_spot_price() -> float:
     """
-    Palauttaa (nykyhetkeä vastaavan) spot-hinnan snt/kWh.
-    Päivittää tarvittaessa cachet, jos kello on ylittänyt 16:00 (Helsingin aikaa).
+    Returns the current spot price (cents/kWh).
+    Refreshes the cache if the local time is past the refresh time.
     """
     global _cached_prices, _next_refresh_time
 
     if _cached_prices is None or _next_refresh_time is None:
-        # Ei ole vielä dataa, haetaan heti ja asetetaan seuraava päivitysaika
+        # No data yet, fetch immediately and set the next refresh time
         data = fetch_latest_price_data()
         _cached_prices = convert_price_data(data["prices"])
         _next_refresh_time = get_next_refresh_time()
     else:
-        # Tarkista, onko nykyhetki ylittänyt seuraavan päivitysajankohdan
+        # Check if the current time has passed the next refresh time
         tz = pytz.timezone("Europe/Helsinki")
         now_local = datetime.now(tz)
         if now_local >= _next_refresh_time:
-            # Päivitetään data
+            # Update data
             data = fetch_latest_price_data()
             _cached_prices = convert_price_data(data["prices"])
             _next_refresh_time = get_next_refresh_time()
 
-    # Etsitään hinta nykyhetkelle UTC-ajassa
+    # Find the price for the current time in UTC
     now_utc = datetime.now(timezone.utc)
     return get_price_for_datetime(now_utc, _cached_prices)
 
@@ -120,13 +114,12 @@ def get_current_spot_price() -> float:
 
 def get_threshold_for_hours(hours: int = 3) -> float:
     """
-    Etsii listasta (prices) hinnan raja-arvon ainoastaan kuluvalta vuorokaudelta, jolla voidaan ajaa
-    laitetta 'hours' tuntia vuorokaudessa halvimmilla tunneilla.
-    Palauttaa sen suurimman hinnan (snt/kWh), joka sisältyy halvimpiin 'hours' tunnin hintoihin.
+    Determines the threshold price for running the device during the cheapest 'hours' today.
+    Returns the highest price among the cheapest 'hours' hours (cents/kWh).
     """
-    get_current_spot_price()  # päivitetään cache
+    get_current_spot_price()  # update cache
     prices: List[PriceEntry] = _cached_prices  # type: ignore
-    # Suodatetaan vain tämän päivän hinnat
+    # Filter today's prices only
     tz = pytz.timezone("Europe/Helsinki")
     today = datetime.now(tz).date()
     todays_prices: List[PriceEntry] = []
@@ -135,31 +128,31 @@ def get_threshold_for_hours(hours: int = 3) -> float:
         if start_local.date() == today:
             todays_prices.append(price_info)
     if not todays_prices:
-        raise ValueError("Ei hintadataa tälle päivälle.")
+        raise ValueError("No price data for today.")
     if hours <= 0:
-        raise ValueError("hours on oltava positiivinen kokonaisluku.")
+        raise ValueError("hours must be a positive integer.")
 
     sorted_prices = sorted(todays_prices, key=lambda p: p['price'])
     if hours > len(sorted_prices):
-        raise ValueError(f"Dataa on vain {len(sorted_prices)} tuntia tälle päivälle, pyydettiin {hours} tuntia.")
+        raise ValueError(f"Data contains only {len(sorted_prices)} hours for today, but {hours} hours were requested.")
     cheapest_hours = sorted_prices[:hours]
     threshold_price = max(h['price'] for h in cheapest_hours)
     return threshold_price
 
 if __name__ == "__main__":
-    # Esimerkki, miten käyttö voisi mennä
+    # Example usage
     try:
-        # Hae/tai päivitä globaali cache
+        # Fetch/update global cache
         current_price = get_current_spot_price()
-        print(f"Sähkön spothinta nyt: {current_price} snt/kWh (sis. alv)")
+        print(f"Current spot price: {current_price} cents/kWh (incl. VAT)")
 
-        # Haetaan suoraan globaali välimuisti, jotta ei turhaan ladata dataa uudelleen
+        # Use global cache to avoid unnecessary data reload
         if _cached_prices:
-            # Etsi esim. 3 tunnin halvimpiin tunteihin sopiva raja-arvo
+            # Determine threshold for the cheapest 3 hours
             threshold = get_threshold_for_hours(hours=3)
-            print(f"3 halvimman tunnin raja-arvohinta: {threshold} snt/kWh")
+            print(f"Threshold price for the cheapest 3 hours: {threshold} cents/kWh")
         else:
-            print("Ei hintadataa cache:ssa.")
+            print("No price data in cache.")
 
     except Exception as e:
-        print(f"Virhe hinnan haussa: {e}")
+        print(f"Error fetching price: {e}")
