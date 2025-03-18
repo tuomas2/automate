@@ -4,7 +4,7 @@ except ImportError:
     from typing_extensions import TypedDict
 from typing import Optional, List, Dict, Any
 import requests
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone, time
 import pytz
 
 class PriceEntry(TypedDict):
@@ -119,19 +119,25 @@ def get_threshold_for_hours(hours: int = 3) -> float:
     """
     get_current_spot_price()  # update cache
     prices: List[PriceEntry] = _cached_prices  # type: ignore
-    # Filter today's prices only
     tz = pytz.timezone("Europe/Helsinki")
     today = datetime.now(tz).date()
+    
+    # Compute today's boundaries in UTC
+    start_local = tz.localize(datetime.combine(today, time.min))
+    end_local = start_local + timedelta(days=1)
+    start_utc = start_local.astimezone(timezone.utc)
+    end_utc = end_local.astimezone(timezone.utc)
+    
+    # Filter prices within today's UTC boundaries
     todays_prices: List[PriceEntry] = []
     for price_info in prices:
-        start_local = price_info['startDate'].astimezone(tz)
-        if start_local.date() == today:
+        if start_utc <= price_info['startDate'] < end_utc:
             todays_prices.append(price_info)
     if not todays_prices:
         raise ValueError("No price data for today.")
     if hours <= 0:
         raise ValueError("hours must be a positive integer.")
-
+    
     sorted_prices = sorted(todays_prices, key=lambda p: p['price'])
     if hours > len(sorted_prices):
         raise ValueError(f"Data contains only {len(sorted_prices)} hours for today, but {hours} hours were requested.")
