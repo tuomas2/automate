@@ -199,7 +199,7 @@ class Aquarium(commonmixin.CommonMixin, System):
                 'lammitin',
                 And(
                     Or(Value("lammitin_force"), Value('spot_cheap')),
-                    Not('vedenvaihtomoodi'),
+                    Value('pumput'), # Don't heat if pumps are off
                     Value('aqua_temperature') < water_temp_adj)
             )
         )
@@ -355,7 +355,7 @@ class Aquarium(commonmixin.CommonMixin, System):
         lammitin = RelayActuator(
             tags="temperature",
             port=portmap['heater'],
-            default=1,
+            default=0,
             safety_delay=60 * 3,
             safety_mode="both")
 
