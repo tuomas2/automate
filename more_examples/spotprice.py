@@ -77,7 +77,7 @@ def get_price_for_datetime(dt: datetime, prices: List[PriceEntry]) -> float:
 
 def get_next_refresh_time() -> datetime:
     now_local = datetime.now(tz)
-    refresh_time = now_local.replace(hour=1, minute=0, second=5, microsecond=0)
+    refresh_time = now_local.replace(hour=0, minute=0, second=0, microsecond=0)
 
     if now_local >= refresh_time:
         refresh_time += timedelta(days=1)
