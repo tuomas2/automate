@@ -241,7 +241,7 @@ class Aquarium(commonmixin.CommonMixin, System):
         spot_cheap = BoolActuator(
             tags='electricity,temperature',
             active_condition=Value(True),
-            on_update=SetStatus("spot_cheap", Or(spot_price<spot_price_limit, spot_price == spot_price_limit)),
+            on_update=SetStatus("spot_cheap", Or(spot_price<spot_price_limit, Equal(spot_price, spot_price_limit))),
         )
     class Kytkimet(Group):
         vesivahinko_kytkin = UserBoolSensor(
