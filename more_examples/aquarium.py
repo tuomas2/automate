@@ -75,7 +75,7 @@ portmap = {
 
     # outputs:
     'alarm': outputpins[0],
-    'led': relays[0], #unused
+    'uvc_filter': relays[0],
     'allpumps': relays[1],
     'lamp3': relays[2], #lamppu3
     'kv_pumppu': relays[3],
@@ -83,7 +83,7 @@ portmap = {
     'heater': relays[4],
     'lamp1': relays[5],
     'lamp2': relays[6],
-    'uvc_filter': relays[7], #joskus tuomittu rikkonaiseksi mutta ehkä ei rikki
+    'led': relays[7],
 }
 # GPIO port 4 is reserved for temperature sensor
 #bread = [17, 27, 22, 10, 9, 11, 2, 3]
