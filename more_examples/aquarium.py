@@ -56,25 +56,18 @@ inputboard = [17, 27, 22, 10, 11, 14, 15,
 inputpins = [12, 16, 21]
 outputpins = [9]
 
+NOT_USED = None
+
 portmap = {
     # inputs:
-    'palkit': inputboard[0],
-    'pääallas yläraja critical': inputboard[1],
-    'pääallas yläraja warning': inputboard[2],
-    'valutusputki': inputboard[3],
-    #'ala-altaiden alaraja': inputboard[4], # KÄYTTÄMÄTÖN
-    'ala-altaiden yläraja': inputboard[5],  # ei vielä aktivoitu (--what -- kai nyt sentään on?)
-    'vasen lattiasensori': inputboard[6],  # ei vielä aktivoitu
+    'ylivalutus': inputboard[0],
 
-    # siirretty arduinosta:
-    'kaapin_sensori': inputboard[7],
-    'ala_varoitus': inputboard[8],
-    'keski_lattiasensori': inputboard[9],
     'ala_altaat_alaraja': inputpins[0],
     'pääallas yläraja uusi': inputpins[1],
 
     # outputs:
     'alarm': outputpins[0],
+
     'uvc_filter': relays[0],
     'allpumps': relays[1],
     'lamp3': relays[2], #lamppu3
@@ -129,9 +122,12 @@ class Aquarium(commonmixin.CommonMixin, System):
     )
 
     class Sensors(Group):
-        valutusputki = RpioSensor(port=portmap['valutusputki'], change_delay=1)
-        vetta_yli_altaan = RpioSensor(port=portmap['pääallas yläraja uusi'], change_delay=1, button_type="up")
+        ylivalutus = RpioSensor(port=portmap['ylivalutus'], change_delay=2,
+                                description='Ylivalutuksen alla lattialla (suojalaatikon sisällä)',
+                                )
         palkit = RpioSensor(port=portmap['palkit'], change_delay=2)
+
+        vetta_yli_altaan = RpioSensor(port=portmap['pääallas yläraja uusi'], change_delay=1, button_type="up")
         ala_altaat_ylaraja = RpioSensor(port=portmap['ala-altaiden yläraja'], change_delay=1)
 
         vetta_yli_altaan_warning = RpioSensor(port=portmap['pääallas yläraja warning'],
@@ -504,17 +500,14 @@ class Aquarium(commonmixin.CommonMixin, System):
 
     class Vesiohjelmat(Group):
         vesivahinko_ohjelma = Program(
-            active_condition=And(Or('valutusputki',
-                                    'ala_altaat_ylaraja',
-                                    'vetta_yli_altaan',
-                                    'palkit',
-                                    'lattiasensori_1',
-                                    'lattiasensori_2',
-                                    'kaapin_ulkosuodatin',
-                                    'vesivahinko_kytkin'),
-                                 Not('testimoodi'),
-                                 Not('vedenvaihtomoodi')
-                                 ),
+            active_condition=And(Or(
+                'ylivalutus',
+                'vetta_yli_altaan',
+                'vesivahinko_kytkin'
+            ),
+                Not('testimoodi'),
+                Not('vedenvaihtomoodi')
+            ),
             on_activate=Run(
                 SetStatus('vesivahinko_kytkin', 1),
                 SetStatus('pumput', 0),
