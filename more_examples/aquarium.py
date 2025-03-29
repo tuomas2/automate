@@ -175,11 +175,6 @@ class Aquarium(commonmixin.CommonMixin, System):
             triggers= ['lammitin_force']
         )
 
-        lammitin_ajastin = CronTimerSensor(
-            tags="temperature",
-            timer_on="01 0 * * *",
-            timer_off="59 6 * * *")
-
         cpu_lampo = PollingSensor(
             tags='temperature,analog',
             interval=5,
