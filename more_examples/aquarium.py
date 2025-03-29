@@ -125,37 +125,7 @@ class Aquarium(commonmixin.CommonMixin, System):
         ylivalutus = RpioSensor(port=portmap['ylivalutus'], change_delay=2,
                                 description='Ylivalutuksen alla lattialla (suojalaatikon sisällä)',
                                 )
-        palkit = RpioSensor(port=portmap['palkit'], change_delay=2)
-
         vetta_yli_altaan = RpioSensor(port=portmap['pääallas yläraja uusi'], change_delay=1, button_type="up")
-        ala_altaat_ylaraja = RpioSensor(port=portmap['ala-altaiden yläraja'], change_delay=1)
-
-        vetta_yli_altaan_warning = RpioSensor(port=portmap['pääallas yläraja warning'],
-                                              change_delay=1,
-                                              active_condition=And(
-                                                  Or(
-                                                      'vetta_yli_altaan_warning',
-                                                  ),
-                                                  Not('testimoodi'),
-                                                  Not('vedenvaihtomoodi')
-                                              ),
-            on_activate=Run('push_sender',
-                            SetStatus('alarmtrigger', 1),
-                            ),
-            on_deactivate=Run('push_sender'),
-            priority=4,
-        )
-
-        lattiasensori_1 = RpioSensor(port=portmap['vasen lattiasensori'], change_delay=1,
-                                     description='Ylivalutuksen alla lattialla')
-
-        kaapin_ulkosuodatin = RpioSensor(port=portmap['kaapin_sensori'], change_delay=1)
-
-        ala_varoitus = RpioSensor(port=portmap['ala_varoitus'])
-
-        lattiasensori_2 = RpioSensor(port=portmap['keski_lattiasensori'],
-                                     description='altaan alla oleva lattiasensori',
-                                     change_delay=1)
 
         ala_altaat_alaraja = RpioSensor(
             port=portmap['ala_altaat_alaraja'],
