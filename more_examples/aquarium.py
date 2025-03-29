@@ -68,14 +68,14 @@ portmap = {
     # outputs:
     'alarm': outputpins[0],
 
-    'uvc_filter': relays[0],
+    #'uvc_filter': relays[0],
     'allpumps': relays[1],
-    'lamp3': relays[2], #lamppu3
+    #'lamp3': relays[2], #lamppu3
     'kv_pumppu': relays[3],
     #'co2input': relays[3],
     'heater': relays[4],
-    'lamp1': relays[5],
-    'lamp2': relays[6],
+    #'lamp1': relays[5],
+    #'lamp2': relays[6],
     'led': relays[7],
 }
 # GPIO port 4 is reserved for temperature sensor
@@ -246,14 +246,6 @@ class Aquarium(commonmixin.CommonMixin, System):
             active_condition=Value('vesivahinko_kytkin'),
             on_deactivate=SetStatus('silence_alarm', 0),
         )
-        valot_manuaalimoodi = UserBoolSensor(
-            default=1,
-            active_condition=Value('valot_manuaalimoodi'),
-            on_update=SetStatus('lamput', 'valot_kytkin'),
-            priority=3
-        )
-
-        valot_kytkin = UserBoolSensor(default=0)
 
         led_manuaalimoodi = UserBoolSensor(
             default=0,
@@ -290,25 +282,9 @@ class Aquarium(commonmixin.CommonMixin, System):
             tags='quick',
         )
 
-        uvc_stop = UserBoolSensor(
-            description='Stops UVC either manually or if pumps are down',
-            default=False,
-            active_condition=Or(Not('pumput'), 'uvc_stop'),
-            priority=5,
-            on_activate=SetStatus('uvc', False))
-
-        uvc_force_on = UserBoolSensor(
-            default=False,
-            active_condition=And('pumput', 'uvc_force_on'),
-            priority=4,
-            on_activate=SetStatus('uvc', True))
-
         reload_arduino = UserEventSensor(
             on_activate=ReloadService('ArduinoService'),
         )
-
-        lamput_ajastin1_k = UserBoolSensor(default=True)
-        lamput_ajastin2_k = UserBoolSensor(default=False)
 
         kv_manual_mode = UserBoolSensor(
             active_condition=Value('kv_manual_mode'),
@@ -331,11 +307,6 @@ class Aquarium(commonmixin.CommonMixin, System):
         )
 
     class Vesiaktuaattorit(Group):
-        uvc = RelayActuator(
-            port=portmap['uvc_filter'],
-            default=0,
-            safety_delay=30)
-
         pumput = RelayActuator(
             port=portmap['allpumps'],
             default=1,
@@ -356,17 +327,6 @@ class Aquarium(commonmixin.CommonMixin, System):
             safety_mode="both")
 
     class Lamppuryhma(Group):
-        lamp_safety_delay = 30 * 60
-        lamppu1 = RelayActuator(
-            port=portmap['lamp1'],
-            safety_delay=lamp_safety_delay,
-            safety_mode="rising")
-        lamppu2 = RelayActuator(port=portmap['lamp2'],
-                                safety_delay=lamp_safety_delay,
-                                safety_mode="rising")
-        lamppu3 = RelayActuator(port=portmap['lamp3'],
-                                safety_delay=lamp_safety_delay,
-                                safety_mode="rising")
         led = RelayActuator(
             port=portmap['led'],
             active_condition=Value(True),
@@ -379,71 +339,7 @@ class Aquarium(commonmixin.CommonMixin, System):
 
         led_pwm = ArduinoPWMActuator(service=0, pin=11, default=0., history_length=1000)
 
-        lamp_on_delay = UserFloatSensor(default=15)
-        lamp_off_delay = UserFloatSensor(default=15)
-
-        lamput = BoolActuator(
-            active_condition=Value('lamput_ajastin1_k'),
-            on_update=Run(
-                          SetStatus(lamppu1, 'lamput'),
-                          Delay(IfElse('lamput', lamp_on_delay, lamp_off_delay), SetStatus(lamppu3, 'lamput')),
-                          Delay(IfElse('lamput', Value(2) * lamp_on_delay, Value(2) * lamp_off_delay),
-                                   SetStatus(lamppu2, 'lamput')),
-                               ),
-        )
-
-        lamppu1_manual = UserBoolSensor(active_condition=Value('lamppu1_manual'),
-                                        on_activate=SetStatus(lamppu1, 1),
-                                        priority=2)
-        lamppu2_manual = UserBoolSensor(active_condition=Value('lamppu2_manual'),
-                                        on_activate=SetStatus(lamppu2, 1),
-                                        priority=2)
-        lamppu3_manual = UserBoolSensor(active_condition=Value('lamppu3_manual'),
-                                        on_activate=SetStatus(lamppu3, 1),
-                                        priority=2)
-
-        switch_off_delay = UserFloatSensor(description='in minutes', default=15)
-
-        switch_manual_lamps_off = UserBoolSensor(
-            active_condition=Value('switch_manual_lamps_off'),
-            on_activate=Delay(switch_off_delay*60,
-                              SetStatus([lamppu1_manual,
-                                         lamppu2_manual,
-                                         lamppu3_manual,
-                                         'switch_manual_lamps_off'],[0]*4))
-        )
-
     class Ajastimet(Group):
-        lamput_ajastin = CronTimerSensor(
-            timer_on="0 14 * * *",
-            timer_off="0 22 * * *")
-
-        lamppu1_ajastin = CronTimerSensor(
-            timer_on="0 13,15,18 * * *",
-            timer_off="0 21 * * *;2 14,17 * * *",
-            active_condition=And('lamput_ajastin2_k', 'lamppu1_ajastin'),
-            on_activate=SetStatus('lamppu1', 1),
-        )
-
-        lamppu2_ajastin = CronTimerSensor(
-            timer_on="2 13 * * *;0 16 * * *",
-            timer_off="3 21 * * *;2 15 * * *",
-            active_condition=And('lamput_ajastin2_k', 'lamppu2_ajastin'),
-            on_activate=SetStatus('lamppu2', 1),
-        )
-
-        lamppu3_ajastin = CronTimerSensor(
-            timer_on="0 14,17 * * *",
-            timer_off="6 21 * * *;2 16 * * *",
-            active_condition=And('lamput_ajastin2_k', 'lamppu3_ajastin'),
-            on_activate=SetStatus('lamppu3', 1),
-        )
-
-        lamput_ajastin_loma = CronTimerSensor(
-            timer_on="0 15 * * *",
-            timer_off="0 20 * * *",
-            tags="holiday")
-
         led_ajastin = CronTimerSensor(
             timer_on="0 7 * * *",
             timer_off="0 22 * * *",
@@ -457,21 +353,6 @@ class Aquarium(commonmixin.CommonMixin, System):
             active_condition=Value(True),
             on_update=SetStatus('kv_pumppu', "kv_pumppu_ajastin"),
             priority=2,
-        )
-
-
-
-        ajastinohjelma = Program(
-            on_update=IfElse('lomamoodi',
-                             Run(
-                                 SetStatus('lamput', lamput_ajastin_loma),
-                                 Delay(30, SetStatus('uvc', lamput_ajastin_loma))),
-                             Run(
-                                 SetStatus('lamput', lamput_ajastin),
-                                 Delay(30, SetStatus('uvc', lamput_ajastin)))),
-            priority=1.5,
-            triggers = ['lomamoodi'],
-            tags='co2',
         )
 
     class Alarm(Group):
