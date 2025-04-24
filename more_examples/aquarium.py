@@ -74,9 +74,9 @@ portmap = {
     'kv_pumppu': relays[3],
     #'co2input': relays[3],
     'heater': relays[4],
-    #'lamp1': relays[5],
+    'led': relays[5],
     #'lamp2': relays[6],
-    'led': relays[7],
+    #'led': relays[7], # RIKKI! on oikeasti. Ledin kanssa alkoi temppuilemaan niin että sammuu itsestään hetken kuluttua.
 }
 # GPIO port 4 is reserved for temperature sensor
 #bread = [17, 27, 22, 10, 9, 11, 2, 3]
@@ -156,7 +156,7 @@ class Aquarium(commonmixin.CommonMixin, System):
             history_length=5000,
         )
 
-        water_temp_adj = UserFloatSensor(tags="temperature", default=28.0)
+        water_temp_adj = UserFloatSensor(tags="temperature", default=27.5)
 
         lammitin_prog = Program(
             tags="temperature",
