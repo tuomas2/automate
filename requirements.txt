@@ -5,41 +5,87 @@
 #    pip-compile --output-file requirements.txt requirements.in
 #
 ansiconv==1.0.0
-certifi==2017.7.27.1      # via requests
-chardet==3.0.4            # via requests
+    # via -r requirements.in
+backcall==0.2.0
+    # via ipython
+certifi==2017.7.27.1
+    # via requests
+chardet==3.0.4
+    # via requests
 colorlog==3.1.0
-coverage==4.4.1           # via pytest-cov
+    # via -r requirements.in
+coverage==4.4.1
+    # via pytest-cov
 croniter==0.3.19
-decorator==4.1.2          # via ipython, traitlets
-django-crispy-forms==1.6.1
+    # via -r requirements.in
+decorator==4.1.2
+    # via
+    #   ipython
+    #   traitlets
 django==1.11.6
-idna==2.6                 # via requests
-ipython-genutils==0.2.0   # via traitlets
-ipython==6.2.1
-jedi==0.11.0              # via ipython
-parso==0.1.0              # via jedi
-pexpect==4.2.1            # via ipython
-pickleshare==0.7.4        # via ipython
-prompt-toolkit==1.0.15    # via ipython
+    # via -r requirements.in
+django-crispy-forms==1.6.1
+    # via -r requirements.in
+idna==2.6
+    # via requests
+ipython==7.16.3
+    # via -r requirements.in
+ipython-genutils==0.2.0
+    # via traitlets
+jedi==0.11.0
+    # via ipython
+parso==0.1.0
+    # via jedi
+pexpect==4.2.1
+    # via ipython
+pickleshare==0.7.4
+    # via ipython
+prompt-toolkit==3.0.24
+    # via ipython
 psutil==5.3.1
-ptyprocess==0.5.2         # via pexpect
-py==1.4.34                # via pytest
+    # via -r requirements.in
+ptyprocess==0.5.2
+    # via pexpect
+py==1.4.34
+    # via pytest
 pyfirmata==1.0.3
-pygments==2.2.0           # via ipython
+    # via -r requirements.in
+pygments==2.2.0
+    # via ipython
 pyinotify==0.9.6
-pyserial==3.4             # via pyfirmata
-pytest-cov==2.5.1
-pytest-pycharm==0.4.0
+    # via -r requirements.in
+pyserial==3.4
+    # via pyfirmata
 pytest==3.2.3
-python-dateutil==2.6.1    # via croniter
-pytz==2017.2              # via django
+    # via
+    #   -r requirements.in
+    #   pytest-cov
+    #   pytest-pycharm
+pytest-cov==2.5.1
+    # via -r requirements.in
+pytest-pycharm==0.4.0
+    # via -r requirements.in
+python-dateutil==2.6.1
+    # via croniter
+pytz==2017.2
+    # via django
 raven==6.2.1
+    # via -r requirements.in
 requests==2.18.4
+    # via -r requirements.in
 rpio==0.10.0
-simplegeneric==0.8.1      # via ipython
-six==1.11.0               # via prompt-toolkit, python-dateutil, traitlets
+    # via -r requirements.in
+six==1.11.0
+    # via
+    #   python-dateutil
+    #   traitlets
 tornado==4.5.2
-traitlets==4.3.2          # via ipython
+    # via -r requirements.in
+traitlets==4.3.2
+    # via ipython
 traits==4.6.0
-urllib3==1.22             # via requests
-wcwidth==0.1.7            # via prompt-toolkit
+    # via -r requirements.in
+urllib3==1.22
+    # via requests
+wcwidth==0.1.7
+    # via prompt-toolkit
