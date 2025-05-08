@@ -51,12 +51,12 @@ def mocked_services(context):
     return [(service.__class__.__name__, service) for service in system.services if service.is_mocked]
 
 
-@register.assignment_tag()
+@register.simple_tag()
 def ident(arg):
     return id(arg)
 
 
-@register.assignment_tag()
+@register.simple_tag()
 def cancelable_thread(arg):
     return hasattr(arg, 'cancel')
 
@@ -147,7 +147,7 @@ def condition_string(prog, attr):
     return mark_safe('<pre class="conditions">%s</pre>' % cond_str)
 
 
-@register.assignment_tag(takes_context=True)
+@register.simple_tag(takes_context=True)
 def sensor_form(context, sensor):
     try:
         form = QUICK_EDITS[sensor.data_type]({'status': sensor.status, 'name': sensor.name},
