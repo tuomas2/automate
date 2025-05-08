@@ -43,6 +43,7 @@ TEMPLATES = [
 
 INSTALLED_APPS = ['crispy_forms',
                   'django.contrib.staticfiles',
+                  'django.contrib.sessions',
                   'django.contrib.messages',
                   'automate.extensions.webui.djangoapp',
                   ]
@@ -50,13 +51,15 @@ INSTALLED_APPS = ['crispy_forms',
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(os.path.dirname(__file__), 'static')
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
-MIDDLEWARE_CLASSES = [
-#    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-#STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 SESSION_ENGINE = "django.contrib.sessions.backends.file"
 CRISPY_TEMPLATE_PACK = 'bootstrap3'

@@ -141,7 +141,7 @@ def logout(request):
 def custom(request, name):
     context = RequestContext(request, {'source': 'main'})
     try:
-        return HttpResponse(content=Template(service.custom_pages[name]).render(context))
+        return HttpResponse(Template(service.custom_pages[name]).render(context))
     except KeyError:
         raise Http404
 
@@ -158,13 +158,13 @@ def history_json(request, name):
 @require_login
 def puml_svg(request):
     svg = service.system.request_service('PlantUMLService').write_svg()
-    return HttpResponse(content=svg, content_type='image/svg+xml')
+    return HttpResponse(svg, content_type='image/svg+xml')
 
 
 @require_login
 def puml_raw(request):
     puml = service.system.request_service('PlantUMLService').write_puml()
-    return HttpResponse(content=puml, content_type='text/plain')
+    return HttpResponse(puml, content_type='text/plain')
 
 
 @require_login
@@ -197,7 +197,6 @@ def single_tag(request, tag):
         raise Http404
     return render(request, 'views/single_tag_view.html',
                   {'source': 'tags_view', 'objs': objs, 'tag': tag})
-
 
 
 @require_login
@@ -234,7 +233,7 @@ def tag_view_only_groups(request):
 @require_login
 def info_panel(request, name):
     source = request.GET.get('source', 'main')
-    if request.is_ajax():
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':  # Updated is_ajax check
         obj = service.system.namespace[name]
         view_items = obj.view[:] + ['class_name', 'data_type', 'next_scheduled_action']
         if 'change_delay' in view_items and not obj.change_delay:
