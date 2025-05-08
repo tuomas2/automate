@@ -33,7 +33,7 @@ setupopts = dict(
         "croniter~=0.3.0",
         "ipython",
         "pyinotify",
-        "traits~=4.6.0",
+        "traits~=7.0.2",
         "requests",
         "raven",
         "pyfirmata",
