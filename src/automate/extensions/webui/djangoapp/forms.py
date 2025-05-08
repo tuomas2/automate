@@ -25,7 +25,7 @@ import re
 import keyword
 
 import django.forms as forms
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib import messages
 
 from traits.api import TraitError

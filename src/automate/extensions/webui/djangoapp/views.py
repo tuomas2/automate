@@ -30,7 +30,7 @@ except ImportError:
     from io import BytesIO as StringIO
 
 from django.contrib import messages
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponseRedirect, Http404, HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.template import Template, RequestContext

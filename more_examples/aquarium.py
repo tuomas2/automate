@@ -7,7 +7,6 @@
 """
 
 import automate
-import commonmixin
 from automate import *
 from automate.extensions.arduino import ArduinoDigitalActuator, \
     ArduinoDigitalSensor, ArduinoAnalogSensor, ArduinoService
@@ -109,7 +108,7 @@ class RelayActuator(RpioActuator):
     inverted = CBool(True)
 
 
-class Aquarium(commonmixin.CommonMixin, System):
+class Aquarium(System):
     israspi = IsRaspi()
     push_sender = PushOver(
         api_key=os.getenv('PUSHOVER_API_KEY'),
