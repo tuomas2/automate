@@ -28,7 +28,6 @@
 import socket
 import subprocess
 import types
-import pyinotify
 import threading
 import queue
 from copy import deepcopy
@@ -43,6 +42,18 @@ from automate.common import threaded, Lock
 from automate.statusobject import AbstractSensor
 from automate.callables import Value
 from automate.callable import AbstractCallable
+
+# Try to import pyinotify, but make it optional
+try:
+    import pyinotify
+    PYINOTIFY_AVAILABLE = True
+except ImportError:
+    PYINOTIFY_AVAILABLE = False
+    # Create a dummy class so imports don't fail
+    class pyinotify:
+        class ProcessEvent:
+            pass
+        IN_MODIFY = IN_CREATE = IN_DELETE = 0
 
 
 class UserAnySensor(AbstractSensor):
@@ -258,17 +269,21 @@ class FileChangeSensor(AbstractSensor):
         self.status += 1
 
     def setup(self):
-        if self._notifier:
-            self._notifier.stop()
-        wm = pyinotify.WatchManager()
-        handler = self.InotifyEventHandler(self.notify)
-        self._notifier = pyinotify.ThreadedNotifier(wm, default_proc_fun=handler)
+        if PYINOTIFY_AVAILABLE:
+            if self._notifier:
+                self._notifier.stop()
+            wm = pyinotify.WatchManager()
+            handler = self.InotifyEventHandler(self.notify)
+            self._notifier = pyinotify.ThreadedNotifier(wm, default_proc_fun=handler)
 
-        wm.add_watch(self.filename, self.watch_flags, rec=True)
-        self._notifier.start()
+            wm.add_watch(self.filename, self.watch_flags, rec=True)
+            self._notifier.start()
+        else:
+            self.logger.error("Pyinotify is not available. FileChangeSensor cannot be used.")
 
     def cleanup(self):
-        self._notifier.stop()
+        if PYINOTIFY_AVAILABLE and self._notifier:
+            self._notifier.stop()
 
 
 class AbstractPollingSensor(AbstractSensor):

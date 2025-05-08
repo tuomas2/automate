@@ -26,7 +26,12 @@ import logging
 import re
 import keyword
 import threading
-from collections import Iterable
+try:
+    # For Python 3.10+ compatibility
+    from collections.abc import Iterable
+except ImportError:
+    # For older Python versions
+    from collections import Iterable
 from functools import wraps
 
 from traits.api import CSet, HasStrictTraits, Unicode, TraitType

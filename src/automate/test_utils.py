@@ -23,7 +23,7 @@
 
 import logging
 import contextlib
-import py
+import io  # Use Python's built-in io module instead of py.io
 
 
 class CaptureLogHandler(logging.StreamHandler):
@@ -35,7 +35,7 @@ class CaptureLogHandler(logging.StreamHandler):
         self.reset()
 
     def reset(self):
-        self.stream = py.io.TextIO()
+        self.stream = io.StringIO()  # Use StringIO instead of py.io.TextIO
         self.records = []
 
     def close(self):
