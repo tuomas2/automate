@@ -42,6 +42,7 @@ TEMPLATES = [
             ]
 
 INSTALLED_APPS = ['crispy_forms',
+                  'crispy_bootstrap3',
                   'django.contrib.staticfiles',
                   'django.contrib.sessions',
                   'django.contrib.messages',
@@ -62,6 +63,8 @@ MIDDLEWARE = [
 ]
 
 SESSION_ENGINE = "django.contrib.sessions.backends.file"
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap3"
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
 LOGGING_CONFIG = None
