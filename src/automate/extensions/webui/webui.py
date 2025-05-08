@@ -39,6 +39,8 @@ from automate.statusobject import StatusObject
 from automate.extensions.wsgi import TornadoService
 from automate import __version__
 
+from django.contrib.sessions.backends.file import SessionStore
+
 
 class WebService(TornadoService):
 
@@ -98,9 +100,7 @@ class WebService(TornadoService):
 
             def validate_absolute_path(self, *args, **kwargs):
                 session_id = getattr(self.request.cookies.get('sessionid', None), 'value', None)
-                from django.contrib.sessions.middleware import SessionMiddleware
-                mw = SessionMiddleware()
-                session_data = mw.SessionStore(session_id)
+                session_data = SessionStore(session_key=session_id)
                 if not session_data.get('logged_in', False):
                     raise tornado.web.HTTPError(403, 'not logged in')
 
@@ -180,9 +180,7 @@ class WebService(TornadoService):
 
             def open(self):
                 self.session_id = session_id = getattr(self.request.cookies.get('sessionid', None), 'value', None)
-                from django.contrib.sessions.middleware import SessionMiddleware
-                mw = SessionMiddleware()
-                session_data = mw.SessionStore(session_id)
+                session_data = SessionStore(session_key=session_id)
 
                 if session_data.get('logged_in', False) or not service.http_auth:
                     self.logged_in = True
