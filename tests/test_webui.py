@@ -26,18 +26,24 @@ from automate.extensions.webui import WebService
 def sys_with_web():
     web = WebService(
         http_port=80811,
-        http_auth=(
-            ('test', 'test')
-        ),
+        http_auth=('test', 'test'),
         debug=False,
         user_tags={'web'},
         read_only=False,
         default_view='tags_view',
         #static_dirs={'/webcam/(.*)': '/home/tuma/public_html/webcam/'},
         #custom_pages={'Webcam': webcam_page},
-        #django_settings={
-        #    'SESSION_FILE_PATH': '/var/cache/automatesession' if is_raspi() else '/tmp',
-        #    'SESSION_COOKIE_AGE': 52560000},
+        django_settings={
+            'MIDDLEWARE': [
+                'django.middleware.security.SecurityMiddleware',
+                'django.contrib.sessions.middleware.SessionMiddleware',
+                'django.middleware.common.CommonMiddleware',
+                'django.middleware.csrf.CsrfViewMiddleware',
+                'django.contrib.messages.middleware.MessageMiddleware',
+                'django.middleware.clickjacking.XFrameOptionsMiddleware',
+            ],
+            'CRISPY_ALLOWED_TEMPLATE_PACKS': 'bootstrap3',
+        },
     )
     class sys(System):
         s1 = UserBoolSensor()
@@ -57,7 +63,7 @@ class Http:
 
 
 def r(view_name, *args, **kwargs):
-    from django.core.urlresolvers import reverse
+    from django.urls import reverse
     return reverse(view_name, args=args, kwargs=kwargs)
 
 @pytest.fixture
