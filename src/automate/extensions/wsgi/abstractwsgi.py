@@ -125,15 +125,16 @@ class TornadoService(AbstractUserService):
 
     def start_ioloop(self):
         global web_thread
-        ioloop = tornado.ioloop.IOLoop.instance()
-        if not ioloop._running:
+        ioloop = tornado.ioloop.IOLoop.current()
+        if not ioloop.asyncio_loop.is_running():
             web_thread = threading.Thread(target=threaded(self.system, ioloop.start),
                                           name="%s::%s" % (self.system.name, self.__class__.__name__))
             web_thread.start()
 
     def cleanup(self):
         if self.is_alive:
-            tornado.ioloop.IOLoop.instance().stop()
+            ioloop = tornado.ioloop.IOLoop.current()
+            ioloop.add_callback(ioloop.stop)
             self._http_server.stop()
             self._http_server = None
             web_thread.join()

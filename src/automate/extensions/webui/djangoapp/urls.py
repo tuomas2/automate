@@ -17,54 +17,54 @@
 
 """
 The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/1.9/topics/http/urls/
+    https://docs.djangoproject.com/en/4.2/topics/http/urls/
 Examples:
 Function views
     1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  url(r'^$', views.home, name='home')
+    2. Add a URL to urlpatterns:  path('', views.home, name='home')
 Class-based views
     1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  url(r'^$', Home.as_view(), name='home')
+    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
 Including another URLconf
-    1. Import the include() function: from django.conf.urls import url, include
-    2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
+    1. Import the include() function: from django.urls import include, path
+    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
-from django.conf.urls import url
+from django.urls import path, re_path
 
 from . import views
 
 urlpatterns = [
-    url(r'^login$', views.login, name='login'),
-    url(r'^$', views.main, name='main'),
-    url(r'^logout$', views.logout, name='logout'),
-    url('^custom/(\w*)$', views.custom, name='custom'),
-    url('^uml/system.svg$', views.puml_svg, name='puml_svg'),
-    url('^history.json/object/(\w*)$', views.history_json, name='history_json'),
-    url('^uml/system.puml$', views.puml_raw, name='puml_raw'),
-    url('^uml$', views.plantuml, name='plantuml'),
+    path('login', views.login, name='login'),
+    path('', views.main, name='main'),
+    path('logout', views.logout, name='logout'),
+    re_path(r'^custom/(\w*)$', views.custom, name='custom'),
+    path('uml/system.svg', views.puml_svg, name='puml_svg'),
+    re_path(r'^history.json/object/(\w*)$', views.history_json, name='history_json'),
+    path('uml/system.puml', views.puml_raw, name='puml_raw'),
+    path('uml', views.plantuml, name='plantuml'),
 
-    url('^system$', views.system_view, name='system'),
-    url("^threads$", views.threads, name='threads'),
+    path('system', views.system_view, name='system'),
+    path('threads', views.threads, name='threads'),
 
-    url('^tag/([\w:]*)', views.single_tag, name='single_tag'),
+    re_path(r'^tag/([\w:]*)$', views.single_tag, name='single_tag'),
 
-    url('^tag$', views.tags_view, name='tags_view'),
-    url('^user_editable_view$', views.user_defined_view, name='user_editable_view'),
-    url('^user_defined_view$', views.tags_view, name='user_defined_view'),
-    url('^only_groups$', views.tag_view_only_groups, name='tag_view_only_groups'),
-    url('^info_panel/(\w*)', views.info_panel, name='info_panel'),
-    url('^toggle_sensor/(\w*)$', views.toggle_sensor, name='toggle_sensor'),
-    url(r'^toggle/(\w*)$', views.toggle_value, name='toggle_value'),
-    url(r'^set/(\w*)/(\w*)$', views.set_value, name='set_value'),
-    url(r'^set_ready/(\w*)/(\w*)', views.set_ready, name='set_ready'),
-    url(r'^reload_service/(\d*)$', views.reload_service, name='reload_service'),
-    url(r'^cancel_thread/(\d*)$', views.cancel_thread, name='cancel_thread'),
-    url(r'^edit/(\w*)$', views.edit, name='edit'),
-    url(r'^continue_edit/(\w*)/(\w*)$', views.continue_edit, name='continue_edit'),
-    url(r'^new/(\w*)$', views.new, name='new'),
-    url('^console$', views.console, name='console'),
+    path('tag', views.tags_view, name='tags_view'),
+    path('user_editable_view', views.user_defined_view, name='user_editable_view'),
+    path('user_defined_view', views.tags_view, name='user_defined_view'),
+    path('only_groups', views.tag_view_only_groups, name='tag_view_only_groups'),
+    re_path(r'^info_panel/(\w*)$', views.info_panel, name='info_panel'),
+    re_path(r'^toggle_sensor/(\w*)$', views.toggle_sensor, name='toggle_sensor'),
+    re_path(r'^toggle/(\w*)$', views.toggle_value, name='toggle_value'),
+    re_path(r'^set/(\w*)/(\w*)$', views.set_value, name='set_value'),
+    re_path(r'^set_ready/(\w*)/(\w*)$', views.set_ready, name='set_ready'),
+    re_path(r'^reload_service/(\d*)$', views.reload_service, name='reload_service'),
+    re_path(r'^cancel_thread/(\d*)$', views.cancel_thread, name='cancel_thread'),
+    re_path(r'^edit/(\w*)$', views.edit, name='edit'),
+    re_path(r'^continue_edit/(\w*)/(\w*)$', views.continue_edit, name='continue_edit'),
+    re_path(r'^new/(\w*)$', views.new, name='new'),
+    path('console', views.console, name='console'),
 
-    url('^set_status$', views.set_status, name='set_status'),
-    url('^.*', views.notfound, name='notfound'),
+    path('set_status', views.set_status, name='set_status'),
+    re_path(r'^.*', views.notfound, name='notfound'),
 ]
