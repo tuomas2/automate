@@ -255,7 +255,7 @@ class Aquarium(commonmixin.CommonMixin, System):
             active_condition=Value('kv_manual_mode'),
             on_activate=SetStatus("kv_pumppu", 1),
             priority=3,
-            default=True,
+            default=False,
             tags="quick",
         )
         kv_pause_switch = UserBoolSensor(
@@ -313,8 +313,8 @@ class Aquarium(commonmixin.CommonMixin, System):
         )
 
         kv_pumppu_ajastin = CronTimerSensor(
-            timer_on="30 8,20 * * *",
-            timer_off="30 7,19 * * *",
+            timer_on="0 10 * * *",
+            timer_off="0 18 * * *",
             active_condition=Value(True),
             on_update=SetStatus('kv_pumppu', "kv_pumppu_ajastin"),
             priority=2,
