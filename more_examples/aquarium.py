@@ -43,8 +43,13 @@ def read_cpu_temp(caller):
 
 import spotprice
 
+excluded_hours = [7,8,9,18,19,20,21]
+
+def spot_price():
+    return spotprice.get_current_spot_price(excluded_hours)
+
 def spot_threshold():
-    return spotprice.get_threshold_for_hours(3)
+    return spotprice.get_threshold_for_hours(3, excluded_hours)
 
 # GPIO pin configuration
 relays = [7, 8, 25, 24, 23, 18, 3, 2]
@@ -192,7 +197,7 @@ class Aquarium(commonmixin.CommonMixin, System):
             tags='electricity,temperature',
             interval=5,
             history_length=1000,
-            status_updater=Func(spotprice.get_current_spot_price),
+            status_updater=Func(spot_price),
         )
         spot_price_limit = PollingSensor(
             tags='electricity,temperature',
@@ -525,3 +530,4 @@ if __name__ == '__main__':
         no_input=not is_raspi(),
         raven_dsn=RAVEN_DSN,
     )
+

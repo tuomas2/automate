@@ -85,10 +85,13 @@ def get_next_refresh_time() -> datetime:
     return refresh_time
 
 
-def get_current_spot_price() -> float:
+def get_current_spot_price(exception_hours: List[int] = None) -> float:
     """
     Returns the current spot price (cents/kWh).
     Refreshes the cache if the local time is past the refresh time.
+    
+    Parameters:
+    - exception_hours: List of hour values (0-23) to exclude. Returns float('inf') for these hours.
     """
     global _cached_prices, _next_refresh_time
 
@@ -108,14 +111,22 @@ def get_current_spot_price() -> float:
 
     # Find the price for the current time in Helsinki
     now_local = datetime.now(tz)
+    
+    # Return infinity if current hour is in exception_hours
+    if exception_hours and now_local.hour in exception_hours:
+        return 1.0 # High price during exception hours to make device to not run
+    
     return get_price_for_datetime(now_local, _cached_prices)
 
 
-
-def get_threshold_for_hours(hours: int = 3) -> float:
+def get_threshold_for_hours(hours: int = 3, exception_hours: List[int] = None) -> float:
     """
     Determines the threshold price for running the device during the cheapest 'hours' today.
     Returns the highest price among the cheapest 'hours' hours (cents/kWh).
+    
+    Parameters:
+    - hours: Number of cheapest hours to consider
+    - exception_hours: List of hour values (0-23) to exclude from consideration
     """
     get_current_spot_price()  # update cache
     prices: List[PriceEntry] = _cached_prices  # type: ignore
@@ -129,15 +140,19 @@ def get_threshold_for_hours(hours: int = 3) -> float:
     todays_prices: List[PriceEntry] = []
     for price_info in prices:
         if start_local <= price_info['startDate'] < end_local:
+            # Skip exception hours if specified
+            if exception_hours and price_info['startDate'].hour in exception_hours:
+                continue
             todays_prices.append(price_info)
+    
     if not todays_prices:
-        raise ValueError("No price data for today.")
+        raise ValueError("No price data for today (or all hours were excluded).")
     if hours <= 0:
         raise ValueError("hours must be a positive integer.")
     
     sorted_prices = sorted(todays_prices, key=lambda p: p['price'])
     if hours > len(sorted_prices):
-        raise ValueError(f"Data contains only {len(sorted_prices)} hours for today, but {hours} hours were requested.")
+        raise ValueError(f"Data contains only {len(sorted_prices)} hours for today (after excluding exception hours), but {hours} hours were requested.")
     cheapest_hours = sorted_prices[:hours]
     threshold_price = max(h['price'] for h in cheapest_hours)
     return threshold_price
