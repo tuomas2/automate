@@ -71,7 +71,8 @@ portmap = {
     #'uvc_filter': relays[0],
     'allpumps': relays[1],
     #'lamp3': relays[2], #lamppu3
-    'kv_pumppu': relays[3],
+    'kv_pumppu1': relays[2],
+    'kv_pumppu2': relays[3],
     #'co2input': relays[3],
     'heater': relays[4],
     'led': relays[5],
@@ -253,7 +254,10 @@ class Aquarium(commonmixin.CommonMixin, System):
 
         kv_manual_mode = UserBoolSensor(
             active_condition=Value('kv_manual_mode'),
-            on_activate=SetStatus("kv_pumppu", 1),
+            on_activate=Run(
+                SetStatus("kv_pumppu1", 1),
+                SetStatus("kv_pumppu2", 1),
+            ),
             priority=3,
             default=False,
             tags="quick",
@@ -261,9 +265,11 @@ class Aquarium(commonmixin.CommonMixin, System):
         kv_pause_switch = UserBoolSensor(
             active_condition=Value("kv_pause_switch"),
             on_activate=Run(
-                SetStatus("kv_pumppu", 0),
+                SetStatus("kv_pumppu1", 0),
+                SetStatus("kv_pumppu2", 0),
                 Delay(3*one_hour, Run(
-                    SetStatus("kv_pumppu", 1),
+                    SetStatus("kv_pumppu1", 1),
+                    SetStatus("kv_pumppu2", 1),
                     SetStatus("kv_pause_switch", 0)
                 ))),
             priority = 4,
@@ -278,8 +284,14 @@ class Aquarium(commonmixin.CommonMixin, System):
             safety_delay=30,
             safety_mode="rising")
 
-        kv_pumppu = RelayActuator(
-            port=portmap['kv_pumppu'],
+        kv_pumppu1 = RelayActuator(
+            port=portmap['kv_pumppu1'],
+            default=1,
+            safety_delay=5,
+            safety_mode="rising")
+
+        kv_pumppu2 = RelayActuator(
+            port=portmap['kv_pumppu2'],
             default=1,
             safety_delay=5,
             safety_mode="rising")
@@ -312,11 +324,19 @@ class Aquarium(commonmixin.CommonMixin, System):
             on_update=SetStatus('led', Value("led_ajastin")),
         )
 
-        kv_pumppu_ajastin = CronTimerSensor(
+        kv_pumppu1_ajastin = CronTimerSensor(
             timer_on="0 10 * * *",
-            timer_off="0 18 * * *",
+            timer_off="0 18 2-30/2 * *",
             active_condition=Value(True),
-            on_update=SetStatus('kv_pumppu', "kv_pumppu_ajastin"),
+            on_update=SetStatus('kv_pumppu1', "kv_pumppu1_ajastin"),
+            priority=2,
+        )
+
+        kv_pumppu2_ajastin = CronTimerSensor(
+            timer_on="0 10 * * *",
+            timer_off="0 18 1-31/2 * *",
+            active_condition=Value(True),
+            on_update=SetStatus('kv_pumppu2', "kv_pumppu2_ajastin"),
             priority=2,
         )
 
@@ -357,7 +377,8 @@ class Aquarium(commonmixin.CommonMixin, System):
             on_activate=Run(
                 SetStatus('vesivahinko_kytkin', 1),
                 SetStatus('pumput', 0),
-                SetStatus('kv_pumppu', 0),
+                SetStatus('kv_pumppu1', 0),
+                SetStatus('kv_pumppu2', 0),
                 SetStatus('lammitin', 0),
                 SetStatus('alarmtrigger', 1),
                 Run('push_sender_emergency')),
