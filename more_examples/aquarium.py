@@ -324,21 +324,23 @@ class Aquarium(commonmixin.CommonMixin, System):
             on_update=SetStatus('led', Value("led_ajastin")),
         )
 
-        kv_pumppu1_ajastin = CronTimerSensor(
-            timer_on="0 10 * * *",
-            timer_off="0 18 2-30/2 * *",
-            active_condition=Value(True),
-            on_update=SetStatus('kv_pumppu1', "kv_pumppu1_ajastin"),
-            priority=2,
-        )
+    # Pump 1: On during day (10:00-18:00) and on odd nights (22:00-07:00)
+    kv_pumppu1_ajastin = CronTimerSensor(
+        timer_on="0 10 * * *; 0 22 1-31/2 * *",  # Turn on at 10:00 every day AND at 22:00 on odd days
+        timer_off="0 18 * * *; 0 7 * * *",       # Turn off at 18:00 AND 07:00 every day
+        active_condition=Value(True),
+        on_update=SetStatus('kv_pumppu1', "kv_pumppu1_ajastin"),
+        priority=2,
+    )
 
-        kv_pumppu2_ajastin = CronTimerSensor(
-            timer_on="0 10 * * *",
-            timer_off="0 18 1-31/2 * *",
-            active_condition=Value(True),
-            on_update=SetStatus('kv_pumppu2', "kv_pumppu2_ajastin"),
-            priority=2,
-        )
+    # Pump 2: On during day (10:00-18:00) and on even nights (22:00-07:00)
+    kv_pumppu2_ajastin = CronTimerSensor(
+        timer_on="0 10 * * *; 0 22 2-30/2 * *",  # Turn on at 10:00 every day AND at 22:00 on even days
+        timer_off="0 18 * * *; 0 7 * * *",       # Turn off at 18:00 AND 07:00 every day
+        active_condition=Value(True),
+        on_update=SetStatus('kv_pumppu2', "kv_pumppu2_ajastin"),
+        priority=2,
+    )
 
     class Alarm(Group):
         alarminterval = IntervalTimerSensor(interval=0.5, poll_active=False)
