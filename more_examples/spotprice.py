@@ -85,7 +85,7 @@ def get_next_refresh_time() -> datetime:
     return refresh_time
 
 
-def get_current_spot_price(exception_hours: List[int] = None) -> float|None:
+def get_current_spot_price(exception_hours: List[int] = None) -> Optional[float]:
     """
     Returns the current spot price (cents/kWh).
     Refreshes the cache if the local time is past the refresh time.
