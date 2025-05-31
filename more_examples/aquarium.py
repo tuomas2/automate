@@ -43,10 +43,13 @@ def read_cpu_temp(caller):
 
 import spotprice
 
-excluded_hours = [7,8,9,18,19,20,21]
+excluded_hours = [7,8,9,19,20,21]
 
 def spot_price():
-    return spotprice.get_current_spot_price(excluded_hours)
+    price = spotprice.get_current_spot_price(excluded_hours)
+    if price is None:
+        price = 100
+    return price
 
 def spot_threshold():
     return spotprice.get_threshold_for_hours(3, excluded_hours)
@@ -332,7 +335,7 @@ class Aquarium(commonmixin.CommonMixin, System):
     # Pump 1: On during day (10:00-18:00) and on odd nights (22:00-07:00)
     kv_pumppu1_ajastin = CronTimerSensor(
         timer_on="0 10 * * *; 0 22 1-31/2 * *",  # Turn on at 10:00 every day AND at 22:00 on odd days
-        timer_off="0 18 * * *; 0 7 * * *",       # Turn off at 18:00 AND 07:00 every day
+        timer_off="0 19 * * *; 0 7 * * *",       # Turn off at 18:00 AND 07:00 every day
         active_condition=Value(True),
         on_update=SetStatus('kv_pumppu1', "kv_pumppu1_ajastin"),
         priority=2,
@@ -341,7 +344,7 @@ class Aquarium(commonmixin.CommonMixin, System):
     # Pump 2: On during day (10:00-18:00) and on even nights (22:00-07:00)
     kv_pumppu2_ajastin = CronTimerSensor(
         timer_on="0 10 * * *; 0 22 2-30/2 * *",  # Turn on at 10:00 every day AND at 22:00 on even days
-        timer_off="0 18 * * *; 0 7 * * *",       # Turn off at 18:00 AND 07:00 every day
+        timer_off="0 19 * * *; 0 7 * * *",       # Turn off at 18:00 AND 07:00 every day
         active_condition=Value(True),
         on_update=SetStatus('kv_pumppu2', "kv_pumppu2_ajastin"),
         priority=2,
