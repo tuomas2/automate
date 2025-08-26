@@ -332,19 +332,19 @@ class Aquarium(commonmixin.CommonMixin, System):
             on_update=SetStatus('led', Value("led_ajastin")),
         )
 
-    # Pump 1: Off only from 7:00 to 8:00 in the morning
+    # Pump 1: On at 8:00 every day, and at 22:00 on odd days (off at 22:00 on even days)
     kv_pumppu1_ajastin = CronTimerSensor(
         timer_on="0 8 * * *; 0 22 1-31/2 * *",  # Turn on at 8:00 every day AND at 22:00 on odd days
-        timer_off="0 7 * * *",                 # Turn off at 7:00 every day
+        timer_off="0 7 * * *; 0 22 2-30/2 * *",            # Turn off at 7:00 and 22:00 on even days
         active_condition=Value(True),
         on_update=SetStatus('kv_pumppu1', "kv_pumppu1_ajastin"),
         priority=2,
     )
 
-    # Pump 2: Off only from 7:00 to 8:00 in the morning
+    # Pump 2: On at 8:00 every day, and at 22:00 on even days (off at 22:00 on odd days)
     kv_pumppu2_ajastin = CronTimerSensor(
         timer_on="0 8 * * *; 0 22 2-30/2 * *",  # Turn on at 8:00 every day AND at 22:00 on even days
-        timer_off="0 7 * * *",                 # Turn off at 7:00 every day
+        timer_off="0 7 * * *; 0 22 1-31/2 * *",            # Turn off 7:00 and at 22:00 on odd days
         active_condition=Value(True),
         on_update=SetStatus('kv_pumppu2', "kv_pumppu2_ajastin"),
         priority=2,
