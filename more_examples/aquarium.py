@@ -43,7 +43,7 @@ def read_cpu_temp(caller):
 
 import spotprice
 
-excluded_hours = [7,8,9,19,20,21]
+excluded_hours = [7,8]
 
 def spot_price():
     price = spotprice.get_current_spot_price(excluded_hours)
@@ -332,19 +332,19 @@ class Aquarium(commonmixin.CommonMixin, System):
             on_update=SetStatus('led', Value("led_ajastin")),
         )
 
-    # Pump 1: On during day (10:00-18:00) and on odd nights (22:00-07:00)
+    # Pump 1: Off only from 7:00 to 8:00 in the morning
     kv_pumppu1_ajastin = CronTimerSensor(
-        timer_on="0 10 * * *; 0 22 1-31/2 * *",  # Turn on at 10:00 every day AND at 22:00 on odd days
-        timer_off="0 19 * * *; 0 7 * * *",       # Turn off at 18:00 AND 07:00 every day
+        timer_on="0 8 * * *; 0 22 1-31/2 * *",  # Turn on at 8:00 every day AND at 22:00 on odd days
+        timer_off="0 7 * * *",                 # Turn off at 7:00 every day
         active_condition=Value(True),
         on_update=SetStatus('kv_pumppu1', "kv_pumppu1_ajastin"),
         priority=2,
     )
 
-    # Pump 2: On during day (10:00-18:00) and on even nights (22:00-07:00)
+    # Pump 2: Off only from 7:00 to 8:00 in the morning
     kv_pumppu2_ajastin = CronTimerSensor(
-        timer_on="0 10 * * *; 0 22 2-30/2 * *",  # Turn on at 10:00 every day AND at 22:00 on even days
-        timer_off="0 19 * * *; 0 7 * * *",       # Turn off at 18:00 AND 07:00 every day
+        timer_on="0 8 * * *; 0 22 2-30/2 * *",  # Turn on at 8:00 every day AND at 22:00 on even days
+        timer_off="0 7 * * *",                 # Turn off at 7:00 every day
         active_condition=Value(True),
         on_update=SetStatus('kv_pumppu2', "kv_pumppu2_ajastin"),
         priority=2,
@@ -533,4 +533,3 @@ if __name__ == '__main__':
         no_input=not is_raspi(),
         raven_dsn=RAVEN_DSN,
     )
-
