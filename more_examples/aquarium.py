@@ -43,7 +43,7 @@ def read_cpu_temp(caller):
 
 import spotprice
 
-excluded_hours = [7,8]
+excluded_hours = [7]
 
 def spot_price():
     price = spotprice.get_current_spot_price(excluded_hours)
@@ -334,7 +334,7 @@ class Aquarium(commonmixin.CommonMixin, System):
 
     # Pump 1: On at 8:00 every day, and at 22:00 on odd days (off at 22:00 on even days)
     kv_pumppu1_ajastin = CronTimerSensor(
-        timer_on="0 8 * * *; 0 22 1-31/2 * *",  # Turn on at 8:00 every day AND at 22:00 on odd days
+        timer_on="0 8 * * *",  # Turn on at 8:00 every day AND at 22:00 on odd days
         timer_off="0 7 * * *; 0 22 2-30/2 * *",            # Turn off at 7:00 and 22:00 on even days
         active_condition=Value(True),
         on_update=SetStatus('kv_pumppu1', "kv_pumppu1_ajastin"),
@@ -343,7 +343,7 @@ class Aquarium(commonmixin.CommonMixin, System):
 
     # Pump 2: On at 8:00 every day, and at 22:00 on even days (off at 22:00 on odd days)
     kv_pumppu2_ajastin = CronTimerSensor(
-        timer_on="0 8 * * *; 0 22 2-30/2 * *",  # Turn on at 8:00 every day AND at 22:00 on even days
+        timer_on="0 8 * * *",  # Turn on at 8:00 every day AND at 22:00 on even days
         timer_off="0 7 * * *; 0 22 1-31/2 * *",            # Turn off 7:00 and at 22:00 on odd days
         active_condition=Value(True),
         on_update=SetStatus('kv_pumppu2', "kv_pumppu2_ajastin"),
