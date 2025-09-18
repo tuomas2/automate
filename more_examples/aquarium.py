@@ -54,6 +54,16 @@ def spot_price():
 def spot_threshold():
     return spotprice.get_threshold_for_hours(3, excluded_hours)
 
+def check_temperature_sensor_available(caller):
+    """Check if the temperature sensor file exists"""
+    sensor_path = "/sys/bus/w1/devices/%s/w1_slave" % akva
+    try:
+        with open(sensor_path, 'r') as f:
+            return True
+    except (IOError, OSError):
+        caller.logger.warning("Temperature sensor file %s not found or not accessible", sensor_path)
+        return False
+
 # GPIO pin configuration
 relays = [7, 8, 25, 24, 23, 18, 3, 2]
 
@@ -165,6 +175,15 @@ class Aquarium(commonmixin.CommonMixin, System):
             history_length=5000,
         )
 
+        temperature_sensor_available = PollingSensor(
+            tags='temperature,sensor_status',
+            interval=30,  # Check every 30 seconds
+            status_updater=Func(check_temperature_sensor_available, add_caller=True),
+            active_condition=Not(Value('temperature_sensor_available')),
+            on_activate=Run('push_sender'),
+            default=True,  # Assume available by default
+        )
+
         water_temp_adj = UserFloatSensor(tags="temperature", default=27.5)
 
         lammitin_prog = Program(
@@ -175,6 +194,7 @@ class Aquarium(commonmixin.CommonMixin, System):
                 And(
                     Or(Value("lammitin_force"), Value('spot_cheap')),
                     Value('pumput'), # Don't heat if pumps are off
+                    Value('temperature_sensor_available'), # Don't heat if sensor is not available
                     Value('aqua_temperature') < water_temp_adj)
             )
         )
