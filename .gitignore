@@ -9,3 +9,5 @@
 /.cache/
 /build/
 *.ignore
+/.venv/
+/automate-env/
