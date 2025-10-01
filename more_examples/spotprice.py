@@ -17,7 +17,7 @@ class RawPriceEntry(TypedDict):
     endDate: str
     price: float
 
-LATEST_PRICES_ENDPOINT = "https://api.porssisahko.net/v1/latest-prices.json"
+LATEST_PRICES_ENDPOINT = "https://api.porssisahko.net/v2/latest-prices.json"
 
 # Global cache
 _cached_prices: Optional[List[PriceEntry]] = None
@@ -47,6 +47,7 @@ def parse_iso_zulu(dt_string: str) -> datetime:
 def fetch_latest_price_data() -> Dict[str, Any]:
     """
     Fetches the latest 48 hours prices (cents/kWh) from the API.
+    With v2 API, returns 192 price entries (48h * 4 periods/hour for 15-minute intervals).
     Returns the response in JSON format.
     """
     response = requests.get(LATEST_PRICES_ENDPOINT)
@@ -122,20 +123,23 @@ def get_current_spot_price(exception_hours: List[int] = None) -> Optional[float]
 def get_threshold_for_hours(hours: int = 3, exception_hours: List[int] = None) -> float:
     """
     Determines the threshold price for running the device during the cheapest 'hours' today.
-    Returns the highest price among the cheapest 'hours' hours (cents/kWh).
-    
+    Returns the highest price among the cheapest periods totaling 'hours' hours (cents/kWh).
+
+    With v2 API (15-minute intervals), this function calculates the number of periods as hours * 4.
+    For example, 3 hours = 12 periods of 15 minutes each.
+
     Parameters:
-    - hours: Number of cheapest hours to consider
+    - hours: Number of cheapest hours to consider (converted to 15-minute periods)
     - exception_hours: List of hour values (0-23) to exclude from consideration
     """
     get_current_spot_price()  # update cache
     prices: List[PriceEntry] = _cached_prices  # type: ignore
     today = datetime.now(tz).date()
-    
+
     # Compute today's boundaries in local time
     start_local = tz.localize(datetime.combine(today, time.min))
     end_local = start_local + timedelta(days=1)
-    
+
     # Filter prices within today's local boundaries
     todays_prices: List[PriceEntry] = []
     for price_info in prices:
@@ -144,17 +148,20 @@ def get_threshold_for_hours(hours: int = 3, exception_hours: List[int] = None) -
             if exception_hours and price_info['startDate'].hour in exception_hours:
                 continue
             todays_prices.append(price_info)
-    
+
     if not todays_prices:
         raise ValueError("No price data for today (or all hours were excluded).")
     if hours <= 0:
         raise ValueError("hours must be a positive integer.")
-    
+
+    # Convert hours to 15-minute periods (1 hour = 4 periods)
+    num_periods = hours * 4
+
     sorted_prices = sorted(todays_prices, key=lambda p: p['price'])
-    if hours > len(sorted_prices):
-        raise ValueError(f"Data contains only {len(sorted_prices)} hours for today (after excluding exception hours), but {hours} hours were requested.")
-    cheapest_hours = sorted_prices[:hours]
-    threshold_price = max(h['price'] for h in cheapest_hours)
+    if num_periods > len(sorted_prices):
+        raise ValueError(f"Data contains only {len(sorted_prices)} periods for today (after excluding exception hours), but {num_periods} periods ({hours} hours) were requested.")
+    cheapest_periods = sorted_prices[:num_periods]
+    threshold_price = max(p['price'] for p in cheapest_periods)
     return threshold_price
 
 if __name__ == "__main__":
